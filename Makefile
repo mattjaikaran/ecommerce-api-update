@@ -24,6 +24,7 @@ startapp:
 		echo "Usage: make startapp <app_name>"; \
 	else \
 		python manage.py startapp_extended $(filter-out $@,$(MAKECMDGOALS)); \
+		rm -rf $(filter-out $@,$(MAKECMDGOALS))/views.py; \
 	fi
 
 %:

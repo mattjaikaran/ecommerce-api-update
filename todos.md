@@ -69,7 +69,7 @@ or be in orders app?
 ## Models
 
 ### Core
-- [ ] User Model (Already exists)
+- [ ] User Model
     - Extended Django User with e-commerce fields
 - [ ] Address Model
     - Support for multiple address types

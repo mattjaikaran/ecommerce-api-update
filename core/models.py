@@ -72,22 +72,16 @@ class AbstractBaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name="%(app_label)s_%(class)s_created"
+        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_created"
     )
     updated_by = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name="%(app_label)s_%(class)s_updated"
+        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_updated"
     )
     is_active = models.BooleanField(default=True)
-    is_deleted = models.BooleanField(default=False) # soft delete
+    is_deleted = models.BooleanField(default=False)  # soft delete
     deleted_at = models.DateTimeField(null=True, blank=True)
     deleted_by = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name="%(app_label)s_%(class)s_deleted"
+        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_deleted"
     )
 
     class Meta:
@@ -96,9 +90,20 @@ class AbstractBaseModel(models.Model):
 
 
 class CustomerFeedback(AbstractBaseModel):
-    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="customer_feedback")
+    customer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="customer_feedback"
+    )
     feedback = models.TextField(max_length=500)
-    rating = models.IntegerField(default=0, choices=[(1, "1 Star"), (2, "2 Stars"), (3, "3 Stars"), (4, "4 Stars"), (5, "5 Stars")])
+    rating = models.IntegerField(
+        default=0,
+        choices=[
+            (1, "1 Star"),
+            (2, "2 Stars"),
+            (3, "3 Stars"),
+            (4, "4 Stars"),
+            (5, "5 Stars"),
+        ],
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -108,3 +113,54 @@ class CustomerFeedback(AbstractBaseModel):
     def __str__(self):
         return f"{self.customer.username} - {self.feedback[:50]}"
 
+
+class Address(AbstractBaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    zip_code = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    is_default = models.BooleanField(default=False)
+    is_billing = models.BooleanField(default=False)
+    is_shipping = models.BooleanField(default=False)
+    is_shipping_default = models.BooleanField(default=False)
+    is_billing_default = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Address"
+        verbose_name_plural = "Addresses"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.address_line_1}"
+
+
+class Customer(AbstractBaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=255)
+    is_default = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Customer"
+        verbose_name_plural = "Customers"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.phone}"
+
+
+class CustomerGroup(AbstractBaseModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    customers = models.ManyToManyField(Customer, related_name="customer_groups")
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Customer Group"
+        verbose_name_plural = "Customer Groups"
+
+    def __str__(self):
+        return self.name
