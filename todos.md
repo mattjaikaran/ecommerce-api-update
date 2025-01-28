@@ -10,6 +10,15 @@
     - Categories and Collections
     - Inventory Management
     - Digital Products Support
+    - SEO Fields
+    - Status (draft, active, archived)
+    - Images
+    - Reviews
+    - Tags
+    - Discounts
+    - Tax
+    - Shipping
+    - Payments
 - [ ] Orders App
     - Orders and Line Items
     - Order Status Management
@@ -50,6 +59,12 @@
     - Customer Analytics
     - Inventory Reports
     - Performance Metrics
+
+- should discounts be in its own app? 
+- should shipping be in its own app?
+- should payments be in its own app?
+- should taxes be in its own app?
+or be in orders app?
 
 ## Models
 

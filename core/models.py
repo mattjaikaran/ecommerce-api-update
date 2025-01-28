@@ -71,13 +71,40 @@ class AbstractBaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_by")
-    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="updated_by")
+    created_by = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name="%(app_label)s_%(class)s_created"
+    )
+    updated_by = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name="%(app_label)s_%(class)s_updated"
+    )
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False) # soft delete
     deleted_at = models.DateTimeField(null=True, blank=True)
-    deleted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="deleted_by")
+    deleted_by = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name="%(app_label)s_%(class)s_deleted"
+    )
 
     class Meta:
         abstract = True
         ordering = ["-created_at"]
+
+
+class CustomerFeedback(AbstractBaseModel):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="customer_feedback")
+    feedback = models.TextField(max_length=500)
+    rating = models.IntegerField(default=0, choices=[(1, "1 Star"), (2, "2 Stars"), (3, "3 Stars"), (4, "4 Stars"), (5, "5 Stars")])
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Customer Feedback"
+        verbose_name_plural = "Customer Feedback Messages"
+
+    def __str__(self):
+        return f"{self.customer.username} - {self.feedback[:50]}"
+

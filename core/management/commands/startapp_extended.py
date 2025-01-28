@@ -118,8 +118,8 @@ class Command(StartAppCommand):
         content = f"""# {app_name}/models.py
 from django.db import models
 import uuid
-
-class {model_name}(models.Model):
+from core.models import AbstractBaseModel
+class {model_name}(AbstractBaseModel):
     \"""
     Model representing a {model_name.lower()}.
     
