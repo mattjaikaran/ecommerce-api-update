@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from ninja_extra import (
     api_controller,
-    route,
     http_get,
     http_post,
     http_put,
@@ -15,7 +14,6 @@ from ninja.pagination import paginate
 
 from orders.models import (
     Order,
-    OrderStatus,
     OrderNote,
 )
 from orders.schemas import (

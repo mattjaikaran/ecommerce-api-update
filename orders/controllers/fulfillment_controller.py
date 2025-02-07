@@ -3,7 +3,6 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from ninja_extra import (
     api_controller,
-    route,
     http_get,
     http_post,
     http_put,
@@ -21,9 +20,8 @@ from orders.models import (
     FulfillmentLineItem,
 )
 from orders.schemas import (
-    FulfillmentOrderSchema,
-    FulfillmentOrderCreateSchema,
-    FulfillmentOrderUpdateSchema,
+    FulfillmentSchema,
+    FulfillmentCreateSchema,
 )
 
 
@@ -34,7 +32,7 @@ class FulfillmentController:
     @http_get(
         "/",
         response={
-            200: List[FulfillmentOrderSchema],
+            200: List[FulfillmentSchema],
             404: dict,
             500: dict,
         },
@@ -58,7 +56,7 @@ class FulfillmentController:
     @http_get(
         "/{fulfillment_id}",
         response={
-            200: FulfillmentOrderSchema,
+            200: FulfillmentSchema,
             404: dict,
             500: dict,
         },
@@ -84,14 +82,14 @@ class FulfillmentController:
     @http_post(
         "/",
         response={
-            201: FulfillmentOrderSchema,
+            201: FulfillmentSchema,
             400: dict,
             404: dict,
             500: dict,
         },
     )
     @transaction.atomic
-    def create_fulfillment(self, request, payload: FulfillmentOrderCreateSchema):
+    def create_fulfillment(self, request, payload: FulfillmentCreateSchema):
         """Create a new fulfillment."""
         try:
             order = get_object_or_404(Order, id=payload.order_id)
@@ -160,7 +158,7 @@ class FulfillmentController:
     @http_put(
         "/{fulfillment_id}",
         response={
-            200: FulfillmentOrderSchema,
+            200: FulfillmentSchema,
             400: dict,
             404: dict,
             500: dict,
@@ -168,7 +166,7 @@ class FulfillmentController:
     )
     @transaction.atomic
     def update_fulfillment(
-        self, request, fulfillment_id: str, payload: FulfillmentOrderUpdateSchema
+        self, request, fulfillment_id: str, payload: FulfillmentCreateSchema
     ):
         """Update an existing fulfillment."""
         try:
@@ -256,7 +254,7 @@ class FulfillmentController:
     @http_post(
         "/{fulfillment_id}/ship",
         response={
-            200: FulfillmentOrderSchema,
+            200: FulfillmentSchema,
             400: dict,
             404: dict,
             500: dict,
@@ -301,7 +299,7 @@ class FulfillmentController:
     @http_post(
         "/{fulfillment_id}/cancel",
         response={
-            200: FulfillmentOrderSchema,
+            200: FulfillmentSchema,
             400: dict,
             404: dict,
             500: dict,

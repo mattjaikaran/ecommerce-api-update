@@ -1,8 +1,9 @@
+from typing import List
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
-from ninja_extra import api_controller, route, http_get, http_post
+from ninja_extra import api_controller, http_get, http_post
 from ninja_extra.permissions import IsAuthenticated
 from ninja.pagination import paginate
 
@@ -10,16 +11,14 @@ from orders.models import (
     Order,
     OrderHistory,
 )
-from orders.schemas import (
-    OrderHistorySchema,
-)
+from orders.schemas import OrderHistorySchema
 
 
 @api_controller("/orders/{order_id}/history", tags=["Order History"])
 class OrderHistoryController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("")
+    @http_get("", response={200: List[OrderHistorySchema], 404: dict, 500: dict})
     @paginate
     def list_history(self, request, order_id: str):
         """Get a paginated list of history entries for an order."""
@@ -39,7 +38,7 @@ class OrderHistoryController:
                 "message": str(e),
             }
 
-    @http_get("/{history_id}")
+    @http_get("/{history_id}", response={200: OrderHistorySchema, 404: dict, 500: dict})
     def get_history_entry(self, request, order_id: str, history_id: str):
         """Get a single history entry by ID."""
         try:
@@ -60,7 +59,10 @@ class OrderHistoryController:
                 "message": str(e),
             }
 
-    @http_get("/status/{status}")
+    @http_get(
+        "/status/{status}",
+        response={200: List[OrderHistorySchema], 404: dict, 500: dict},
+    )
     @paginate
     def list_history_by_status(self, request, order_id: str, status: str):
         """Get a paginated list of history entries for a specific status."""
@@ -80,7 +82,10 @@ class OrderHistoryController:
                 "message": str(e),
             }
 
-    @http_get("/user/{user_id}")
+    @http_get(
+        "/user/{user_id}",
+        response={200: List[OrderHistorySchema], 404: dict, 500: dict},
+    )
     @paginate
     def list_history_by_user(self, request, order_id: str, user_id: str):
         """Get a paginated list of history entries for a specific user."""
@@ -106,7 +111,9 @@ class OrderHistoryController:
                 "message": str(e),
             }
 
-    @http_get("/date-range")
+    @http_get(
+        "/date-range", response={200: List[OrderHistorySchema], 404: dict, 500: dict}
+    )
     @paginate
     def list_history_by_date_range(
         self, request, order_id: str, start_date: str, end_date: str
@@ -128,7 +135,9 @@ class OrderHistoryController:
                 "message": str(e),
             }
 
-    @http_post("/add")
+    @http_post(
+        "/add", response={201: OrderHistorySchema, 404: dict, 400: dict, 500: dict}
+    )
     @transaction.atomic
     def add_history_entry(self, request, order_id: str, status: str, notes: str = None):
         """Add a new history entry for an order."""
@@ -166,7 +175,7 @@ class OrderHistoryController:
                 "message": str(e),
             }
 
-    @http_get("/summary")
+    @http_get("/summary", response={200: dict, 404: dict, 500: dict})
     def get_history_summary(self, request, order_id: str):
         """Get a summary of order history."""
         try:
