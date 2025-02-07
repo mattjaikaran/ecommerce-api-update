@@ -1,12 +1,13 @@
 from uuid import UUID
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 
-from .schemas import (
+from core.schemas import (
+    UserLoginSchema,
     UserSchema,
     UserSignupSchema,
     UserUpdateSchema,
@@ -56,6 +57,14 @@ class UserController:
             return 400, {"error": e.messages}
         except Exception as e:
             return 400, {"error": str(e)}
+
+    # login
+    @http_post("/login", response={200: UserSchema, 400: dict})
+    def login(self, request: UserLoginSchema):
+        user = authenticate(username=request.username, password=request.password)
+        if not user:
+            return 400, {"error": "Invalid credentials"}
+        return 200, UserSchema.from_orm(user)
 
     @http_get("/{user_id}", response={200: UserSchema, 404: dict})
     def get_user(self, user_id: UUID):
