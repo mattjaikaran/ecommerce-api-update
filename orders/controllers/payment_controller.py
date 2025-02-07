@@ -4,11 +4,9 @@ from django.shortcuts import get_object_or_404
 from typing import List
 from ninja_extra import (
     api_controller,
-    route,
     http_get,
     http_post,
     http_put,
-    http_delete,
 )
 from ninja_extra.permissions import IsAuthenticated
 from ninja.pagination import paginate

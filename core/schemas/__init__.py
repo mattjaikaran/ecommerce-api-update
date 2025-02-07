@@ -7,9 +7,9 @@ from .users import (
 )
 
 all = [
-    "UserSchema",
-    "UserSignupSchema",
-    "UserLoginSchema",
-    "UserLogoutSchema",
-    "UserUpdateSchema",
+    UserSchema,
+    UserSignupSchema,
+    UserLoginSchema,
+    UserLogoutSchema,
+    UserUpdateSchema,
 ]

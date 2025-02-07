@@ -109,7 +109,6 @@ INSTALLED_APPS = [
     # user created apps
     #####
     "core",  # core app
-    "todos",  # todos app
     #####
     # third party packages
     #####
