@@ -14,7 +14,7 @@ from products.schemas.product import (
 
 
 @api_controller("/options", tags=["Product Options"])
-class OptionController:
+class ProductOptionController:
     permission_classes = [IsAuthenticated]
 
     @http_get("/", response={200: List[ProductOptionSchema], 500: dict})
