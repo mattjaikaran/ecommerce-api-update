@@ -16,8 +16,6 @@ from core.schemas import (
 User = get_user_model()
 
 
-# the tag customizes Swagger or else it will be default lowercase
-# ie - users
 @api_controller("/users", tags=["Users"])
 class UserController:
     @http_post("/signup", response={201: UserSignupSchema, 400: dict})

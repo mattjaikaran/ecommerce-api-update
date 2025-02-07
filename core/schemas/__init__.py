@@ -5,6 +5,14 @@ from .users import (
     UserLogoutSchema,
     UserUpdateSchema,
 )
+from .address import (
+    AddressSchema,
+    AddressCreateSchema,
+)
+from .feedback import (
+    FeedbackSchema,
+    FeedbackCreateSchema,
+)
 
 all = [
     UserSchema,
@@ -12,4 +20,8 @@ all = [
     UserLoginSchema,
     UserLogoutSchema,
     UserUpdateSchema,
+    AddressSchema,
+    AddressCreateSchema,
+    FeedbackSchema,
+    FeedbackCreateSchema,
 ]
