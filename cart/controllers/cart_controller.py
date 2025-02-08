@@ -1,5 +1,4 @@
 import logging
-from typing import List
 from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
 from cart.models import Cart
 from cart.schemas import CartSchema

@@ -37,7 +37,7 @@ api = NinjaExtraAPI(
     title="Django Ninja Boilerplate API",
     description="API documentation for the Django Ninja Boilerplate API",
     urls_namespace="boilerplate_api",
-    # docs=Redoc(),  # this line is to use ReDoc instead of Swagger
+    docs=Redoc(),  # this line is to use ReDoc instead of Swagger
 )
 
 
@@ -48,7 +48,11 @@ api.register_controllers(
     NinjaJWTDefaultController,  # JWT Auth. If you want to use JWT, you must include this https://github.com/eadwinCode/django-ninja-jwt
     # core app
     UserController,  # User Controller
-    # Add more controllers here
+    # products app
+    # cart app
+    # orders app
+    # payments app
+    # reports app
 )
 
 # add the urls to the urlpatterns
