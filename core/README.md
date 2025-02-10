@@ -1,131 +1,154 @@
 # Core App
 
-The core app is the foundation of the Django Ninja Boilerplate, providing essential functionality including user management, authentication, and base models.
+## Overview
+The Core app serves as the foundation of the ecommerce platform, providing essential functionality, base models, and utilities used throughout the application.
 
 ## Features
+- User Authentication & Authorization
+- Base Models
+- Custom Management Commands
+- Core Configurations
+- Utility Functions
 
-### Custom User Model
-- Extended Django's AbstractBaseUser
-- UUID primary key
-- Email and username unique fields
-- First name and last name fields
-- Staff and superuser flags
-- Custom user manager with email normalization
+## Models
 
-### Base Models
-- `AbstractBaseModel`: Base model with UUID, created_at, and updated_at fields
-- Used as the base for all other models in the project
+### AbstractBaseModel
+Base model that all other models inherit from. Located in `core.models`.
 
-### Authentication
-- JWT-based authentication using django-ninja-jwt
-- Token-based API access
-- Customizable token lifetime
+```python
+class AbstractBaseModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_created"
+    )
+    updated_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_updated"
+    )
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)  # soft delete
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_deleted"
+    )
+
+    class Meta:
+        abstract = True
+        ordering = ["-created_at"]
+```
+
+### User Model
+Extended Django User model with additional fields for ecommerce functionality.
+
+## Management Commands
+
+### create_superuser
+Creates a superuser with predefined credentials from environment variables.
+```bash
+python manage.py create_superuser
+```
+
+### startapp_extended
+Custom command to create a new Django app with pre-configured structure including controllers and schemas directories.
+```bash
+python manage.py startapp_extended app_name
+```
+
+## Directory Structure
+```
+core/
+├── __init__.py
+├── admin.py
+├── apps.py
+├── controllers/
+│   ├── __init__.py
+│   └── user_controller.py
+├── management/
+│   └── commands/
+│       ├── create_superuser.py
+│       └── startapp_extended.py
+├── migrations/
+├── models.py
+├── schemas/
+│   ├── __init__.py
+│   └── user.py
+├── tests/
+│   └── __init__.py
+└── utils/
+    └── __init__.py
+```
+
+## Controllers
+
+### UserController
+Handles user-related operations using Django Ninja Extra.
+
+```python
+@api_controller("/users", tags=["Users"])
+class UserController:
+    @http_get("", response={200: List[UserSchema]})
+    def get_users(self):
+        try:
+            users = User.objects.all()
+            return 200, users
+        except Exception as e:
+            logger.error(f"Error fetching users: {e}")
+            return 500, {"error": "An error occurred while fetching users", "message": str(e)}
+```
+
+## Schemas
+
+### UserSchema
+```python
+class UserSchema(Schema):
+    id: UUID
+    email: str
+    full_name: str
+    is_active: bool
+    date_created: datetime
+    date_modified: datetime
+```
+
+## Authentication
+- JWT-based authentication
+- Token refresh mechanism
+- Password reset functionality
+- Email verification
+
+## Utilities
+- Custom exceptions
+- Helper functions
+- Common decorators
+- Logging configuration
+
+## Testing
+```bash
+# Run core app tests
+python manage.py test core
+
+# Run with coverage
+coverage run manage.py test core
+coverage report
+```
 
 ## API Endpoints
 
-### User Management
-- `POST /api/users/signup` - Create new user
-- `POST /api/users/superuser` - Create superuser (admin only)
-- `GET /api/users/` - List all users
-- `GET /api/users/{user_id}` - Get user details
-- `PUT /api/users/{user_id}` - Update user
-- `DELETE /api/users/{user_id}` - Delete user
+### Authentication
+- POST `/api/v1/auth/login/` - User login
+- POST `/api/v1/auth/register/` - User registration
+- POST `/api/v1/auth/refresh/` - Refresh token
+- POST `/api/v1/auth/password-reset/` - Password reset
 
-## Testing
+### Users
+- GET `/api/v1/users/` - List users
+- GET `/api/v1/users/{id}/` - Get user details
+- PUT `/api/v1/users/{id}/` - Update user
+- DELETE `/api/v1/users/{id}/` - Delete user
 
-### Test Structure
-The tests are organized into two main classes:
-1. `TestUserModel`: Tests for the User model functionality
-2. `TestUserAPI`: Tests for the API endpoints
-
-### Reusable Test Fixtures
-The following fixtures can be imported and used in other apps' tests:
-
-```python
-from core.tests import test_user, test_user_data, auth_headers, create_user
-
-# Available fixtures:
-test_password          # Standard test password
-test_user_data        # Dictionary of user data
-create_user           # Factory function to create users
-test_user            # Pre-created test user
-auth_token           # JWT token for test_user
-auth_headers         # Headers with JWT token for authentication
+## Environment Variables
+```env
+DJANGO_SUPERUSER_EMAIL=admin@example.com
+DJANGO_SUPERUSER_PASSWORD=your_secure_password
+DJANGO_SUPERUSER_USERNAME=admin
 ```
-
-### Running Tests
-```bash
-# Run all core tests
-pytest core/tests.py
-
-# Run specific test class
-pytest core/tests.py::TestUserModel
-pytest core/tests.py::TestUserAPI
-
-# Run specific test
-pytest core/tests.py::TestUserModel::test_create_user
-```
-
-### Test Coverage
-The tests cover:
-- User creation and validation
-- Password handling
-- Email uniqueness
-- Username uniqueness
-- Full name generation
-- API endpoints
-- Authentication
-- Authorization
-- Data validation
-
-## Development
-
-### Creating a New User
-```python
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-# Create regular user
-user = User.objects.create_user(
-    email="user@example.com",
-    username="username",
-    password="password",
-    first_name="First",
-    last_name="Last"
-)
-
-# Create superuser
-admin = User.objects.create_superuser(
-    email="admin@example.com",
-    username="admin",
-    password="password",
-    first_name="Admin",
-    last_name="User"
-)
-```
-
-### Using the Base Model
-```python
-from core.models import AbstractBaseModel
-
-class YourModel(AbstractBaseModel):
-    # Your model will automatically have:
-    # - UUID primary key
-    # - created_at timestamp
-    # - updated_at timestamp
-    name = models.CharField(max_length=100)
-```
-
-## Configuration
-
-### JWT Settings
-JWT settings can be configured in `settings.py`:
-```python
-NINJA_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ALGORITHM": "HS256",
-    # ... other settings
-}
-``` 

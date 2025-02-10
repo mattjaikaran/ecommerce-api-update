@@ -1,169 +1,179 @@
 # Products App
 
-A comprehensive product management system for e-commerce.
+## Overview
+The Products app manages all product-related functionality including product categories, inventory tracking, pricing, and product search capabilities.
 
 ## Features
-
-- Complete product management with variants and options
-- Hierarchical category system
-- Collections for product grouping
-- Product reviews and ratings
-- Product tagging
-- SEO optimization
-- Digital product support
-- Inventory tracking
-- Tax and shipping class management
+- Product Management
+- Category Management
+- Inventory Tracking
+- Product Search & Filtering
+- Image Handling
+- Price Management
+- Product Variants
+- Product Reviews & Ratings
 
 ## Models
 
 ### Product
-- Base product information
-- SEO fields
-- Status (draft, active, archived)
-- Digital product support
-- Tax and shipping classes
-- Inventory tracking
-- Dimensions and weight
-- Price management (regular, compare at, cost)
-- Meta data support
+```python
+class Product(AbstractBaseModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    sku = models.CharField(max_length=100, unique=True)
+    stock = models.IntegerField(default=0)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
+    
+    class Meta:
+        verbose_name_plural = "Products"
+        ordering = ['-date_created']
+```
 
-### ProductVariant
-- SKU and barcode
-- Price management
-- Inventory tracking
-- Dimensions and weight
-- Option combinations
-- Meta data support
+### Category
+```python
+class Category(AbstractBaseModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
+    
+    class Meta:
+        verbose_name_plural = "Categories"
+```
 
-### ProductOption & ProductOptionValue
-- Configurable product options (e.g., size, color)
-- Option values with position ordering
-- Support for variant combinations
+## Directory Structure
+```
+products/
+├── __init__.py
+├── admin.py
+├── apps.py
+├── controllers/
+│   ├── __init__.py
+│   ├── product_controller.py
+│   └── category_controller.py
+├── models.py
+├── schemas/
+│   ├── __init__.py
+│   ├── product.py
+│   └── category.py
+└── tests/
+    └── __init__.py
+```
 
-### ProductCategory
-- Hierarchical categories
-- SEO optimization
-- Image support
-- Position ordering
+## Controllers
 
-### ProductCollection
-- Curated product groups
-- SEO optimization
-- Image support
-- Position ordering
+### ProductController
+```python
+@api_controller("/products", tags=["Products"])
+class ProductController:
+    @http_get("", response={200: List[ProductSchema]})
+    def get_products(self, 
+                    search: str = None, 
+                    category_id: UUID = None,
+                    min_price: float = None,
+                    max_price: float = None):
+        try:
+            products = Product.objects.all()
+            
+            if search:
+                products = products.filter(
+                    Q(name__icontains=search) | 
+                    Q(description__icontains=search)
+                )
+            
+            if category_id:
+                products = products.filter(category_id=category_id)
+                
+            if min_price:
+                products = products.filter(price__gte=min_price)
+                
+            if max_price:
+                products = products.filter(price__lte=max_price)
+                
+            return 200, products
+        except Exception as e:
+            logger.error(f"Error fetching products: {e}")
+            return 500, {"error": "An error occurred while fetching products", "message": str(e)}
+```
 
-### ProductReview
-- Rating system (1-5 stars)
-- Verified reviews
-- Featured reviews
-- User authentication
-- Title and comment support
+## Schemas
 
-### ProductTag
-- Product tagging system
-- Slug support
-- Description fields
+### ProductSchema
+```python
+class ProductSchema(Schema):
+    id: UUID
+    name: str
+    description: str
+    price: Decimal
+    sku: str
+    stock: int
+    category_id: UUID
+    date_created: datetime
+    date_modified: datetime
+    is_active: bool
+```
 
-### ProductImage
-- Image management for products and variants
-- Alt text support
-- Position ordering
+### CategorySchema
+```python
+class CategorySchema(Schema):
+    id: UUID
+    name: str
+    description: Optional[str]
+    parent_id: Optional[UUID]
+    date_created: datetime
+    date_modified: datetime
+    is_active: bool
+```
 
 ## API Endpoints
 
-### Products (`/api/products/`)
-- `GET /` - List all products
-- `GET /{id}` - Get product details
-- `POST /` - Create product
-- `PUT /{id}` - Update product
-- `DELETE /{id}` - Delete product
+### Products
+- GET `/api/v1/products/` - List all products
+- GET `/api/v1/products/{id}/` - Get product details
+- POST `/api/v1/products/` - Create new product
+- PUT `/api/v1/products/{id}/` - Update product
+- DELETE `/api/v1/products/{id}/` - Delete product
+- GET `/api/v1/products/search/` - Search products
 
-### Product Variants (`/api/products/{product_id}/variants/`)
-- `GET /` - List variants
-- `GET /{id}` - Get variant details
-- `POST /` - Create variant
-- `PUT /{id}` - Update variant
-- `DELETE /{id}` - Delete variant
+### Categories
+- GET `/api/v1/categories/` - List all categories
+- GET `/api/v1/categories/{id}/` - Get category details
+- POST `/api/v1/categories/` - Create new category
+- PUT `/api/v1/categories/{id}/` - Update category
+- DELETE `/api/v1/categories/{id}/` - Delete category
 
-### Categories (`/api/categories/`)
-- `GET /` - List categories
-- `GET /{id}` - Get category details
-- `POST /` - Create category
-- `PUT /{id}` - Update category
-- `DELETE /{id}` - Delete category
-- `GET /tree` - Get category tree
+## Testing
+```bash
+# Run product app tests
+python manage.py test products
 
-### Options (`/api/options/`)
-- `GET /` - List options
-- `GET /{id}` - Get option details
-- `POST /` - Create option
-- `PUT /{id}` - Update option
-- `DELETE /{id}` - Delete option
-
-### Collections (`/api/collections/`)
-- `GET /` - List collections
-- `GET /{id}` - Get collection details
-- `POST /` - Create collection
-- `PUT /{id}` - Update collection
-- `DELETE /{id}` - Delete collection
-- `POST /{id}/products/{product_id}` - Add product to collection
-- `DELETE /{id}/products/{product_id}` - Remove product from collection
-- `POST /{id}/products` - Bulk add products
-- `DELETE /{id}/products` - Bulk remove products
-
-### Reviews (`/api/reviews/`)
-- `GET /` - List reviews
-- `GET /{id}` - Get review details
-- `GET /products/{product_id}` - Get product reviews
-- `POST /` - Create review
-- `PUT /{id}` - Update review
-- `DELETE /{id}` - Delete review
-- `PUT /{id}/verify` - Verify review (admin only)
-- `PUT /{id}/feature` - Feature/unfeature review (admin only)
-
-### Tags (`/api/tags/`)
-- `GET /` - List tags
-- `GET /{id}` - Get tag details
-- `POST /` - Create tag
-- `PUT /{id}` - Update tag
-- `DELETE /{id}` - Delete tag
-- `POST /{id}/products/{product_id}` - Add product to tag
-- `DELETE /{id}/products/{product_id}` - Remove product from tag
-- `POST /{id}/products` - Bulk add products
-- `DELETE /{id}/products` - Bulk remove products
-
-## Authentication
-
-All endpoints require authentication using JWT tokens. Include the token in the Authorization header:
-```
-Authorization: Bearer <token>
+# Run with coverage
+coverage run manage.py test products
+coverage report
 ```
 
-## Error Handling
+## Image Handling
+- Supports multiple images per product
+- Automatic thumbnail generation
+- Image optimization
+- S3 storage integration
 
-All endpoints follow a consistent error response format:
-```json
-{
-    "error": "Error message",
-    "message": "Detailed error message"
-}
-```
+## Search & Filtering
+- Full-text search on product name and description
+- Category filtering
+- Price range filtering
+- Stock status filtering
+- Rating filtering
 
-Common status codes:
-- 200: Success
-- 201: Created
-- 204: Deleted
-- 400: Validation error
-- 401: Unauthorized
-- 403: Forbidden
-- 404: Not found
-- 500: Server error
+## Inventory Management
+- Stock tracking
+- Low stock alerts
+- SKU management
+- Variant tracking
 
-## Database Optimization
-
-- Uses select_related and prefetch_related for efficient queries
-- Proper indexing on frequently queried fields
-- Transaction management for data integrity
-- Optimistic locking for concurrent updates
-
-
+## Dependencies
+- Django 4.2+
+- Django Ninja Extra
+- Pillow (for image handling)
+- django-storages (for S3 integration)
+- django-filter
