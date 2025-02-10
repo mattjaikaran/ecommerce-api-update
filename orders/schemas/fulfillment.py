@@ -1,18 +1,55 @@
-from ninja import Schema
 from datetime import datetime
-from .order import OrderSchema
+from typing import Optional, List
+from ninja import Schema
+from pydantic import Field
+
+from orders.models import ShippingMethod
 
 
-class FulfillmentSchema(Schema):
-    id: int
-    order: OrderSchema
-    fulfillment_date: datetime
+class FulfillmentLineItemSchema(Schema):
+    id: str
+    fulfillment_id: str
+    order_item_id: str
+    quantity: int = Field(ge=1)
+    meta_data: dict = {}
+    date_created: datetime
+    date_updated: datetime
+
+
+class FulfillmentOrderSchema(Schema):
+    id: str
+    order_id: str
     status: str
-    created_at: datetime
-    updated_at: datetime
+    tracking_number: Optional[str] = None
+    tracking_url: Optional[str] = None
+    shipping_carrier: Optional[str] = None
+    shipping_method: str = ShippingMethod.STANDARD
+    shipping_label_url: Optional[str] = None
+    notes: Optional[str] = None
+    meta_data: dict = {}
+    items: List[FulfillmentLineItemSchema]
+    date_created: datetime
+    date_updated: datetime
 
 
-class FulfillmentCreateSchema(Schema):
-    order_id: int
-    fulfillment_date: datetime
-    status: str
+class FulfillmentOrderCreateSchema(Schema):
+    order_id: str
+    tracking_number: Optional[str] = None
+    tracking_url: Optional[str] = None
+    shipping_carrier: Optional[str] = None
+    shipping_method: str = ShippingMethod.STANDARD
+    shipping_label_url: Optional[str] = None
+    notes: Optional[str] = None
+    meta_data: dict = {}
+    items: List[dict]  # List of {order_item_id: str, quantity: int}
+
+
+class FulfillmentOrderUpdateSchema(Schema):
+    status: Optional[str] = None
+    tracking_number: Optional[str] = None
+    tracking_url: Optional[str] = None
+    shipping_carrier: Optional[str] = None
+    shipping_method: Optional[str] = None
+    shipping_label_url: Optional[str] = None
+    notes: Optional[str] = None
+    meta_data: Optional[dict] = None

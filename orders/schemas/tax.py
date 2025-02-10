@@ -1,15 +1,21 @@
-from ninja import Schema
 from datetime import datetime
-from .order import OrderSchema
+from decimal import Decimal
+from typing import Optional
+from ninja import Schema
+from pydantic import Field
 
 
 class TaxSchema(Schema):
-    id: int
-    order: OrderSchema
-    tax_rate: float
-    tax_amount: float
-    created_at: datetime
-    updated_at: datetime
+    id: str
+    order_id: str
+    tax_type: str
+    name: str
+    rate: Decimal = Field(ge=0, le=1)
+    amount: Decimal = Field(ge=0)
+    jurisdiction: Optional[str] = None
+    meta_data: dict = {}
+    date_created: datetime
+    date_updated: datetime
 
 
 class TaxCreateSchema(Schema):
