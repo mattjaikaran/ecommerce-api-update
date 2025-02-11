@@ -1,12 +1,20 @@
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator
 from core.models import AbstractBaseModel
 from products.models import ProductVariant
+from core.models import Customer
 
 
 class Cart(AbstractBaseModel):
     session_key = models.CharField(max_length=255, null=True, blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, null=True, blank=True
+    )
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_quantity = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Cart {self.id}"
