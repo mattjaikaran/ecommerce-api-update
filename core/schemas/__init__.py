@@ -5,6 +5,10 @@ from .users import (
     UserLogoutSchema,
     UserUpdateSchema,
 )
+from .auth import (
+    PasswordlessLoginRequest,
+    PasswordlessLoginVerify,
+)
 from .address import (
     AddressSchema,
     AddressCreateSchema,
@@ -19,6 +23,8 @@ all = [
     UserSignupSchema,
     UserLoginSchema,
     UserLogoutSchema,
+    PasswordlessLoginRequest,
+    PasswordlessLoginVerify,
     UserUpdateSchema,
     AddressSchema,
     AddressCreateSchema,

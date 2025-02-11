@@ -49,6 +49,7 @@ DEBUG = env("DEBUG", default=False)
 # Raises Django's ImproperlyConfigured exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
 
+FRONTEND_URL = env("FRONTEND_URL")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -217,6 +218,14 @@ LOGGING = {
         },
     },
 }
+
+# Email settings
+# if debug true, use console email backend
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

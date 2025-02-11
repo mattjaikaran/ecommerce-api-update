@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.core.exceptions import ValidationError
@@ -87,6 +88,14 @@ class AbstractBaseModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["-created_at"]
+
+
+class OneTimePassword(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
 
 
 class CustomerFeedback(AbstractBaseModel):
