@@ -14,8 +14,8 @@ class TaxSchema(Schema):
     amount: Decimal = Field(ge=0)
     jurisdiction: Optional[str] = None
     meta_data: dict = {}
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class TaxCreateSchema(Schema):

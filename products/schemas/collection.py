@@ -14,8 +14,8 @@ class CollectionSchema(Schema):
     seo_title: Optional[str] = None
     seo_description: Optional[str] = None
     seo_keywords: Optional[str] = None
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class CollectionCreateSchema(Schema):

@@ -8,8 +8,8 @@ class TagSchema(Schema):
     name: str
     slug: str
     description: Optional[str] = None
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class TagCreateSchema(Schema):

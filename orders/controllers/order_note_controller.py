@@ -47,7 +47,7 @@ class OrderNoteController:
             if not request.user.is_staff:
                 notes = notes.filter(is_customer_visible=True)
 
-            return 200, notes.order_by("-date_created")
+            return 200, notes.order_by("-created_at")
         except Order.DoesNotExist:
             return 404, {"error": "Order not found"}
         except Exception as e:
@@ -227,7 +227,7 @@ class OrderNoteController:
             notes = (
                 OrderNote.objects.select_related("order", "created_by")
                 .filter(order=order, is_customer_visible=True)
-                .order_by("-date_created")
+                .order_by("-created_at")
             )
             return 200, notes
         except Order.DoesNotExist:
@@ -258,7 +258,7 @@ class OrderNoteController:
             notes = (
                 OrderNote.objects.select_related("order", "created_by")
                 .filter(order=order, is_customer_visible=False)
-                .order_by("-date_created")
+                .order_by("-created_at")
             )
             return 200, notes
         except Order.DoesNotExist:

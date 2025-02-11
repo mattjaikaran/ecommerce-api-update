@@ -25,7 +25,7 @@ class OrderHistory(AbstractBaseModel):
     class Meta:
         verbose_name = "Order History"
         verbose_name_plural = "Order Histories"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["order", "status"]),
         ]

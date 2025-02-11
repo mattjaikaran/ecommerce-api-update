@@ -86,4 +86,4 @@ class Product(AbstractBaseModel):
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]

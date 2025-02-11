@@ -11,7 +11,7 @@ class AttributeSchema(Schema):
     description: Optional[str]
     is_filterable: bool
     position: int
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 
@@ -36,7 +36,7 @@ class AttributeValueSchema(Schema):
     attribute_id: UUID
     value: str
     position: int
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 
@@ -55,7 +55,7 @@ class AttributeAssignmentSchema(Schema):
     product_id: UUID
     attribute_id: UUID
     value_id: UUID
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 
@@ -78,7 +78,7 @@ class AttributeGroupSchema(Schema):
     description: Optional[str]
     position: int
     attributes: list[AttributeSchema]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 
@@ -101,7 +101,7 @@ class AttributeGroupProductSchema(Schema):
     name: str
     slug: str
     description: Optional[str]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 
@@ -119,7 +119,7 @@ class ProductAttributeGroupSchema(Schema):
     description: Optional[str]
     position: int
     attributes: list[AttributeSchema]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 

@@ -9,8 +9,8 @@ class ProductOptionValueSchema(Schema):
     id: str
     name: str
     position: int = 0
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class ProductOptionSchema(Schema):
@@ -18,16 +18,16 @@ class ProductOptionSchema(Schema):
     name: str
     position: int = 0
     values: List[ProductOptionValueSchema]
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class ProductVariantOptionSchema(Schema):
     id: str
     option_id: str
     value_id: str
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class ProductImageSchema(Schema):
@@ -37,8 +37,8 @@ class ProductImageSchema(Schema):
     image: str
     alt_text: Optional[str] = None
     position: int = 0
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class ProductVariantSchema(Schema):
@@ -61,8 +61,8 @@ class ProductVariantSchema(Schema):
     meta_data: dict = {}
     options: List[ProductVariantOptionSchema]
     images: List[ProductImageSchema]
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
     @validator("compare_at_price")
     def compare_at_price_must_be_greater_than_price(cls, v, values):

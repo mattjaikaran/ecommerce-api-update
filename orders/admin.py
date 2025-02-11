@@ -1,9 +1,37 @@
-# orders/admin.py
-from django.contrib import admin
-from unfold.admin import ModelAdmin
-from .models import Orders
+from .admin import (
+    OrderAdmin,
+    OrderLineItemAdmin,
+    FulfillmentOrderAdmin,
+    FulfillmentLineItemAdmin,
+    OrderFulfillmentAdmin,
+    OrderFulfillmentItemAdmin,
+    OrderFulfillmentTrackingAdmin,
+    OrderFulfillmentTrackingUrlAdmin,
+    PaymentTransactionAdmin,
+    OrderPaymentAdmin,
+    RefundAdmin,
+    TaxAdmin,
+    OrderTaxAdmin,
+    OrderNoteAdmin,
+    OrderHistoryAdmin,
+    OrderDiscountAdmin,
+)
 
-@admin.register(Orders)
-class OrdersAdmin(ModelAdmin):
-    list_display = ('id', 'name', 'description')
-    search_fields = ('name', 'description')
+__all__ = [
+    OrderAdmin,
+    OrderLineItemAdmin,
+    FulfillmentOrderAdmin,
+    FulfillmentLineItemAdmin,
+    OrderFulfillmentAdmin,
+    OrderFulfillmentItemAdmin,
+    OrderFulfillmentTrackingAdmin,
+    OrderFulfillmentTrackingUrlAdmin,
+    PaymentTransactionAdmin,
+    OrderPaymentAdmin,
+    RefundAdmin,
+    TaxAdmin,
+    OrderTaxAdmin,
+    OrderNoteAdmin,
+    OrderHistoryAdmin,
+    OrderDiscountAdmin,
+]

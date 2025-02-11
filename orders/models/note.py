@@ -21,7 +21,7 @@ class OrderNote(AbstractBaseModel):
     class Meta:
         verbose_name = "Order Note"
         verbose_name_plural = "Order Notes"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["order", "is_customer_visible"]),
         ]

@@ -110,6 +110,10 @@ INSTALLED_APPS = [
     # user created apps
     #####
     "core",  # core app
+    "products",  # products app
+    "cart",  # cart app
+    "orders",  # orders app
+    # "payments",  # payments app
     #####
     # third party packages
     #####

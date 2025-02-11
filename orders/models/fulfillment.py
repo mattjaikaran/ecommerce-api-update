@@ -31,7 +31,7 @@ class FulfillmentOrder(AbstractBaseModel):
     class Meta:
         verbose_name = "Fulfillment Order"
         verbose_name_plural = "Fulfillment Orders"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["order", "status"]),
             models.Index(fields=["tracking_number"]),

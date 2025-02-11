@@ -23,5 +23,5 @@ class ProductReview(AbstractBaseModel):
     class Meta:
         verbose_name = "Product Review"
         verbose_name_plural = "Product Reviews"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
         unique_together = ["product", "user"]

@@ -31,9 +31,9 @@ class Refund(AbstractBaseModel):
     class Meta:
         verbose_name = "Refund"
         verbose_name_plural = "Refunds"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["order", "refund_transaction_id"]),
             models.Index(fields=["status"]),
-            models.Index(fields=["date_created"]),
+            models.Index(fields=["created_at"]),
         ]

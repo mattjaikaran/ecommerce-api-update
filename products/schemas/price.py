@@ -14,7 +14,7 @@ class PriceHistorySchema(Schema):
     new_price: Decimal
     reason: Optional[str]
     notes: Optional[str]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 
@@ -61,5 +61,5 @@ class PricingRuleSchema(Schema):
     start_date: Optional[datetime]
     end_date: Optional[datetime]
     is_active: bool
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime

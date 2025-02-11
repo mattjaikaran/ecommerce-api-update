@@ -29,7 +29,7 @@ class Cart(AbstractBaseModel):
     
     class Meta:
         verbose_name_plural = "Carts"
-        ordering = ['-date_created']
+        ordering = ['-created_at']
 ```
 
 ### CartItem
@@ -126,7 +126,7 @@ class CartSchema(Schema):
     session_id: Optional[str]
     status: str
     expires_at: Optional[datetime]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
     items: List[CartItemSchema]
     total: Decimal
@@ -138,7 +138,7 @@ class CartItemSchema(Schema):
     id: UUID
     product_id: UUID
     quantity: int
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
     subtotal: Decimal
 ```

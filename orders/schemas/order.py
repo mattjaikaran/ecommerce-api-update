@@ -49,8 +49,8 @@ class OrderSchema(Schema):
     taxes: List[TaxSchema]
     notes: List[OrderNoteSchema]
     history: List[OrderHistorySchema]
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
     @validator("total")
     def validate_total(cls, v, values):

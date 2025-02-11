@@ -15,7 +15,7 @@ class InventoryHistorySchema(Schema):
     new_quantity: int
     reference: Optional[str]
     notes: Optional[str]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 

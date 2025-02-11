@@ -29,11 +29,11 @@ class PaymentTransaction(AbstractBaseModel):
     class Meta:
         verbose_name = "Payment Transaction"
         verbose_name_plural = "Payment Transactions"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["order", "transaction_id"]),
             models.Index(fields=["status"]),
-            models.Index(fields=["date_created"]),
+            models.Index(fields=["created_at"]),
         ]
 
 

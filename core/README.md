@@ -106,7 +106,7 @@ class UserSchema(Schema):
     email: str
     full_name: str
     is_active: bool
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 ```
 

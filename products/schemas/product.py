@@ -41,8 +41,8 @@ class ProductSchema(Schema):
     reviews: List[ReviewSchema]
     tags: List[TagSchema]
     collections: List[CollectionSchema]
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
     @validator("compare_at_price")
     def compare_at_price_must_be_greater_than_price(cls, v, values):

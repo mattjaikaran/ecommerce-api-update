@@ -23,7 +23,7 @@ class ProductBundle(AbstractBaseModel):
     class Meta:
         verbose_name = "Product Bundle"
         verbose_name_plural = "Product Bundles"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
 
 
 class BundleItem(AbstractBaseModel):

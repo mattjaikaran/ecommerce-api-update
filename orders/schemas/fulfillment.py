@@ -12,8 +12,8 @@ class FulfillmentLineItemSchema(Schema):
     order_item_id: str
     quantity: int = Field(ge=1)
     meta_data: dict = {}
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class FulfillmentOrderSchema(Schema):
@@ -28,8 +28,8 @@ class FulfillmentOrderSchema(Schema):
     notes: Optional[str] = None
     meta_data: dict = {}
     items: List[FulfillmentLineItemSchema]
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class FulfillmentOrderCreateSchema(Schema):

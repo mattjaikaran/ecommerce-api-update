@@ -16,8 +16,8 @@ class OrderLineItemSchema(Schema):
     tax_rate: Decimal = Field(ge=0, le=1)
     weight: Decimal = Field(ge=0)
     meta_data: dict = {}
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class OrderLineItemCreateSchema(Schema):

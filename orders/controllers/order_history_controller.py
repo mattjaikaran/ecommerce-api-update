@@ -27,7 +27,7 @@ class OrderHistoryController:
             history = (
                 OrderHistory.objects.select_related("order", "created_by")
                 .filter(order=order)
-                .order_by("-date_created")
+                .order_by("-created_at")
             )
             return 200, history
         except Order.DoesNotExist:
@@ -71,7 +71,7 @@ class OrderHistoryController:
             history = (
                 OrderHistory.objects.select_related("order", "created_by")
                 .filter(order=order, status=status)
-                .order_by("-date_created")
+                .order_by("-created_at")
             )
             return 200, history
         except Order.DoesNotExist:
@@ -100,7 +100,7 @@ class OrderHistoryController:
             history = (
                 OrderHistory.objects.select_related("order", "created_by")
                 .filter(order=order, created_by_id=user_id)
-                .order_by("-date_created")
+                .order_by("-created_at")
             )
             return 200, history
         except Order.DoesNotExist:
@@ -123,8 +123,8 @@ class OrderHistoryController:
             order = get_object_or_404(Order, id=order_id)
             history = (
                 OrderHistory.objects.select_related("order", "created_by")
-                .filter(order=order, date_created__range=[start_date, end_date])
-                .order_by("-date_created")
+                .filter(order=order, created_at__range=[start_date, end_date])
+                .order_by("-created_at")
             )
             return 200, history
         except Order.DoesNotExist:
@@ -186,8 +186,8 @@ class OrderHistoryController:
             summary = {
                 "total_entries": history.count(),
                 "status_changes": history.exclude(old_status=None).count(),
-                "first_entry": history.order_by("date_created").first(),
-                "last_entry": history.order_by("-date_created").first(),
+                "first_entry": history.order_by("created_at").first(),
+                "last_entry": history.order_by("-created_at").first(),
                 "status_breakdown": history.values("status").annotate(
                     count=Count("id")
                 ),

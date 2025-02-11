@@ -15,8 +15,8 @@ class CategorySchema(Schema):
     seo_keywords: Optional[str] = None
     is_active: bool = True
     position: int = 0
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class CategoryCreateSchema(Schema):

@@ -37,7 +37,7 @@ class Order(AbstractBaseModel):
 
     class Meta:
         verbose_name_plural = "Orders"
-        ordering = ['-date_created']
+        ordering = ['-created_at']
 ```
 
 ### OrderItem
@@ -121,7 +121,7 @@ class OrderSchema(Schema):
     payment_status: str
     tracking_number: Optional[str]
     notes: Optional[str]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
     items: List[OrderItemSchema]
 ```
@@ -133,7 +133,7 @@ class OrderItemSchema(Schema):
     product_id: UUID
     quantity: int
     price: Decimal
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 ```
 

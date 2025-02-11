@@ -25,4 +25,4 @@ class ProductPriceHistory(AbstractBaseModel):
     class Meta:
         verbose_name = "Product Price History"
         verbose_name_plural = "Product Price Histories"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]

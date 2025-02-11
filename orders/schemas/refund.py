@@ -16,8 +16,8 @@ class RefundSchema(Schema):
     refund_transaction_id: str
     gateway_response: Optional[dict] = None
     meta_data: dict = {}
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class RefundCreateSchema(Schema):

@@ -27,7 +27,7 @@ class Product(AbstractBaseModel):
     
     class Meta:
         verbose_name_plural = "Products"
-        ordering = ['-date_created']
+        ordering = ['-created_at']
 ```
 
 ### Category
@@ -108,7 +108,7 @@ class ProductSchema(Schema):
     sku: str
     stock: int
     category_id: UUID
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
     is_active: bool
 ```
@@ -120,7 +120,7 @@ class CategorySchema(Schema):
     name: str
     description: Optional[str]
     parent_id: Optional[UUID]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
     is_active: bool
 ```

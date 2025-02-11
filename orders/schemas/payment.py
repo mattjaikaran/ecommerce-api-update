@@ -34,5 +34,5 @@ class PaymentTransactionSchema(Schema):
     gateway_response: Optional[dict] = None
     error_message: Optional[str] = None
     meta_data: dict = {}
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime

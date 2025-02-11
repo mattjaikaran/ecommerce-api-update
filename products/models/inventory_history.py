@@ -28,4 +28,4 @@ class ProductInventoryHistory(AbstractBaseModel):
     class Meta:
         verbose_name = "Product Inventory History"
         verbose_name_plural = "Product Inventory Histories"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]

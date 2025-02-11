@@ -1,3 +1,6 @@
-from django.contrib import admin
+from .admin import CartAdmin, CartItemAdmin
 
-# Register your models here.
+__all__ = [
+    CartAdmin,
+    CartItemAdmin,
+]

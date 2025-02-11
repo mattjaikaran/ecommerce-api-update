@@ -8,8 +8,8 @@ class ReviewSchema(Schema):
     user_id: str
     rating: int
     comment: str
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class ReviewCreateSchema(Schema):

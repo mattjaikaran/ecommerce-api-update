@@ -76,10 +76,10 @@ class Order(AbstractBaseModel):
     class Meta:
         verbose_name = "Order"
         verbose_name_plural = "Orders"
-        ordering = ["-date_created"]
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["order_number"]),
             models.Index(fields=["status"]),
             models.Index(fields=["payment_status"]),
-            models.Index(fields=["date_created"]),
+            models.Index(fields=["created_at"]),
         ]

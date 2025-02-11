@@ -143,7 +143,7 @@ class Command(StartAppCommand):
         created_files = []
 
         # Create directory structure
-        dirs = ["models", "schemas", "controllers", "tests"]
+        dirs = ["models", "schemas", "controllers", "tests", "admin"]
         for dir_name in dirs:
             dir_path = os.path.join(app_directory, dir_name)
             os.makedirs(dir_path, exist_ok=True)
@@ -169,6 +169,10 @@ class Command(StartAppCommand):
         )
 
         # Create admin
+        admin_file = os.path.join(app_directory, "admin", f"{model_name.lower()}.py")
+        created_files.extend(self.create_admin_file(app_name, admin_file, model_name))
+
+        # Create main admin.py that imports all admin classes
         created_files.extend(
             self.update_admin_file(app_name, app_directory, model_name)
         )
@@ -206,6 +210,11 @@ __all__ = [
 
 __all__ = ['{model_name}Controller']
 """
+        elif dir_name == "admin":
+            return f"""from .{model_name.lower()} import {model_name}Admin
+
+__all__ = ['{model_name}Admin']
+"""
         else:
             return ""
 
@@ -232,7 +241,7 @@ from core.models import AbstractBaseModel
 #     class Meta:
 #         verbose_name = '{model_name}'
 #         verbose_name_plural = '{smart_pluralize(model_name)}'
-#         ordering = ['-date_created']
+#         ordering = ['-created_at']
 """
         return self.create_file(file_path, content)
 
@@ -247,8 +256,8 @@ from ninja import Schema
 #     id: UUID
 #     name: str
 #     description: Optional[str] = None
-#     date_created: datetime
-#     date_updated: datetime
+#     created_at: datetime
+#     updated_at: datetime
 
 
 # class {model_name}CreateSchema(Schema):
@@ -333,6 +342,34 @@ logger = logging.getLogger(__name__)
 """
         return self.create_file(file_path, content)
 
+    def create_admin_file(self, app_name, file_path, model_name):
+        content = f"""from django.contrib import admin
+from unfold.admin import ModelAdmin
+from ..models import {model_name}
+
+
+# @admin.register({model_name})
+# class {model_name}Admin(ModelAdmin):
+#     list_display = ('id', 'name', 'description', 'created_at', 'updated_at')
+#     list_filter = ('is_active', 'created_at', 'updated_at')
+#     search_fields = ('name', 'description')
+#     readonly_fields = ('id', 'created_at', 'updated_at')
+#     ordering = ('-created_at',)
+#     fieldsets = (
+#         ('Basic Information', {{
+#             'fields': ('name', 'description')
+#         }}),
+#         ('Status', {{
+#             'fields': ('is_active',)
+#         }}),
+#         ('Metadata', {{
+#             'fields': ('id', 'created_at', 'updated_at'),
+#             'classes': ('collapse',)
+#         }})
+#     )
+"""
+        return self.create_file(file_path, content)
+
     def update_models_file(self, app_name, app_directory, model_name):
         models_file_path = os.path.join(app_directory, "models.py")
         content = f"""# {app_name}/models.py
@@ -358,7 +395,7 @@ from core.models import AbstractBaseModel
 #     class Meta:
 #         verbose_name = '{model_name}'
 #         verbose_name_plural = '{smart_pluralize(model_name)}'
-#         ordering = ['-date_created']
+#         ordering = ['-created_at']
 """
         return self.create_file(models_file_path, content)
 
@@ -366,14 +403,11 @@ from core.models import AbstractBaseModel
         admin_file_path = os.path.join(app_directory, "admin.py")
         content = f"""# {app_name}/admin.py
 from django.contrib import admin
-from unfold.admin import ModelAdmin
-# from .models import {model_name}
+from .admin.{model_name.lower()} import {model_name}Admin
+from .models import {model_name}
 
-# TODO: Admin registration
-# @admin.register({model_name})
-# class {model_name}Admin(ModelAdmin):
-#     list_display = ('id', 'name', 'description')
-#     search_fields = ('name', 'description')
+# Register your models here
+# admin.site.register({model_name}, {model_name}Admin)
 """
         return self.create_file(admin_file_path, content)
 
@@ -418,8 +452,8 @@ from ninja import Schema
 #     id: UUID
 #     name: str
 #     description: Optional[str] = None
-#     date_created: datetime
-#     date_updated: datetime
+#     created_at: datetime
+#     updated_at: datetime
 
 
 # class {model_name}CreateSchema(Schema):

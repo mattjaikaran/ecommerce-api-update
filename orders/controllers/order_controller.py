@@ -450,7 +450,7 @@ class OrderController:
         """Get the history of an order."""
         try:
             order = get_object_or_404(Order, id=order_id)
-            return 200, order.history.all().order_by("-date_created")
+            return 200, order.history.all().order_by("-created_at")
         except Order.DoesNotExist:
             return 404, {"error": "Order not found"}
         except Exception as e:

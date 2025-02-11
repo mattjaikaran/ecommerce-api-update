@@ -14,8 +14,8 @@ from .address import (
     AddressCreateSchema,
 )
 from .feedback import (
-    FeedbackSchema,
-    FeedbackCreateSchema,
+    CustomerFeedbackSchema,
+    CustomerFeedbackCreateSchema,
 )
 
 all = [
@@ -28,6 +28,6 @@ all = [
     UserUpdateSchema,
     AddressSchema,
     AddressCreateSchema,
-    FeedbackSchema,
-    FeedbackCreateSchema,
+    CustomerFeedbackSchema,
+    CustomerFeedbackCreateSchema,
 ]

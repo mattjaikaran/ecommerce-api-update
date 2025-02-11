@@ -9,8 +9,8 @@ class OrderNoteSchema(Schema):
     is_customer_visible: bool = False
     created_by_id: str
     meta_data: dict = {}
-    date_created: datetime
-    date_updated: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class OrderNoteCreateSchema(Schema):

@@ -14,7 +14,7 @@ class BundleItemBaseSchema(Schema):
 class BundleItemSchema(BundleItemBaseSchema):
     id: UUID
     bundle_id: UUID
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
 
 
@@ -41,7 +41,7 @@ class BundleBaseSchema(Schema):
 class BundleSchema(BundleBaseSchema):
     id: UUID
     items: List[BundleItemSchema]
-    date_created: datetime
+    created_at: datetime
     date_modified: datetime
     total_price: Decimal
     discounted_price: Decimal
