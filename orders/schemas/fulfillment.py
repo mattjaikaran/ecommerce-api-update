@@ -53,3 +53,38 @@ class FulfillmentOrderUpdateSchema(Schema):
     shipping_label_url: Optional[str] = None
     notes: Optional[str] = None
     meta_data: Optional[dict] = None
+
+
+class FulfillmentSchema(Schema):
+    id: str
+    order_id: str
+    status: str
+    tracking_number: Optional[str] = None
+    tracking_url: Optional[str] = None
+    shipping_carrier: Optional[str] = None
+    shipping_method: str = ShippingMethod.STANDARD
+    shipping_label_url: Optional[str] = None
+    notes: Optional[str] = None
+    meta_data: dict = {}
+    items: List[FulfillmentLineItemSchema]
+    created_at: datetime
+    updated_at: datetime
+
+
+class FulfillmentCreateSchema(Schema):
+    order_id: str
+    tracking_number: Optional[str] = None
+    tracking_url: Optional[str] = None
+    shipping_carrier: Optional[str] = None
+    shipping_method: str = ShippingMethod.STANDARD
+    shipping_label_url: Optional[str] = None
+    notes: Optional[str] = None
+    meta_data: dict = {}
+    items: List[dict]  # List of {order_item_id: str, quantity: int}
+
+
+class FulfillmentUpdateSchema(Schema):
+    status: Optional[str] = None
+    tracking_number: Optional[str] = None
+    tracking_url: Optional[str] = None
+    shipping_carrier: Optional[str] = None

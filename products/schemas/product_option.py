@@ -3,10 +3,11 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import Field, validator
 from decimal import Decimal
+from uuid import UUID
 
 
 class ProductOptionValueSchema(Schema):
-    id: str
+    id: UUID
     name: str
     position: int = 0
     created_at: datetime
@@ -14,7 +15,7 @@ class ProductOptionValueSchema(Schema):
 
 
 class ProductOptionSchema(Schema):
-    id: str
+    id: UUID
     name: str
     position: int = 0
     values: List[ProductOptionValueSchema]
@@ -22,18 +23,30 @@ class ProductOptionSchema(Schema):
     updated_at: datetime
 
 
+class ProductOptionCreateSchema(Schema):
+    name: str
+    position: int = 0
+    values: List[ProductOptionValueSchema]
+
+
+class ProductOptionUpdateSchema(Schema):
+    name: Optional[str] = None
+    position: Optional[int] = None
+    values: Optional[List[ProductOptionValueSchema]] = None
+
+
 class ProductVariantOptionSchema(Schema):
-    id: str
-    option_id: str
-    value_id: str
+    id: UUID
+    option_id: UUID
+    value_id: UUID
     created_at: datetime
     updated_at: datetime
 
 
 class ProductImageSchema(Schema):
-    id: str
-    product_id: str
-    variant_id: Optional[str] = None
+    id: UUID
+    product_id: UUID
+    variant_id: Optional[UUID] = None
     image: str
     alt_text: Optional[str] = None
     position: int = 0
@@ -42,8 +55,8 @@ class ProductImageSchema(Schema):
 
 
 class ProductVariantSchema(Schema):
-    id: str
-    product_id: str
+    id: UUID
+    product_id: UUID
     name: str
     sku: str
     barcode: Optional[str] = None
@@ -69,3 +82,33 @@ class ProductVariantSchema(Schema):
         if v is not None and "price" in values and v <= values["price"]:
             raise ValueError("compare_at_price must be greater than price")
         return v
+
+
+class ProductVariantCreateSchema(Schema):
+    name: str
+    sku: str
+    barcode: Optional[str] = None
+    price: Decimal = Field(ge=0)
+    compare_at_price: Optional[Decimal] = None
+    cost_price: Optional[Decimal] = None
+    inventory_quantity: int = 0
+    low_stock_threshold: int = 10
+    weight: Optional[Decimal] = None
+    length: Optional[Decimal] = None
+    width: Optional[Decimal] = None
+    height: Optional[Decimal] = None
+
+
+class ProductVariantUpdateSchema(Schema):
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    barcode: Optional[str] = None
+    price: Optional[Decimal] = None
+    compare_at_price: Optional[Decimal] = None
+    cost_price: Optional[Decimal] = None
+    inventory_quantity: Optional[int] = None
+    low_stock_threshold: Optional[int] = None
+    weight: Optional[Decimal] = None
+    length: Optional[Decimal] = None
+    width: Optional[Decimal] = None
+    height: Optional[Decimal] = None

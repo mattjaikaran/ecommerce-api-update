@@ -5,6 +5,9 @@ from django.conf.urls.static import static
 from ninja_extra import NinjaExtraAPI
 from ninja_jwt.controller import NinjaJWTDefaultController
 from core.controllers import UserController, AuthController
+from products.controllers import ProductController
+from cart.controllers import CartController
+from orders.controllers import OrderController
 from ninja import Redoc
 from debug_toolbar.toolbar import debug_toolbar_urls
 
@@ -50,8 +53,11 @@ api.register_controllers(
     UserController,  # User Controller
     AuthController,  # Auth Controller
     # products app
+    ProductController,  # Product Controller
     # cart app
+    CartController,  # Cart Controller
     # orders app
+    OrderController,  # Order Controller
     # payments app
     # reports app
 )

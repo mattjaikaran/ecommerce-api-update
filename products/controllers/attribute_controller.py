@@ -23,7 +23,6 @@ from products.schemas import (
     AttributeValueUpdateSchema,
     AttributeAssignmentCreateSchema,
     ProductSchema,
-    ProductAttributeGroupSchema,
 )
 import logging
 

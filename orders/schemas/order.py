@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Optional, List
 from ninja import Schema
 from pydantic import Field, validator
-
+from uuid import UUID
 from orders.models import OrderStatus, PaymentStatus, PaymentMethod, ShippingMethod
 from .order_line_item import OrderLineItemSchema
 from .fulfillment import FulfillmentOrderSchema
@@ -15,10 +15,10 @@ from .history import OrderHistorySchema
 
 
 class OrderSchema(Schema):
-    id: str
+    id: UUID
     order_number: str
-    customer_id: str
-    customer_group_id: Optional[str] = None
+    customer_id: UUID
+    customer_group_id: Optional[UUID] = None
     status: str = OrderStatus.DRAFT
     currency: str = "USD"
     subtotal: Decimal = Field(ge=0)
@@ -33,8 +33,8 @@ class OrderSchema(Schema):
     payment_gateway: Optional[str] = None
     payment_gateway_id: Optional[str] = None
     payment_gateway_response: Optional[dict] = None
-    billing_address_id: str
-    shipping_address_id: str
+    billing_address_id: UUID
+    shipping_address_id: UUID
     email: str
     phone: Optional[str] = None
     customer_note: Optional[str] = None
@@ -60,19 +60,19 @@ class OrderSchema(Schema):
 
 
 class OrderCreateSchema(Schema):
-    customer_id: str
-    customer_group_id: Optional[str] = None
+    customer_id: UUID
+    customer_group_id: Optional[UUID] = None
     currency: str = "USD"
     shipping_method: str = ShippingMethod.STANDARD
     payment_method: str = PaymentMethod.CREDIT_CARD
     payment_gateway: Optional[str] = None
-    billing_address_id: str
-    shipping_address_id: str
+    billing_address_id: UUID
+    shipping_address_id: UUID
     email: str
     phone: Optional[str] = None
     customer_note: Optional[str] = None
     meta_data: dict = {}
-    items: List[dict]  # List of {product_variant_id: str, quantity: int}
+    items: List[dict]  # List of {product_variant_id: UUID, quantity: int}
 
 
 class OrderUpdateSchema(Schema):
@@ -80,8 +80,8 @@ class OrderUpdateSchema(Schema):
     shipping_method: Optional[str] = None
     payment_method: Optional[str] = None
     payment_gateway: Optional[str] = None
-    billing_address_id: Optional[str] = None
-    shipping_address_id: Optional[str] = None
+    billing_address_id: Optional[UUID] = None
+    shipping_address_id: Optional[UUID] = None
     email: Optional[str] = None
     phone: Optional[str] = None
     customer_note: Optional[str] = None

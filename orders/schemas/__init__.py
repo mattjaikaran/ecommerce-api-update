@@ -9,6 +9,9 @@ from .fulfillment import (
     FulfillmentOrderSchema,
     FulfillmentOrderCreateSchema,
     FulfillmentOrderUpdateSchema,
+    FulfillmentSchema,
+    FulfillmentCreateSchema,
+    FulfillmentUpdateSchema,
 )
 from .payment import PaymentTransactionSchema
 from .refund import RefundSchema, RefundCreateSchema, RefundUpdateSchema
@@ -30,6 +33,9 @@ __all__ = [
     FulfillmentOrderSchema,
     FulfillmentOrderCreateSchema,
     FulfillmentOrderUpdateSchema,
+    FulfillmentSchema,
+    FulfillmentCreateSchema,
+    FulfillmentUpdateSchema,
     # Payment
     PaymentTransactionSchema,
     # Refund

@@ -6,7 +6,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 
 from products.models import ProductReview, Product
-from products.schemas.product import (
+from products.schemas import (
     ProductReviewSchema,
     ProductReviewCreateSchema,
     ProductReviewUpdateSchema,

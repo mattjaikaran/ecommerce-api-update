@@ -1,14 +1,14 @@
 from ninja import Schema
 from datetime import datetime
-from .order import OrderSchema
 from decimal import Decimal
 from typing import Optional
+from uuid import UUID
 from pydantic import Field
 
 
 class PaymentSchema(Schema):
     id: int
-    order: OrderSchema
+    order_id: UUID
     amount: float
     status: str
     created_at: datetime

@@ -6,10 +6,10 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 
 from products.models import ProductCategory
-from products.schemas.product import (
-    ProductCategorySchema,
-    ProductCategoryCreateSchema,
-    ProductCategoryUpdateSchema,
+from products.schemas import (
+    CategorySchema,
+    CategoryCreateSchema,
+    CategoryUpdateSchema,
 )
 
 
@@ -20,7 +20,7 @@ class CategoryController:
     @http_get(
         "/",
         response={
-            200: List[ProductCategorySchema],
+            200: List[CategorySchema],
             404: dict,
             500: dict,
         },
@@ -42,7 +42,7 @@ class CategoryController:
                 "message": str(e),
             }
 
-    @http_get("/{id}", response=ProductCategorySchema)
+    @http_get("/{id}", response=CategorySchema)
     def get_category(self, id: str):
         """
         Get a category by ID
@@ -64,14 +64,14 @@ class CategoryController:
     @http_post(
         "/",
         response={
-            201: ProductCategorySchema,
+            201: CategorySchema,
             400: dict,
             404: dict,
             500: dict,
         },
     )
     @transaction.atomic
-    def create_category(self, payload: ProductCategoryCreateSchema):
+    def create_category(self, payload: CategoryCreateSchema):
         """
         Create a new category
         """
@@ -95,14 +95,14 @@ class CategoryController:
     @http_put(
         "/{id}",
         response={
-            200: ProductCategorySchema,
+            200: CategorySchema,
             400: dict,
             404: dict,
             500: dict,
         },
     )
     @transaction.atomic
-    def update_category(self, id: str, payload: ProductCategoryUpdateSchema):
+    def update_category(self, id: str, payload: CategoryUpdateSchema):
         """
         Update a category
         """
@@ -183,7 +183,7 @@ class CategoryController:
     @http_get(
         "/tree",
         response={
-            200: List[ProductCategorySchema],
+            200: List[CategorySchema],
             500: dict,
         },
     )

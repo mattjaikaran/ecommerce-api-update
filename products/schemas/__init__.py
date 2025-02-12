@@ -1,12 +1,20 @@
 from .product import ProductSchema, ProductCreateSchema
-from .category import CategorySchema, CategoryCreateSchema
+from .category import (
+    CategorySchema,
+    CategoryCreateSchema,
+    CategoryUpdateSchema,
+)
 from .collection import CollectionSchema, CollectionCreateSchema
 from .review import ReviewSchema, ReviewCreateSchema
 from .tag import TagSchema, TagCreateSchema
 from .product_option import (
     ProductOptionSchema,
+    ProductOptionCreateSchema,
+    ProductOptionUpdateSchema,
     ProductVariantSchema,
     ProductImageSchema,
+    ProductVariantCreateSchema,
+    ProductVariantUpdateSchema,
 )
 from .inventory import (
     InventoryHistorySchema,
@@ -55,6 +63,7 @@ __all__ = [
     # Category Schemas
     CategorySchema,
     CategoryCreateSchema,
+    CategoryUpdateSchema,
     # Collection Schemas
     CollectionSchema,
     CollectionCreateSchema,
@@ -66,7 +75,11 @@ __all__ = [
     TagCreateSchema,
     # Product Option Schemas
     ProductOptionSchema,
+    ProductOptionCreateSchema,
+    ProductOptionUpdateSchema,
     ProductVariantSchema,
+    ProductVariantCreateSchema,
+    ProductVariantUpdateSchema,
     ProductImageSchema,
     # Attribute Schemas
     AttributeSchema,

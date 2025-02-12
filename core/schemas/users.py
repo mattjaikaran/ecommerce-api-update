@@ -1,8 +1,9 @@
 from ninja import Schema
+from uuid import UUID
 
 
 class UserSchema(Schema):
-    id: int
+    id: UUID
     username: str
     email: str
     first_name: str

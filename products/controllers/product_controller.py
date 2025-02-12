@@ -13,10 +13,9 @@ from products.models import (
     ProductVariantOption,
     ProductImage,
 )
-from products.schemas.product import (
+from products.schemas import (
     ProductSchema,
     ProductCreateSchema,
-    ProductUpdateSchema,
     ProductVariantSchema,
     ProductVariantCreateSchema,
     ProductVariantUpdateSchema,
@@ -122,7 +121,7 @@ class ProductController:
         },
     )
     @transaction.atomic
-    def update_product(self, id: str, payload: ProductUpdateSchema):
+    def update_product(self, id: str, payload: ProductCreateSchema):
         """
         Update a product
         """

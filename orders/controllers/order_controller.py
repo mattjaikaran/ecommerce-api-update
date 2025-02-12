@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from decimal import Decimal
 from django.db import transaction
@@ -5,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from ninja_extra import (
     api_controller,
-    route,
     http_get,
     http_post,
     http_put,
@@ -18,16 +18,18 @@ from orders.models import (
     Order,
     OrderLineItem,
     OrderStatus,
-    PaymentStatus,
 )
 from orders.schemas import (
     OrderHistorySchema,
     OrderSchema,
     OrderCreateSchema,
     OrderUpdateSchema,
+    OrderLineItemSchema,
     OrderLineItemCreateSchema,
     OrderLineItemUpdateSchema,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @api_controller("/orders", tags=["Orders"])
@@ -43,7 +45,7 @@ class OrderController:
         },
     )
     @paginate
-    def list_orders(self, request):
+    def list_orders(self):
         """Get a paginated list of orders."""
         try:
             orders = (
@@ -61,8 +63,9 @@ class OrderController:
                 )
                 .all()
             )
-            return 200, orders
+            return orders  # Return just the orders, not a tuple with status code
         except Exception as e:
+            logger.error(f"Error fetching orders: {e}")
             return 500, {
                 "error": "An error occurred while fetching orders",
                 "message": str(e),

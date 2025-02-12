@@ -22,6 +22,7 @@ from orders.models import (
 from orders.schemas import (
     FulfillmentSchema,
     FulfillmentCreateSchema,
+    FulfillmentUpdateSchema,
 )
 
 
@@ -166,7 +167,7 @@ class FulfillmentController:
     )
     @transaction.atomic
     def update_fulfillment(
-        self, request, fulfillment_id: str, payload: FulfillmentCreateSchema
+        self, request, fulfillment_id: str, payload: FulfillmentUpdateSchema
     ):
         """Update an existing fulfillment."""
         try:

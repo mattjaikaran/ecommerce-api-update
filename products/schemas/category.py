@@ -28,3 +28,16 @@ class CategoryCreateSchema(Schema):
     seo_title: Optional[str] = None
     seo_description: Optional[str] = None
     seo_keywords: Optional[str] = None
+
+
+class CategoryUpdateSchema(Schema):
+    name: Optional[str] = None
+    slug: Optional[str] = None
+    description: Optional[str] = None
+    parent_id: Optional[str] = None
+    image: Optional[str] = None
+    seo_title: Optional[str] = None
+    seo_description: Optional[str] = None
+    seo_keywords: Optional[str] = None
+    is_active: Optional[bool] = None
+    position: Optional[int] = None
