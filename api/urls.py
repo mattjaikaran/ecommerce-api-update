@@ -9,9 +9,9 @@ from ninja import Redoc
 from debug_toolbar.toolbar import debug_toolbar_urls
 
 # admin site settings
-admin.site.site_header = "Django Ninja Boilerplate Admin"
-admin.site.site_title = "Django Ninja Boilerplate Panel"
-admin.site.index_title = "Welcome to Django Ninja Boilerplate Panel"
+admin.site.site_header = "E-Commerce Admin"
+admin.site.site_title = "E-Commerce Panel"
+admin.site.index_title = "Welcome to E-Commerce Panel"
 admin.site.site_url = "/api/docs"
 
 # Instantiate the server
@@ -34,9 +34,9 @@ api = NinjaExtraAPI(
         }
     },
     version=0.1,
-    title="Django Ninja Boilerplate API",
-    description="API documentation for the Django Ninja Boilerplate API",
-    urls_namespace="boilerplate_api",
+    title="E-Commerce API",
+    description="API documentation for the E-Commerce API",
+    urls_namespace="ecommerce_api",
     docs=Redoc(),  # this line is to use ReDoc instead of Swagger
 )
 

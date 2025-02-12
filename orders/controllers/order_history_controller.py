@@ -99,7 +99,7 @@ class OrderHistoryController:
             order = get_object_or_404(Order, id=order_id)
             history = (
                 OrderHistory.objects.select_related("order", "created_by")
-                .filter(order=order, created_by_id=user_id)
+                .filter(order=order, created_by=user_id)
                 .order_by("-created_at")
             )
             return 200, history

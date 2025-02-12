@@ -6,13 +6,13 @@ from ..models import ProductAttribute, ProductAttributeValue, ProductAttributeAs
 @admin.register(ProductAttribute)
 class ProductAttributeAdmin(ModelAdmin):
     list_display = (
-        "id",
         "name",
         "code",
         "display_type",
         "is_filterable",
         "is_variation",
         "position",
+        "id",
         "created_at",
     )
     list_filter = (

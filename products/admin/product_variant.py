@@ -6,12 +6,12 @@ from ..models import ProductVariant
 @admin.register(ProductVariant)
 class ProductVariantAdmin(ModelAdmin):
     list_display = (
-        "id",
         "product",
         "name",
         "sku",
         "price",
         "inventory_quantity",
+        "id",
         "is_active",
         "created_at",
     )

@@ -5,7 +5,7 @@ from ..models import ProductTag, ProductCollection
 
 @admin.register(ProductTag)
 class ProductTagAdmin(ModelAdmin):
-    list_display = ("id", "name", "slug", "created_at")
+    list_display = ("name", "slug", "id", "created_at")
     search_fields = ("name", "description")
     readonly_fields = ("id", "created_at", "updated_at")
     ordering = ("name",)

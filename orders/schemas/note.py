@@ -1,5 +1,6 @@
 from datetime import datetime
 from ninja import Schema
+from core.schemas import UserSchema
 
 
 class OrderNoteSchema(Schema):
@@ -7,7 +8,7 @@ class OrderNoteSchema(Schema):
     order_id: str
     note: str
     is_customer_visible: bool = False
-    created_by_id: str
+    created_by: UserSchema
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime

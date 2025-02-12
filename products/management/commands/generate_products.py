@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from faker import Faker
 from decimal import Decimal
 import random
+from core.models import User
 from products.models import (
     Product,
     ProductCategory,
@@ -24,6 +25,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         count = options["count"]
         categories = list(ProductCategory.objects.all())
+
+        admin_user = User.objects.filter(is_superuser=True).first()
 
         if not categories:
             self.stdout.write(
@@ -62,6 +65,7 @@ class Command(BaseCommand):
                 seo_title=f"{name} - Buy {name.lower()} at great prices",
                 seo_description=fake.text(max_nb_chars=160),
                 seo_keywords=f"{name.lower()}, buy {name.lower()}, {category.name.lower()}",
+                created_by=admin_user,
             )
 
             self.stdout.write(

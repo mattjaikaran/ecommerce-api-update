@@ -5,7 +5,7 @@ from datetime import timedelta
 import random
 from cart.models import Cart, CartItem
 from products.models import ProductVariant
-from core.models import Customer
+from core.models import Customer, User
 
 fake = Faker()
 
@@ -37,6 +37,16 @@ class Command(BaseCommand):
         customers = list(Customer.objects.all())
         variants = list(ProductVariant.objects.filter(is_active=True))
 
+        admin_user = User.objects.filter(is_superuser=True).first()
+
+        if not admin_user:
+            self.stdout.write(
+                self.style.ERROR(
+                    "No admin user found. Please create an admin user first."
+                )
+            )
+            return
+
         if not customers:
             self.stdout.write(
                 self.style.ERROR("No customers found. Please create customers first.")
@@ -65,6 +75,7 @@ class Command(BaseCommand):
                     else None
                 ),
                 is_active=not is_abandoned,
+                created_by=admin_user,
             )
 
             # Add random items to cart

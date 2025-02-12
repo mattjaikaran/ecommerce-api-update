@@ -1,9 +1,11 @@
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
+from django.contrib.auth import get_user_model
 from faker import Faker
 from products.models import ProductCategory
 
 fake = Faker()
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -19,6 +21,20 @@ class Command(BaseCommand):
         count = options["count"]
         parent_count = min(options["parent_count"], count)
 
+        # Get or create a superuser for the created_by field
+        try:
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if not admin_user:
+                self.stdout.write(
+                    self.style.ERROR(
+                        "No superuser found. Please create a superuser first using: python manage.py createsuperuser"
+                    )
+                )
+                return
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"Error getting superuser: {e}"))
+            return
+
         # Create parent categories
         parent_categories = []
         for i in range(parent_count):
@@ -31,6 +47,8 @@ class Command(BaseCommand):
                 seo_description=fake.text(max_nb_chars=160),
                 seo_keywords=f"{name.lower()}, shop {name.lower()}, buy {name.lower()}",
                 position=i,
+                created_by=admin_user,
+                updated_by=admin_user,
             )
             parent_categories.append(category)
             self.stdout.write(f"Created parent category: {category.name}")
@@ -50,6 +68,8 @@ class Command(BaseCommand):
                     seo_description=fake.text(max_nb_chars=160),
                     seo_keywords=f"{name.lower()}, {parent.name.lower()}, shop {name.lower()}",
                     position=i,
+                    created_by=admin_user,
+                    updated_by=admin_user,
                 )
                 self.stdout.write(
                     f"Created child category: {category.name} (Parent: {parent.name})"

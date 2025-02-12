@@ -6,12 +6,12 @@ from ..models import ProductBundle, BundleItem
 @admin.register(ProductBundle)
 class ProductBundleAdmin(ModelAdmin):
     list_display = (
-        "id",
         "name",
         "discount_percentage",
         "is_active",
         "start_date",
         "end_date",
+        "id",
         "created_at",
     )
     list_filter = ("is_active", "created_at")

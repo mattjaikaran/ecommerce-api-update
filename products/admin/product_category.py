@@ -5,7 +5,7 @@ from ..models import ProductCategory
 
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(ModelAdmin):
-    list_display = ("id", "name", "parent", "is_active", "position", "created_at")
+    list_display = ("name", "parent", "is_active", "id", "position", "created_at")
     list_filter = ("is_active", "parent", "created_at")
     search_fields = ("name", "description")
     readonly_fields = ("id", "created_at", "updated_at")

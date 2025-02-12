@@ -34,10 +34,10 @@ class AuthController:
 
                 magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={token}"
                 send_mail(
-                    "Your Magic Link",
-                    f"Click to login: {magic_link}",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
+                    subject="Your Magic Link",
+                    message=f"Click to login: {magic_link}",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[email],
                     fail_silently=False,
                 )
 
@@ -61,7 +61,7 @@ class AuthController:
         otp.save()
 
         # Generate JWT tokens
-        from django_ninja_jwt.tokens import RefreshToken
+        from ninja_jwt.tokens import RefreshToken
 
         refresh = RefreshToken.for_user(otp.user)
         return 200, {"access": str(refresh.access_token), "refresh": str(refresh)}

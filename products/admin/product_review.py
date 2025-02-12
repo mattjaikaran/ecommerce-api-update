@@ -6,13 +6,15 @@ from ..models import ProductReview
 @admin.register(ProductReview)
 class ProductReviewAdmin(ModelAdmin):
     list_display = (
-        "id",
+        "title",
+        "comment",
         "product",
         "user",
         "rating",
         "title",
         "is_verified",
         "is_featured",
+        "id",
         "created_at",
     )
     list_filter = ("rating", "is_verified", "is_featured", "created_at")

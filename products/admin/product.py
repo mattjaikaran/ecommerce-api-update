@@ -6,12 +6,12 @@ from ..models import Product
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
     list_display = (
-        "id",
         "name",
         "category",
         "price",
         "quantity",
         "status",
+        "id",
         "is_active",
         "created_at",
     )

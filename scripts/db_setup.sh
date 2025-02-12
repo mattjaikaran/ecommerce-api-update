@@ -33,6 +33,15 @@ python3 manage.py create_superuser # creates superuser based on env file data
 echo "created superuser"
 
 # other scripts here
+echo "Generating sample data..."
+python manage.py generate_categories --count=10 --parent_count=5
+python manage.py generate_products --count=50
+python manage.py generate_variants --min_variants=2 --max_variants=5
+python manage.py generate_reviews 100 --verified-ratio 0.7 --featured-ratio 0.2
+python manage.py generate_carts 20 --min-items 1 --max-items 5 --abandoned-ratio 0.3
+python manage.py generate_orders 30 --min-items 1 --max-items 5
+python manage.py generate_fulfillments --status-ratio 0.7
+echo "Sample data generated"
 
 echo ">>> db_setup complete"
 

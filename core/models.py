@@ -73,16 +73,26 @@ class AbstractBaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_created"
+        User,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_created",
     )
     updated_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_updated"
+        User,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_updated",
+        null=True,
+        blank=True,
     )
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)  # soft delete
     deleted_at = models.DateTimeField(null=True, blank=True)
     deleted_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_deleted"
+        User,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_deleted",
+        null=True,
+        blank=True,
     )
 
     class Meta:
