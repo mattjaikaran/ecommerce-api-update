@@ -100,6 +100,85 @@ $ make install <library-name>
 $ make db-setup
 ```
 
+## Developer Experience Scripts
+
+The project includes several powerful scripts to enhance the development workflow, located in the `scripts/` directory.
+
+### Core Scripts Overview
+
+- `test_feature.sh`: Test specific features or endpoints
+- `reset_test_data.sh`: Reset and seed test data
+- `check_health.sh`: Check API health and dependencies
+- `db_setup.sh`: Set up database and run migrations
+- `setup.sh`: Initial project setup
+- `lint.sh`: Run linting checks
+- `generate_secret_key.sh`: Generate Django secret key
+
+### Testing Features
+
+Test specific parts of the API with detailed output:
+
+```bash
+# Test all product-related endpoints
+./scripts/test_feature.sh products
+
+# Test cart features with verbose output
+./scripts/test_feature.sh -v cart
+
+# Test authentication endpoints
+./scripts/test_feature.sh auth
+
+# Test all features
+./scripts/test_feature.sh all
+```
+
+### Managing Test Data
+
+Reset and seed test data for development:
+
+```bash
+# Reset all test data
+./scripts/reset_test_data.sh
+
+# Reset only product data
+./scripts/reset_test_data.sh -a products
+
+# Force reset without confirmation
+./scripts/reset_test_data.sh -f
+
+# Reset data without running migrations
+./scripts/reset_test_data.sh --no-migrations
+```
+
+### Health Checks
+
+Monitor the health of your API and dependencies:
+
+```bash
+# Run all health checks
+./scripts/check_health.sh
+
+# Run with verbose output
+./scripts/check_health.sh -v
+
+# Check specific API URL
+./scripts/check_health.sh -u http://localhost:8001
+
+# Skip specific checks
+./scripts/check_health.sh --skip-deps --skip-db
+```
+
+### Script Features
+
+All developer scripts include:
+- Colored output for better visibility
+- Verbose mode for detailed information
+- Help documentation (`-h` or `--help`)
+- Error handling with descriptive messages
+- Consistent formatting and logging
+
+For more detailed documentation about the scripts, see `scripts/README.md`.
+
 ## Why Django Ninja?
 - [Django Ninja Docs](https://django-ninja.dev/)
 
