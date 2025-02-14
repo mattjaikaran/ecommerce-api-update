@@ -45,6 +45,7 @@ python manage.py generate_products 50
 python manage.py generate_variants --min-variants=2 --max-variants=5
 python manage.py generate_collections 5 --min-products=5 --max-products=20
 python manage.py generate_reviews 100 --verified-ratio=0.7 --featured-ratio=0.2
+python manage.py generate_product_data --options-count=5 --attributes-count=10 --bundles-count=5 --tags-count=15
 echo "Product data generated"
 
 # Generate Cart Data

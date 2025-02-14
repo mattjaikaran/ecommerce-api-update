@@ -103,11 +103,21 @@ test_endpoint() {
             # Check if response is an array
             if echo "$body" | jq -e 'if type=="array" then true else false end' >/dev/null 2>&1; then
                 count=$(echo "$body" | jq '. | length')
-                body="Array response with $count items"
+                first_item=$(echo "$body" | jq '.[0]')
+                if [ "$count" -gt 0 ]; then
+                    body="Array response with $count items. First item:\n$first_item"
+                else
+                    body="Array response with $count items"
+                fi
             # Check if response has items array    
             elif echo "$body" | jq -e '.items' >/dev/null 2>&1; then
                 count=$(echo "$body" | jq '.items | length')
-                body="Response with $count items"
+                first_item=$(echo "$body" | jq '.items[0]')
+                if [ "$count" -gt 0 ]; then
+                    body="Response with $count items. First item:\n$first_item"
+                else
+                    body="Response with $count items"
+                fi
             fi
         fi
     fi

@@ -1,53 +1,87 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
 from ninja import Schema
-
-
-class AttributeSchema(Schema):
-    id: UUID
-    name: str
-    code: str
-    description: Optional[str]
-    is_filterable: bool
-    position: int
-    created_at: datetime
-    date_modified: datetime
-
-
-class AttributeCreateSchema(Schema):
-    name: str
-    code: str
-    description: Optional[str]
-    is_filterable: bool = True
-    position: int = 0
-
-
-class AttributeUpdateSchema(Schema):
-    name: Optional[str]
-    code: Optional[str]
-    description: Optional[str]
-    is_filterable: Optional[bool]
-    position: Optional[int]
 
 
 class AttributeValueSchema(Schema):
     id: UUID
     attribute_id: UUID
     value: str
-    position: int
+    position: int = 0
+    meta_data: dict = {}
     created_at: datetime
-    date_modified: datetime
+    updated_at: datetime
+    date_modified: Optional[datetime] = None
 
 
 class AttributeValueCreateSchema(Schema):
     value: str
     position: int = 0
+    meta_data: dict = {}
 
 
 class AttributeValueUpdateSchema(Schema):
-    value: Optional[str]
-    position: Optional[int]
+    value: Optional[str] = None
+    position: Optional[int] = None
+    meta_data: Optional[dict] = None
+
+
+class AttributeSchema(Schema):
+    id: UUID
+    name: str
+    code: str
+    description: Optional[str] = None
+    is_filterable: bool = True
+    position: int = 0
+    values: List[AttributeValueSchema] = []
+    meta_data: dict = {}
+    created_at: datetime
+    updated_at: datetime
+    date_modified: Optional[datetime] = None
+
+
+class AttributeCreateSchema(Schema):
+    name: str
+    code: str
+    description: Optional[str] = None
+    is_filterable: bool = True
+    position: int = 0
+    meta_data: dict = {}
+
+
+class AttributeUpdateSchema(Schema):
+    name: Optional[str] = None
+    code: Optional[str] = None
+    description: Optional[str] = None
+    is_filterable: Optional[bool] = None
+    position: Optional[int] = None
+    meta_data: Optional[dict] = None
+
+
+class AttributeGroupSchema(Schema):
+    id: UUID
+    name: str
+    description: Optional[str] = None
+    position: int = 0
+    meta_data: dict = {}
+    created_at: datetime
+    updated_at: datetime
+    date_modified: Optional[datetime] = None
+
+
+class AttributeGroupCreateSchema(Schema):
+    name: str
+    description: Optional[str] = None
+    position: int = 0
+    meta_data: dict = {}
+
+
+class AttributeGroupUpdateSchema(Schema):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    position: Optional[int] = None
+    meta_data: Optional[dict] = None
 
 
 class AttributeAssignmentSchema(Schema):
@@ -55,13 +89,17 @@ class AttributeAssignmentSchema(Schema):
     product_id: UUID
     attribute_id: UUID
     value_id: UUID
+    meta_data: dict = {}
     created_at: datetime
-    date_modified: datetime
+    updated_at: datetime
+    date_modified: Optional[datetime] = None
 
 
 class AttributeAssignmentCreateSchema(Schema):
+    product_id: UUID
     attribute_id: UUID
     value_id: UUID
+    meta_data: dict = {}
 
 
 class AttributeFilterSchema(Schema):
@@ -70,30 +108,6 @@ class AttributeFilterSchema(Schema):
     attribute_code: str
     values: list[AttributeValueSchema]
     selected_values: list[UUID]
-
-
-class AttributeGroupSchema(Schema):
-    id: UUID
-    name: str
-    description: Optional[str]
-    position: int
-    attributes: list[AttributeSchema]
-    created_at: datetime
-    date_modified: datetime
-
-
-class AttributeGroupCreateSchema(Schema):
-    name: str
-    description: Optional[str]
-    position: int = 0
-    attribute_ids: list[UUID]
-
-
-class AttributeGroupUpdateSchema(Schema):
-    name: Optional[str]
-    description: Optional[str]
-    position: Optional[int]
-    attribute_ids: Optional[list[UUID]]
 
 
 class AttributeGroupProductSchema(Schema):

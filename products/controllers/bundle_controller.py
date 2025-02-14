@@ -14,6 +14,7 @@ from ..schemas.bundle import (
     BundleItemUpdateSchema,
 )
 import logging
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +27,47 @@ class BundleController:
     def list_bundles(self, request):
         """Get all bundles"""
         try:
-            bundles = ProductBundle.objects.all()
-            return 200, [BundleSchema.from_orm(bundle) for bundle in bundles]
+            bundles = ProductBundle.objects.prefetch_related("items__product").all()
+            bundle_list = []
+            for bundle in bundles:
+                # Calculate total price
+                total_price = Decimal("0.00")
+                for item in bundle.items.all():
+                    total_price += item.product.price * item.quantity
+
+                # Calculate discounted price
+                discounted_price = total_price * (1 - bundle.discount_percentage / 100)
+
+                # Create bundle dictionary with all fields
+                bundle_dict = {
+                    "id": bundle.id,
+                    "name": bundle.name,
+                    "slug": bundle.slug,
+                    "description": bundle.description,
+                    "discount_percentage": bundle.discount_percentage,
+                    "total_price": total_price,
+                    "discounted_price": discounted_price,
+                    "is_active": bundle.is_active,
+                    "start_date": bundle.start_date,
+                    "end_date": bundle.end_date,
+                    "meta_data": {},  # Add empty dict since it's required by schema
+                    "items": [
+                        BundleItemSchema.from_orm(item) for item in bundle.items.all()
+                    ],
+                    "created_at": bundle.created_at,
+                    "updated_at": bundle.updated_at,
+                    "date_modified": (
+                        bundle.date_modified
+                        if hasattr(bundle, "date_modified")
+                        else None
+                    ),
+                }
+
+                # Create BundleSchema from dictionary
+                bundle_schema = BundleSchema.parse_obj(bundle_dict)
+                bundle_list.append(bundle_schema)
+
+            return 200, bundle_list
         except Exception as e:
             logger.error(f"Error listing bundles: {e}")
             return 500, {
