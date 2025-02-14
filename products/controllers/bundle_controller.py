@@ -18,26 +18,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@api_controller("/bundles", tags=["Bundles"], permissions=[IsAuthenticated])
+@api_controller("/products/bundles", tags=["Product Bundles"])
 class BundleController:
-    @http_get("", response={200: List[BundleSchema]})
-    def list_bundles(self):
-        """List all product bundles"""
+    permission_classes = [IsAuthenticated]
+
+    @http_get("", response={200: List[BundleSchema], 500: dict})
+    def list_bundles(self, request):
+        """Get all bundles"""
         try:
             bundles = ProductBundle.objects.all()
-            return 200, bundles
+            return 200, [BundleSchema.from_orm(bundle) for bundle in bundles]
         except Exception as e:
-            logger.error(f"Error fetching bundles: {e}")
+            logger.error(f"Error listing bundles: {e}")
             return 500, {
                 "error": "An error occurred while fetching bundles",
                 "message": str(e),
             }
 
-    @http_get("/{bundle_id}", response={200: BundleSchema})
-    def get_bundle(self, bundle_id: UUID):
-        """Get a specific product bundle"""
+    @http_get("/{id}", response={200: BundleSchema, 404: dict, 500: dict})
+    def get_bundle(self, request, id: UUID):
+        """Get a bundle by ID"""
         try:
-            bundle = get_object_or_404(ProductBundle, id=bundle_id)
+            bundle = get_object_or_404(ProductBundle, id=id)
             return 200, bundle
         except Exception as e:
             logger.error(f"Error fetching bundle: {e}")

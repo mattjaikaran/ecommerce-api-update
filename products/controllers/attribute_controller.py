@@ -29,26 +29,28 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@api_controller("/attributes", tags=["Attributes"], permissions=[IsAuthenticated])
+@api_controller("/products/attributes", tags=["Product Attributes"])
 class AttributeController:
-    @http_get("", response={200: List[AttributeSchema]})
-    def list_attributes(self):
-        """List all product attributes"""
+    permission_classes = [IsAuthenticated]
+
+    @http_get("", response={200: List[AttributeSchema], 500: dict})
+    def list_attributes(self, request):
+        """Get all attributes"""
         try:
             attributes = ProductAttribute.objects.all()
-            return 200, attributes
+            return 200, [AttributeSchema.from_orm(attr) for attr in attributes]
         except Exception as e:
-            logger.error(f"Error fetching attributes: {e}")
+            logger.error(f"Error listing attributes: {e}")
             return 500, {
                 "error": "An error occurred while fetching attributes",
                 "message": str(e),
             }
 
-    @http_get("/{attribute_id}", response={200: AttributeSchema})
-    def get_attribute(self, attribute_id: UUID):
-        """Get a specific product attribute"""
+    @http_get("/{id}", response={200: AttributeSchema, 404: dict, 500: dict})
+    def get_attribute(self, request, id: UUID):
+        """Get an attribute by ID"""
         try:
-            attribute = get_object_or_404(ProductAttribute, id=attribute_id)
+            attribute = get_object_or_404(ProductAttribute, id=id)
             return 200, attribute
         except Exception as e:
             logger.error(f"Error fetching attribute: {e}")

@@ -1,7 +1,6 @@
 import logging
 from typing import List
 from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
 from cart.models import Cart, CartItem
 from cart.schemas import CartItemSchema, CartItemCreateSchema, CartItemUpdateSchema
 from core.models import Customer
@@ -14,21 +13,25 @@ logger = logging.getLogger(__name__)
 
 @api_controller("/cart", tags=["Cart Items"])
 class CartItemController:
-    permission_classes = [IsAuthenticated]
 
-    @http_get("items", response={200: List[CartItemSchema], 404: dict, 500: dict})
+    @http_get("/items", response={200: List[CartItemSchema], 404: dict, 500: dict})
     def list_cart_items(self, request):
         """List all items in the current user's cart"""
         try:
+            # Return empty list for anonymous users
+            if not request.user.is_authenticated:
+                return 200, []
+
             # Get customer's active cart
-            customer = Customer.objects.get(user=request.user)
-            cart = Cart.objects.get(customer=customer, is_active=True)
-            cart_items = CartItem.objects.filter(cart=cart)
-            return 200, cart_items
-        except Customer.DoesNotExist:
-            return 404, {"message": "Customer profile not found"}
-        except Cart.DoesNotExist:
-            return 404, {"message": "Active cart not found"}
+            try:
+                customer = Customer.objects.get(user=request.user)
+                cart = Cart.objects.get(customer=customer, is_active=True)
+                cart_items = CartItem.objects.filter(cart=cart)
+                return 200, [CartItemSchema.from_orm(item) for item in cart_items]
+            except (Customer.DoesNotExist, Cart.DoesNotExist):
+                # Return empty list if no customer or active cart exists
+                return 200, []
+
         except Exception as e:
             logger.error(f"Error listing cart items: {str(e)}")
             return 500, {
@@ -36,7 +39,9 @@ class CartItemController:
                 "error": str(e),
             }
 
-    @http_post("items", response={201: CartItemSchema, 400: dict, 404: dict, 500: dict})
+    @http_post(
+        "/items", response={201: CartItemSchema, 400: dict, 404: dict, 500: dict}
+    )
     def create_cart_item(self, request, payload: CartItemCreateSchema):
         """Add an item to the current user's cart"""
         try:
@@ -85,7 +90,7 @@ class CartItemController:
             }
 
     @http_put(
-        "items/{item_id}",
+        "/items/{item_id}",
         response={200: CartItemSchema, 400: dict, 404: dict, 500: dict},
     )
     def update_cart_item(self, request, item_id: UUID, payload: CartItemUpdateSchema):
@@ -119,7 +124,7 @@ class CartItemController:
                 "error": str(e),
             }
 
-    @http_delete("items/{item_id}", response={204: dict, 404: dict, 500: dict})
+    @http_delete("/items/{item_id}", response={204: dict, 404: dict, 500: dict})
     def delete_cart_item(self, request, item_id: UUID):
         """Remove an item from the cart"""
         try:

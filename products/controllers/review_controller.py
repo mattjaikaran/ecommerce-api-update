@@ -4,6 +4,8 @@ from ninja_extra.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from uuid import UUID
+import logging
 
 from products.models import ProductReview, Product
 from products.schemas import (
@@ -12,27 +14,30 @@ from products.schemas import (
     ProductReviewUpdateSchema,
 )
 
+logger = logging.getLogger(__name__)
 
-@api_controller("/reviews", tags=["Product Reviews"])
+
+@api_controller("/products/reviews", tags=["Product Reviews"])
 class ReviewController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("/", response={200: List[ProductReviewSchema], 500: dict})
-    def list_reviews(self):
+    @http_get("", response={200: List[ProductReviewSchema], 500: dict})
+    def list_reviews(self, request):
         """
         Get all product reviews
         """
         try:
             reviews = ProductReview.objects.select_related("product", "user").all()
-            return 200, reviews
+            return 200, [ProductReviewSchema.from_orm(review) for review in reviews]
         except Exception as e:
+            logger.error(f"Error listing reviews: {e}")
             return 500, {
                 "error": "An error occurred while fetching reviews",
                 "message": str(e),
             }
 
     @http_get("/{id}", response={200: ProductReviewSchema, 404: dict, 500: dict})
-    def get_review(self, id: str):
+    def get_review(self, request, id: UUID):
         """
         Get a product review by ID
         """

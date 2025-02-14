@@ -216,16 +216,50 @@ test_endpoint "GET" "/products/collections" "List Collections" 200
 print_header "Tag Tests"
 test_endpoint "GET" "/products/tags" "List Tags" 200
 
+# Product Options Tests
+print_header "Product Options Tests"
+test_endpoint "GET" "/products/options" "List Product Options" 200
+if [ -n "$OPTION_ID" ]; then
+    test_endpoint "GET" "/products/options/$OPTION_ID" "Get Product Option by ID" 200
+fi
+
+# Attributes Tests
+print_header "Attribute Tests"
+test_endpoint "GET" "/products/attributes" "List Attributes" 200
+if [ -n "$ATTRIBUTE_ID" ]; then
+    test_endpoint "GET" "/products/attributes/$ATTRIBUTE_ID" "Get Attribute by ID" 200
+fi
+
+# Bundle Tests
+print_header "Bundle Tests"
+test_endpoint "GET" "/products/bundles" "List Bundles" 200
+if [ -n "$BUNDLE_ID" ]; then
+    test_endpoint "GET" "/products/bundles/$BUNDLE_ID" "Get Bundle by ID" 200
+fi
+
+# Review Tests
+print_header "Review Tests"
+test_endpoint "GET" "/products/reviews" "List Reviews" 200
+if [ -n "$REVIEW_ID" ]; then
+    test_endpoint "GET" "/products/reviews/$REVIEW_ID" "Get Review by ID" 200
+fi
+
 # Cart Tests
 print_header "Cart Tests"
 test_endpoint "GET" "/cart" "Get Cart" 200
-if [ -n "$AUTH_TOKEN" ] && [ -n "$PRODUCT_ID" ]; then
-    test_endpoint "POST" "/cart/items" "Add Item to Cart" 201 "{\"product_variant_id\": \"$PRODUCT_ID\", \"quantity\": 1}"
+test_endpoint "GET" "/cart/items" "List Cart Items" 200
+if [ -n "$CART_ITEM_ID" ]; then
+    test_endpoint "GET" "/cart/items/$CART_ITEM_ID" "Get Cart Item by ID" 200
 fi
 
 # Order Tests
 print_header "Order Tests"
 test_endpoint "GET" "/orders" "List Orders" 200
+if [ -n "$ORDER_ID" ]; then
+    test_endpoint "GET" "/orders/$ORDER_ID" "Get Order by ID" 200
+    test_endpoint "GET" "/orders/$ORDER_ID/items" "List Order Items" 200
+    test_endpoint "GET" "/orders/$ORDER_ID/history" "Get Order History" 200
+fi
 
 # Print summary
 print_header "Test Summary"

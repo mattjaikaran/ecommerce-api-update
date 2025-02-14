@@ -17,11 +17,11 @@ from products.schemas import (
 logger = logging.getLogger(__name__)
 
 
-@api_controller("/options", tags=["Product Options"])
+@api_controller("/products/options", tags=["Product Options"])
 class ProductOptionController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("/", response={200: List[ProductOptionSchema], 500: dict})
+    @http_get("", response={200: List[ProductOptionSchema], 500: dict})
     def list_options(self):
         """
         Get all product options
@@ -57,7 +57,7 @@ class ProductOptionController:
                 "message": str(e),
             }
 
-    @http_post("/", response={201: ProductOptionSchema, 400: dict, 500: dict})
+    @http_post("", response={201: ProductOptionSchema, 400: dict, 500: dict})
     @transaction.atomic
     def create_option(self, payload: ProductOptionCreateSchema):
         """
