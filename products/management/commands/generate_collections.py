@@ -3,8 +3,10 @@ from django.utils.text import slugify
 from faker import Faker
 import random
 from products.models import Product, ProductCollection
+from django.contrib.auth import get_user_model
 
 fake = Faker()
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -31,6 +33,15 @@ class Command(BaseCommand):
         max_products = options["max_products"]
         products = list(Product.objects.all())
 
+        admin_user = User.objects.filter(is_superuser=True).first()
+        if not admin_user:
+            self.stdout.write(
+                self.style.ERROR(
+                    "No admin user found. Please create an admin user first."
+                )
+            )
+            return
+
         if not products:
             self.stdout.write(
                 self.style.ERROR("No products found. Please create products first.")
@@ -48,6 +59,7 @@ class Command(BaseCommand):
                 seo_title=f"{name} Collection - Shop {name.lower()}",
                 seo_description=fake.text(max_nb_chars=160),
                 seo_keywords=f"{name.lower()}, collection, shop {name.lower()}",
+                created_by=admin_user,
             )
 
             # Add random products to collection

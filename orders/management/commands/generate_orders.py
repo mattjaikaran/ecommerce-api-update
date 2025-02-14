@@ -12,9 +12,11 @@ from orders.models import (
     ShippingMethod,
 )
 from products.models import ProductVariant
-from core.models import Customer, Address
+from core.models import Customer, Address, CustomerGroup
+from django.contrib.auth import get_user_model
 
 fake = Faker()
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -36,6 +38,16 @@ class Command(BaseCommand):
 
         customers = list(Customer.objects.all())
         variants = list(ProductVariant.objects.filter(is_active=True))
+        customer_groups = list(CustomerGroup.objects.all())
+
+        admin_user = User.objects.filter(is_superuser=True).first()
+        if not admin_user:
+            self.stdout.write(
+                self.style.ERROR(
+                    "No admin user found. Please create an admin user first."
+                )
+            )
+            return
 
         if not customers:
             self.stdout.write(
@@ -53,6 +65,7 @@ class Command(BaseCommand):
 
         for i in range(count):
             customer = random.choice(customers)
+            customer_group = random.choice(customer_groups) if customer_groups else None
 
             # Get or create addresses
             addresses = Address.objects.filter(user=customer.user)
@@ -66,6 +79,7 @@ class Command(BaseCommand):
                     country=fake.country(),
                     phone=fake.phone_number(),
                     is_default=True,
+                    created_by=admin_user,
                 )
             else:
                 billing_address = shipping_address = random.choice(addresses)
@@ -78,19 +92,29 @@ class Command(BaseCommand):
             shipping_method = random.choice(ShippingMethod.choices)[0]
 
             order = Order.objects.create(
-                order_number=order_number,
                 customer=customer,
+                customer_group=customer_group,
+                order_number=order_number,
                 status=status,
                 currency="USD",
+                subtotal=Decimal("0.00"),
+                shipping_amount=Decimal("0.00"),
+                shipping_method=shipping_method,
+                shipping_tax_amount=Decimal("0.00"),
+                tax_amount=Decimal("0.00"),
+                discount_amount=Decimal("0.00"),
+                total=Decimal("0.00"),
                 payment_status=payment_status,
                 payment_method=payment_method,
-                shipping_method=shipping_method,
+                payment_gateway="stripe",
                 billing_address=billing_address,
                 shipping_address=shipping_address,
                 email=customer.user.email,
                 phone=customer.phone,
                 ip_address=fake.ipv4(),
                 user_agent=fake.user_agent(),
+                meta_data={},
+                created_by=admin_user,
             )
 
             # Add random items to order
@@ -117,6 +141,7 @@ class Command(BaseCommand):
                     weight=(
                         variant.weight * quantity if variant.weight else Decimal("0.00")
                     ),
+                    created_by=admin_user,
                 )
 
                 subtotal += line_subtotal

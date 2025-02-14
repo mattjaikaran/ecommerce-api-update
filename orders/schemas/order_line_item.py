@@ -2,11 +2,12 @@ from datetime import datetime
 from decimal import Decimal
 from ninja import Schema
 from pydantic import Field
+from uuid import UUID
 
 
 class OrderLineItemSchema(Schema):
-    id: str
-    product_variant_id: str
+    id: UUID
+    product_variant_id: UUID
     quantity: int = Field(ge=1)
     unit_price: Decimal = Field(ge=0)
     subtotal: Decimal = Field(ge=0)
@@ -21,7 +22,7 @@ class OrderLineItemSchema(Schema):
 
 
 class OrderLineItemCreateSchema(Schema):
-    product_variant_id: str
+    product_variant_id: UUID
     quantity: int = Field(ge=1)
 
 

@@ -3,17 +3,18 @@ from decimal import Decimal
 from typing import Optional
 from ninja import Schema
 from pydantic import Field
+from uuid import UUID
 
 
 class RefundSchema(Schema):
-    id: str
-    order_id: str
+    id: UUID
+    order_id: UUID
     transaction_id: Optional[str] = None
     amount: Decimal = Field(ge=0)
     status: str
     reason: str
     notes: Optional[str] = None
-    refund_transaction_id: str
+    refund_transaction_id: UUID
     gateway_response: Optional[dict] = None
     meta_data: dict = {}
     created_at: datetime
@@ -21,7 +22,7 @@ class RefundSchema(Schema):
 
 
 class RefundCreateSchema(Schema):
-    order_id: str
+    order_id: UUID
     transaction_id: Optional[str] = None
     amount: Decimal = Field(ge=0)
     reason: str

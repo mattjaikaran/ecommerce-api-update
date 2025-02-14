@@ -56,7 +56,7 @@ class ProductCreateSchema(Schema):
     name: str
     slug: str
     description: Optional[str] = None
-    category_id: str
+    category_id: UUID
     type: str = "physical"
     tax_class: str = "standard"
     shipping_class: str = "standard"

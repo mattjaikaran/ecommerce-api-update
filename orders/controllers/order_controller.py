@@ -12,7 +12,6 @@ from ninja_extra import (
     http_delete,
 )
 from ninja_extra.permissions import IsAuthenticated
-from ninja.pagination import paginate
 
 from orders.models import (
     Order,
@@ -36,66 +35,23 @@ logger = logging.getLogger(__name__)
 class OrderController:
     permission_classes = [IsAuthenticated]
 
-    @http_get(
-        "/",
-        response={
-            200: List[OrderSchema],
-            404: dict,
-            500: dict,
-        },
-    )
-    @paginate
-    def list_orders(self):
-        """Get a paginated list of orders."""
+    @http_get("", response={200: List[OrderSchema], 500: dict})
+    def list_orders(self, request):
+        """List all orders."""
         try:
-            orders = (
-                Order.objects.select_related(
-                    "customer", "billing_address", "shipping_address"
-                )
-                .prefetch_related(
-                    "items",
-                    "fulfillments",
-                    "transactions",
-                    "refunds",
-                    "taxes",
-                    "notes",
-                    "history",
-                )
-                .all()
-            )
-            return orders  # Return just the orders, not a tuple with status code
+            orders = Order.objects.all()
+            return 200, orders
         except Exception as e:
-            logger.error(f"Error fetching orders: {e}")
             return 500, {
                 "error": "An error occurred while fetching orders",
                 "message": str(e),
             }
 
-    @http_get(
-        "/{order_id}",
-        response={
-            200: OrderSchema,
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_get("{order_id}", response={200: OrderSchema, 404: dict, 500: dict})
     def get_order(self, request, order_id: str):
-        """Get a single order by ID."""
+        """Get a specific order by ID."""
         try:
-            order = get_object_or_404(
-                Order.objects.select_related(
-                    "customer", "billing_address", "shipping_address"
-                ).prefetch_related(
-                    "items",
-                    "fulfillments",
-                    "transactions",
-                    "refunds",
-                    "taxes",
-                    "notes",
-                    "history",
-                ),
-                id=order_id,
-            )
+            order = get_object_or_404(Order, id=order_id)
             return 200, order
         except Order.DoesNotExist:
             return 404, {"error": "Order not found"}
@@ -106,7 +62,7 @@ class OrderController:
             }
 
     @http_post(
-        "/",
+        "",
         response={
             201: OrderSchema,
             400: dict,
@@ -165,7 +121,7 @@ class OrderController:
             }
 
     @http_put(
-        "/{order_id}",
+        "{order_id}",
         response={
             200: OrderSchema,
             400: dict,
@@ -175,7 +131,7 @@ class OrderController:
     )
     @transaction.atomic
     def update_order(self, request, order_id: str, payload: OrderUpdateSchema):
-        """Update an existing order."""
+        """Update an order."""
         try:
             order = get_object_or_404(Order, id=order_id)
 
@@ -200,26 +156,25 @@ class OrderController:
             }
 
     @http_delete(
-        "/{order_id}",
+        "{order_id}",
         response={
-            204: None,
+            204: dict,
+            400: dict,
             404: dict,
             500: dict,
         },
     )
-    @transaction.atomic
     def delete_order(self, request, order_id: str):
-        """Delete an order (soft delete)."""
+        """Delete/Cancel an order."""
         try:
             order = get_object_or_404(Order, id=order_id)
 
-            # Only allow deletion of draft orders
-            if order.status != OrderStatus.DRAFT:
-                return 400, {"error": "Only draft orders can be deleted"}
+            # Only allow deletion if order is in an editable state
+            if order.status not in [OrderStatus.DRAFT, OrderStatus.PENDING]:
+                return 400, {"error": "Order cannot be deleted in its current status"}
 
-            order.is_deleted = True
-            order.save()
-            return 204, None
+            order.delete()
+            return 204, {"message": "Order deleted successfully"}
         except Order.DoesNotExist:
             return 404, {"error": "Order not found"}
         except Exception as e:
@@ -229,7 +184,7 @@ class OrderController:
             }
 
     @http_post(
-        "/{order_id}/items",
+        "{order_id}/items",
         response={
             201: OrderLineItemSchema,
             400: dict,

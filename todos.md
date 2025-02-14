@@ -1,11 +1,11 @@
 # TODO
 
 ## Apps Structure
-- [ ] Core App
+- [X] Core App
     - Authentication, Users, Base Models
     - Permissions and Groups
     - Settings and Configuration
-- [ ] Products App
+- [X] Products App
     - Products, Variants, Options
     - Categories and Collections
     - Inventory Management
@@ -19,12 +19,12 @@
     - Tax
     - Shipping
     - Payments
-- [ ] Orders App
+- [X] Orders App
     - Orders and Line Items
     - Order Status Management
     - Order History
     - Fulfillment Tracking
-- [ ] Cart App
+- [X] Cart App
     - Shopping Cart
     - Cart Items
     - Cart Calculations
@@ -69,54 +69,54 @@ or be in orders app?
 ## Models
 
 ### Core
-- [ ] User Model
+- [X] User Model
     - Extended Django User with e-commerce fields
-- [ ] Address Model
+- [X] Address Model
     - Support for multiple address types
 - [ ] Configuration Model
     - Store settings and preferences
 
 ### Products
-- [ ] Product Model
+- [X] Product Model
     - Base product information
     - SEO fields
     - Status (draft, active, archived)
-- [ ] ProductVariant Model
+- [X] ProductVariant Model
     - SKU, barcode
     - Price, compare at price
     - Inventory tracking
-- [ ] ProductOption Model
+- [X] ProductOption Model
     - Color, size, material etc
-- [ ] ProductImage Model
+- [X] ProductImage Model
     - Image management
     - Alt text, position
-- [ ] Category Model
+- [X] Category Model
     - Hierarchical categories
     - SEO fields
-- [ ] Collection Model
+- [X] Collection Model
     - Curated product groups
     - Automated collections
 
 ### Orders
-- [ ] Order Model
+- [X] Order Model
     - Order details
     - Status management
     - Financial details
-- [ ] OrderLineItem Model
+- [X] OrderLineItem Model
     - Product variants
     - Quantities
     - Prices at time of order
-- [ ] FulfillmentOrder Model
+- [X] FulfillmentOrder Model
     - Shipping details
     - Tracking information
-- [ ] OrderNote Model
+- [X] OrderNote Model
     - Internal and customer notes
 
 ### Cart
-- [ ] Cart Model
+- [X] Cart Model
     - Session management
     - Expiry handling
-- [ ] CartItem Model
+- [X] CartItem Model
     - Product variants
     - Quantities
     - Price calculations
@@ -178,36 +178,36 @@ or be in orders app?
 ## API Controllers (using django-ninja-extra)
 
 ### Core
-- [ ] Authentication Controller
+- [X] Authentication Controller
     - JWT token management
     - Permission checking
-- [ ] User Controller
+- [X] User Controller
     - User management
     - Profile updates
 
 ### Products
-- [ ] Product Controller
+- [X] Product Controller
     - CRUD operations
     - Variant management
-- [ ] Category Controller
+- [X] Category Controller
     - Hierarchical management
-- [ ] Collection Controller
+- [X] Collection Controller
     - Collection management
     - Product assignments
 
 ### Orders
-- [ ] Order Controller
+- [X] Order Controller
     - Order processing
     - Status updates
-- [ ] Fulfillment Controller
+- [X] Fulfillment Controller
     - Shipping management
     - Tracking updates
 
 ### Cart
-- [ ] Cart Controller
+- [X] Cart Controller
     - Cart management
     - Item updates
-- [ ] CartCalculation Controller
+- [X] CartCalculation Controller
     - Price calculations
     - Discount applications
 
@@ -254,42 +254,42 @@ or be in orders app?
 ## Schemas (using Pydantic)
 
 ### Core
-- [ ] UserSchema
-- [ ] AddressSchema
+- [X] UserSchema
+- [X] AddressSchema
 - [ ] ConfigurationSchema
 
 ### Products
-- [ ] ProductSchema
-- [ ] ProductVariantSchema
-- [ ] ProductOptionSchema
-- [ ] CategorySchema
-- [ ] CollectionSchema
+- [X] ProductSchema
+- [X] ProductVariantSchema
+- [X] ProductOptionSchema
+- [X] CategorySchema
+- [X] CollectionSchema
 
 ### Orders
-- [ ] OrderSchema
-- [ ] OrderLineItemSchema
-- [ ] FulfillmentSchema
-- [ ] OrderNoteSchema
+- [X] OrderSchema
+- [X] OrderLineItemSchema
+- [X] FulfillmentSchema
+- [X] OrderNoteSchema
 
 ### Cart
-- [ ] CartSchema
-- [ ] CartItemSchema
-- [ ] CartCalculationSchema
+- [X] CartSchema
+- [X] CartItemSchema
+- [X] CartCalculationSchema
 
 ### Customers
-- [ ] CustomerSchema
-- [ ] CustomerGroupSchema
-- [ ] CustomerAddressSchema
+- [X] CustomerSchema
+- [X] CustomerGroupSchema
+- [X] CustomerAddressSchema
 
 ### Payments
-- [ ] PaymentMethodSchema
-- [ ] TransactionSchema
-- [ ] RefundSchema
+- [X] PaymentMethodSchema
+- [X] TransactionSchema
+- [X] RefundSchema
 
 ### Shipping
-- [ ] ShippingZoneSchema
-- [ ] ShippingMethodSchema
-- [ ] ShippingRateSchema
+- [X] ShippingZoneSchema
+- [X] ShippingMethodSchema
+- [X] ShippingRateSchema
 
 ### Discounts
 - [ ] DiscountSchema
@@ -316,20 +316,20 @@ or be in orders app?
 - [ ] Performance Tests
 
 ### Development Tools
-- [ ] Data Seeding Scripts
-- [ ] Development Environment Setup
+- [X] Data Seeding Scripts
+- [X] Development Environment Setup
 - [ ] Docker Configuration
 - [ ] CI/CD Pipeline
 
 ### Security
-- [ ] API Authentication
-- [ ] Rate Limiting
-- [ ] Input Validation
+- [X] API Authentication
+- [X] Rate Limiting
+- [X] Input Validation
 - [ ] Data Encryption
 - [ ] PCI Compliance (for payments)
 
 ### Monitoring
-- [ ] Error Logging
+- [X] Error Logging
 - [ ] Performance Monitoring
 - [ ] Audit Logging
 - [ ] Analytics Integration

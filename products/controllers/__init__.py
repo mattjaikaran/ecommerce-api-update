@@ -1,15 +1,19 @@
 from .attribute_controller import AttributeController
 from .bundle_controller import BundleController
-from .inventory_controller import InventoryController
-from .price_controller import PriceController
+from .category_controller import CategoryController
+from .collection_controller import CollectionController
 from .product_controller import ProductController
 from .product_option_controller import ProductOptionController
+from .review_controller import ReviewController
+from .tag_controller import TagController
 
 __all__ = [
     AttributeController,
     BundleController,
-    InventoryController,
-    PriceController,
+    CategoryController,
+    CollectionController,
     ProductController,
     ProductOptionController,
+    ReviewController,
+    TagController,
 ]

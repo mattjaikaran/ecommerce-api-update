@@ -1,21 +1,21 @@
 from datetime import datetime
 from ninja import Schema
-from core.schemas import UserSchema
+from uuid import UUID
 
 
 class OrderNoteSchema(Schema):
-    id: str
-    order_id: str
+    id: UUID
+    order_id: UUID
     note: str
-    is_customer_visible: bool = False
-    created_by: UserSchema
-    meta_data: dict = {}
+    is_customer_note: bool = False
+    is_staff_note: bool = False
     created_at: datetime
     updated_at: datetime
 
 
 class OrderNoteCreateSchema(Schema):
-    order_id: str
+    order_id: UUID
     note: str
-    is_customer_visible: bool = False
+    is_customer_note: bool = False
+    is_staff_note: bool = False
     meta_data: dict = {}

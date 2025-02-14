@@ -262,29 +262,24 @@ AUTH_USER_MODEL = "core.User"
 #####
 
 NINJA_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),  # 5 minutes
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # 1 day
-    "ROTATE_REFRESH_TOKENS": False,  # rotate refresh tokens
-    "BLACKLIST_AFTER_ROTATION": False,  # blacklist after rotation
-    "UPDATE_LAST_LOGIN": False,  # update last login
-    "ALGORITHM": "HS256",  # algorithm
-    "SIGNING_KEY": SECRET_KEY,  # signing key
-    "VERIFYING_KEY": None,  # verifying key
-    "AUDIENCE": None,  # audience
-    "ISSUER": None,  # issuer
-    "JWK_URL": None,  # jwk url
-    "LEEWAY": 0,  # leeway
-    "USER_ID_FIELD": "id",  # user id field
-    "USER_ID_CLAIM": "user_id",  # user id claim
-    "USER_AUTHENTICATION_RULE": "ninja_jwt.authentication.default_user_authentication_rule",
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": False,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
     "AUTH_TOKEN_CLASSES": ("ninja_jwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
-    "TOKEN_USER_CLASS": "ninja_jwt.models.TokenUser",  # token user class
-    "JTI_CLAIM": "jti",  # jti claim
-    # For Controller Schemas
-    # FOR OBTAIN PAIR
-    "TOKEN_OBTAIN_PAIR_INPUT_SCHEMA": "ninja_jwt.schema.TokenObtainPairInputSchema",  # token obtain pair input schema
-    "TOKEN_OBTAIN_PAIR_REFRESH_INPUT_SCHEMA": "ninja_jwt.schema.TokenRefreshInputSchema",  # token obtain pair refresh input schema
+    "JTI_CLAIM": "jti",
+    "TOKEN_USER_CLASS": "core.User",
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
 
 

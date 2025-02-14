@@ -17,6 +17,11 @@ from .feedback import (
     CustomerFeedbackSchema,
     CustomerFeedbackCreateSchema,
 )
+from .customer import (
+    CustomerSchema,
+    CustomerCreateSchema,
+    CustomerUpdateSchema,
+)
 
 all = [
     UserSchema,
@@ -30,4 +35,7 @@ all = [
     AddressCreateSchema,
     CustomerFeedbackSchema,
     CustomerFeedbackCreateSchema,
+    CustomerSchema,
+    CustomerCreateSchema,
+    CustomerUpdateSchema,
 ]

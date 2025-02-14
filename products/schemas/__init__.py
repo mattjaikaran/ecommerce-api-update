@@ -1,28 +1,3 @@
-from .product import ProductSchema, ProductCreateSchema
-from .category import (
-    CategorySchema,
-    CategoryCreateSchema,
-    CategoryUpdateSchema,
-)
-from .collection import CollectionSchema, CollectionCreateSchema
-from .review import ReviewSchema, ReviewCreateSchema
-from .tag import TagSchema, TagCreateSchema
-from .product_option import (
-    ProductOptionSchema,
-    ProductOptionCreateSchema,
-    ProductOptionUpdateSchema,
-    ProductVariantSchema,
-    ProductImageSchema,
-    ProductVariantCreateSchema,
-    ProductVariantUpdateSchema,
-)
-from .inventory import (
-    InventoryHistorySchema,
-    InventoryAdjustmentSchema,
-    InventoryAdjustmentResponseSchema,
-    LowStockAlertSchema,
-    InventorySnapshotSchema,
-)
 from .attribute import (
     AttributeSchema,
     AttributeCreateSchema,
@@ -30,12 +5,11 @@ from .attribute import (
     AttributeValueSchema,
     AttributeValueCreateSchema,
     AttributeValueUpdateSchema,
-    AttributeAssignmentSchema,
-    AttributeAssignmentCreateSchema,
-    AttributeFilterSchema,
     AttributeGroupSchema,
     AttributeGroupCreateSchema,
     AttributeGroupUpdateSchema,
+    AttributeAssignmentSchema,
+    AttributeAssignmentCreateSchema,
 )
 from .bundle import (
     BundleSchema,
@@ -44,76 +18,90 @@ from .bundle import (
     BundleItemSchema,
     BundleItemCreateSchema,
     BundleItemUpdateSchema,
-    BundleAnalyticsSchema,
-    BundleSearchSchema,
 )
-from .price import (
-    PriceHistorySchema,
-    PriceAdjustmentSchema,
-    PriceAdjustmentResponseSchema,
-    BulkPriceAdjustmentSchema,
-    PriceAnalyticsSchema,
-    PricingRuleSchema,
-)
-
-__all__ = [
-    # Product Schemas
-    ProductSchema,
-    ProductCreateSchema,
-    # Category Schemas
+from .category import (
     CategorySchema,
     CategoryCreateSchema,
     CategoryUpdateSchema,
-    # Collection Schemas
+)
+from .collection import (
     CollectionSchema,
     CollectionCreateSchema,
-    # Review Schemas
-    ReviewSchema,
-    ReviewCreateSchema,
-    # Tag Schemas
-    TagSchema,
-    TagCreateSchema,
-    # Product Option Schemas
+    CollectionUpdateSchema,
+    CollectionProductSchema,
+)
+from .product import (
+    ProductSchema,
+    ProductCreateSchema,
+)
+from .product_option import (
     ProductOptionSchema,
     ProductOptionCreateSchema,
     ProductOptionUpdateSchema,
+    ProductOptionValueSchema,
     ProductVariantSchema,
     ProductVariantCreateSchema,
     ProductVariantUpdateSchema,
     ProductImageSchema,
-    # Attribute Schemas
-    AttributeSchema,
-    AttributeCreateSchema,
-    AttributeUpdateSchema,
-    AttributeValueSchema,
-    AttributeValueCreateSchema,
-    AttributeValueUpdateSchema,
-    AttributeAssignmentSchema,
-    AttributeAssignmentCreateSchema,
-    AttributeFilterSchema,
-    AttributeGroupSchema,
-    AttributeGroupCreateSchema,
-    AttributeGroupUpdateSchema,
-    # Bundle Schemas
-    BundleSchema,
-    BundleCreateSchema,
-    BundleUpdateSchema,
-    BundleItemSchema,
-    BundleItemCreateSchema,
-    BundleItemUpdateSchema,
-    BundleAnalyticsSchema,
-    BundleSearchSchema,
-    # Inventory Schemas
-    InventoryHistorySchema,
-    InventoryAdjustmentSchema,
-    InventoryAdjustmentResponseSchema,
-    LowStockAlertSchema,
-    InventorySnapshotSchema,
-    # Price Schemas
-    PriceHistorySchema,
-    PriceAdjustmentSchema,
-    PriceAdjustmentResponseSchema,
-    BulkPriceAdjustmentSchema,
-    PriceAnalyticsSchema,
-    PricingRuleSchema,
+)
+from .review import (
+    ReviewSchema as ProductReviewSchema,
+    ReviewCreateSchema as ProductReviewCreateSchema,
+    ReviewUpdateSchema as ProductReviewUpdateSchema,
+)
+from .tag import (
+    TagSchema as ProductTagSchema,
+    TagCreateSchema as ProductTagCreateSchema,
+    TagUpdateSchema as ProductTagUpdateSchema,
+)
+
+__all__ = [
+    # Attribute schemas
+    "AttributeSchema",
+    "AttributeCreateSchema",
+    "AttributeUpdateSchema",
+    "AttributeValueSchema",
+    "AttributeValueCreateSchema",
+    "AttributeValueUpdateSchema",
+    "AttributeGroupSchema",
+    "AttributeGroupCreateSchema",
+    "AttributeGroupUpdateSchema",
+    "AttributeAssignmentSchema",
+    "AttributeAssignmentCreateSchema",
+    # Bundle schemas
+    "BundleSchema",
+    "BundleCreateSchema",
+    "BundleUpdateSchema",
+    "BundleItemSchema",
+    "BundleItemCreateSchema",
+    "BundleItemUpdateSchema",
+    # Category schemas
+    "CategorySchema",
+    "CategoryCreateSchema",
+    "CategoryUpdateSchema",
+    # Collection schemas
+    "CollectionSchema",
+    "CollectionCreateSchema",
+    "CollectionUpdateSchema",
+    "CollectionProductSchema",
+    # Product schemas
+    "ProductSchema",
+    "ProductCreateSchema",
+    # Product option schemas
+    "ProductOptionSchema",
+    "ProductOptionCreateSchema",
+    "ProductOptionUpdateSchema",
+    "ProductOptionValueSchema",
+    "ProductVariantSchema",
+    "ProductVariantCreateSchema",
+    "ProductVariantUpdateSchema",
+    "ProductImageSchema",
+    # Review schemas
+    "ProductReviewSchema",
+    "ProductReviewCreateSchema",
+    "ProductReviewUpdateSchema",
+    # Tag schemas
+    "ProductTagSchema",
+    "ProductTagCreateSchema",
+    "ProductTagUpdateSchema",
 ]

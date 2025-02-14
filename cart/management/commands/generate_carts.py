@@ -5,9 +5,11 @@ from datetime import timedelta
 import random
 from cart.models import Cart, CartItem
 from products.models import ProductVariant
-from core.models import Customer, User
+from core.models import Customer
+from django.contrib.auth import get_user_model
 
 fake = Faker()
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -38,7 +40,6 @@ class Command(BaseCommand):
         variants = list(ProductVariant.objects.filter(is_active=True))
 
         admin_user = User.objects.filter(is_superuser=True).first()
-
         if not admin_user:
             self.stdout.write(
                 self.style.ERROR(
@@ -90,7 +91,11 @@ class Command(BaseCommand):
                 price = variant.price
 
                 CartItem.objects.create(
-                    cart=cart, product_variant=variant, quantity=quantity, price=price
+                    cart=cart,
+                    product_variant=variant,
+                    quantity=quantity,
+                    price=price,
+                    created_by=admin_user,
                 )
 
                 subtotal += price * quantity
