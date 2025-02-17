@@ -33,6 +33,8 @@ from .collection import (
 from .product import (
     ProductSchema,
     ProductCreateSchema,
+    ProductListSchema,
+    ProductUpdateSchema,
 )
 from .product_option import (
     ProductOptionSchema,
@@ -87,6 +89,8 @@ __all__ = [
     # Product schemas
     "ProductSchema",
     "ProductCreateSchema",
+    "ProductListSchema",
+    "ProductUpdateSchema",
     # Product option schemas
     "ProductOptionSchema",
     "ProductOptionCreateSchema",

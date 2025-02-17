@@ -179,17 +179,6 @@ All developer scripts include:
 
 For more detailed documentation about the scripts, see `scripts/README.md`.
 
-## Why Django Ninja?
-- [Django Ninja Docs](https://django-ninja.dev/)
-
-Django Ninja is a newer framework that can run on Django 5.0, built in OpenAPI/Swagger/ReDoc, has async support, and uses Pydantic. It almost has a FastAPI vibe with some Django features. It seems like there is decent support and an excitement to have a *new* Django Framework.
-
-By following this approach, the front-end can easily consume the JSON data from these endpoints. The API will be self-documenting and you can view the OpenAPI (Swagger) documentation by navigating to `/api/docs` in your browser.
-
-### Why Django Ninja Extra?
-- [Django Ninja Extra Docs](https://eadwincode.github.io/django-ninja-extra/)
-
-When building Django apps, I am mostly familiar with a class-based views architecture and ninja-extra makes the transition from DRF to ninja a little easier. There are permissions and dependency injection included. 
 
 ### Django Ninja Serialization
 
@@ -198,10 +187,6 @@ When building Django apps, I am mostly familiar with a class-based views archite
 - Use from_orm() to convert Django ORM objects to Pydantic models.
 - Django Ninja automatically handles the conversion to JSON in the HTTP response.
 
-## Admin Panel
-- [Django Unfold Docs](https://github.com/unfoldadmin/django-unfold)
-
-Django Unfold has one of the cleaniest designs for Django admin panels. Pretty easy to get set up and there is now support for certain libraries that broke the design (ie - django-import-export)
 
 ## Production Deployment
 
@@ -230,6 +215,7 @@ pytest --cov=.
 
 ## Features
 - JWT Authentication
+- Passwordless Authentication
 - PostgreSQL Database
 - Docker & Docker Compose setup
 - Comprehensive test setup with pytest
@@ -242,6 +228,138 @@ pytest --cov=.
 - CORS configuration
 - Debug toolbar for development
 
+## Caching System
+
+The project includes a comprehensive Redis-based caching system with the following features:
+
+### Cache Management
+
+1. **Command Line Interface**:
+   ```bash
+   # Warm cache for specific models
+   python manage.py cache_ops warm --models products.Product orders.Order
+   
+   # Clear all cache
+   python manage.py cache_ops clear --force
+   
+   # Preload common queries
+   python manage.py cache_ops preload
+   
+   # Show cache statistics
+   python manage.py cache_ops stats
+   
+   # Show cache versions
+   python manage.py cache_ops version
+   ```
+
+2. **Cache Decorators**:
+   ```python
+   from core.cache.decorators import cached_view, cached_method
+   
+   @api_controller('/products')
+   class ProductController:
+       @http_get('')
+       @cached_view(timeout=300, key_prefix='products')
+       def list_products(self):
+           return Product.objects.all()
+   
+       @cached_method(timeout=300, key_prefix='product')
+       def get_product_data(self, product_id):
+           return Product.objects.get(id=product_id)
+   ```
+
+3. **Versioned Cache**:
+   ```python
+   from core.cache.versioning import VersionedCache
+   
+   # Create versioned cache for a namespace
+   cache = VersionedCache('products')
+   
+   # Set and get data
+   cache.set('featured', featured_products)
+   featured = cache.get('featured')
+   
+   # Invalidate all cache for namespace
+   cache.invalidate_all()
+   ```
+
+### Cache Warming
+
+The system includes automatic cache warming for common queries:
+
+1. **Model Cache Warming**:
+   ```python
+   from core.cache.warming import CacheWarmer
+   
+   warmer = CacheWarmer()
+   warmer.warm_model(Product, chunk_size=100)
+   ```
+
+2. **Query Preloading**:
+   ```python
+   from core.cache.preload import CachePreloader
+   
+   preloader = CachePreloader()
+   preloader.preload_products()  # Preload product-related queries
+   preloader.preload_all()       # Preload all common queries
+   ```
+
+### Admin Interface
+
+The Django admin includes a cache monitoring interface at `/admin/cache-monitor/` with features:
+
+- Cache statistics and metrics
+- Cache version management
+- Cache warming controls
+- Clear cache by namespace
+- Monitor cache usage
+
+### Automatic Cache Invalidation
+
+The system automatically invalidates cache when models are updated:
+
+1. **Signal Handlers**:
+   ```python
+   from core.cache.signals import register_cache_signals
+   
+   # In apps.py
+   def ready(self):
+       register_cache_signals()
+   ```
+
+2. **Related Model Invalidation**:
+   - When a model is updated, related models' cache is automatically invalidated
+   - Handles both forward and reverse relationships
+
+### Configuration
+
+Add to your `settings.py`:
+
+```python
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'SOCKET_CONNECT_TIMEOUT': 5,
+            'SOCKET_TIMEOUT': 5,
+            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
+            'IGNORE_EXCEPTIONS': True,
+        }
+    }
+}
+
+# Cache time to live in seconds
+CACHE_TTL = 60 * 15  # 15 minutes
+CACHE_KEY_PREFIX = 'ecommerce'
+
+# Session backend
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+```
+
 ## Database
 
 ```bash
@@ -249,10 +367,3 @@ $ psql my_db # enter shell
 $ createdb --username=USERNAME my_db # create db
 $ dropdb my_db # drop db
 ```
-
-## Contributing
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request

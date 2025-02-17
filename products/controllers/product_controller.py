@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from uuid import UUID
 import logging
 
+from core.cache.decorators import cached_view
 from products.models import (
     Product,
     ProductVariant,
@@ -20,6 +21,8 @@ from products.schemas import (
     ProductVariantSchema,
     ProductVariantCreateSchema,
     ProductVariantUpdateSchema,
+    ProductListSchema,
+    ProductUpdateSchema,
 )
 
 logger = logging.getLogger(__name__)
@@ -32,90 +35,89 @@ class ProductController:
     @http_get(
         "",
         response={
-            200: List[ProductSchema],
+            200: List[ProductListSchema],
             400: dict,
             404: dict,
-            500: dict,
         },
     )
-    def list_products(self, request):
+    @cached_view(timeout=300, key_prefix="products")
+    def list_products(self):
         """
         Get all products
         """
         try:
-            products = Product.objects.prefetch_related(
-                "variants",
-                "images",
-                "reviews",
-                "tags",
-                "collections",
-            ).all()
-            return 200, [ProductSchema.from_orm(product) for product in products]
+            products = (
+                Product.objects.select_related(
+                    "category",
+                    "created_by",
+                    "updated_by",
+                )
+                .prefetch_related(
+                    "variants",
+                    "tags",
+                    "collections",
+                    "images",
+                )
+                .all()
+            )
+            return 200, [ProductListSchema.from_orm(product) for product in products]
         except Exception as e:
             logger.error(f"Error listing products: {e}")
-            return 500, {
-                "error": "An error occurred while fetching products",
-                "message": str(e),
-            }
+            return 400, {"error": "Error listing products", "message": str(e)}
 
     @http_get(
         "/{id}",
         response={
             200: ProductSchema,
+            400: dict,
             404: dict,
-            500: dict,
         },
+        tags=["Products"],
     )
-    def get_product(self, request, id: UUID):
+    @cached_view(timeout=300, key_prefix="product")
+    def get_product(self, id: UUID):
         """
         Get a product by ID
         """
         try:
-            product = get_object_or_404(
-                Product.objects.prefetch_related(
+            product = (
+                Product.objects.select_related(
+                    "category",
+                    "brand",
+                )
+                .prefetch_related(
                     "variants",
-                    "images",
-                    "reviews",
                     "tags",
                     "collections",
-                ),
-                id=id,
+                )
+                .get(id=id)
             )
             return 200, ProductSchema.from_orm(product)
         except Product.DoesNotExist:
             return 404, {"error": "Product not found"}
         except Exception as e:
-            logger.error(f"Error getting product {id}: {e}")
-            return 500, {
-                "error": "An error occurred while fetching the product",
-                "message": str(e),
-            }
+            logger.error(f"Error getting product: {e}")
+            return 400, {"error": "Error getting product", "message": str(e)}
 
     @http_post(
         "",
         response={
             201: ProductSchema,
             400: dict,
-            404: dict,
-            500: dict,
         },
+        tags=["Products"],
     )
     @transaction.atomic
-    def create_product(self, request, payload: ProductCreateSchema):
+    def create_product(self, payload: ProductCreateSchema):
         """
         Create a new product
         """
         try:
             product = Product.objects.create(**payload.dict())
             return 201, ProductSchema.from_orm(product)
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
         except Exception as e:
             logger.error(f"Error creating product: {e}")
-            return 500, {
-                "error": "An error occurred while creating the product",
-                "message": str(e),
-            }
+            return 400, {"error": "Error creating product", "message": str(e)}
 
     @http_put(
         "/{id}",
@@ -123,55 +125,49 @@ class ProductController:
             200: ProductSchema,
             400: dict,
             404: dict,
-            500: dict,
         },
+        tags=["Products"],
     )
     @transaction.atomic
-    def update_product(self, request, id: UUID, payload: ProductCreateSchema):
+    def update_product(self, id: UUID, payload: ProductUpdateSchema):
         """
         Update a product
         """
         try:
             product = get_object_or_404(Product, id=id)
-            for attr, value in payload.dict(exclude_unset=True).items():
-                setattr(product, attr, value)
+            for key, value in payload.dict(exclude_unset=True).items():
+                setattr(product, key, value)
             product.save()
             return 200, ProductSchema.from_orm(product)
         except Product.DoesNotExist:
             return 404, {"error": "Product not found"}
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
         except Exception as e:
-            logger.error(f"Error updating product {id}: {e}")
-            return 500, {
-                "error": "An error occurred while updating the product",
-                "message": str(e),
-            }
+            logger.error(f"Error updating product: {e}")
+            return 400, {"error": "Error updating product", "message": str(e)}
 
     @http_delete(
         "/{id}",
         response={
-            204: dict,
+            204: None,
+            400: dict,
             404: dict,
-            500: dict,
         },
+        tags=["Products"],
     )
-    def delete_product(self, request, id: UUID):
+    @transaction.atomic
+    def delete_product(self, id: UUID):
         """
         Delete a product
         """
         try:
             product = get_object_or_404(Product, id=id)
             product.delete()
-            return 204, {"message": "Product deleted successfully"}
+            return 204, None
         except Product.DoesNotExist:
             return 404, {"error": "Product not found"}
         except Exception as e:
-            logger.error(f"Error deleting product {id}: {e}")
-            return 500, {
-                "error": "An error occurred while deleting the product",
-                "message": str(e),
-            }
+            logger.error(f"Error deleting product: {e}")
+            return 400, {"error": "Error deleting product", "message": str(e)}
 
     # Product Variant endpoints
     @http_get(
@@ -182,6 +178,7 @@ class ProductController:
             500: dict,
         },
     )
+    @cached_view(timeout=300, key_prefix="products")
     def list_product_variants(self, request, product_id: UUID):
         """
         Get all variants for a product
@@ -209,6 +206,7 @@ class ProductController:
             500: dict,
         },
     )
+    @cached_view(timeout=300, key_prefix="products")
     def get_product_variant(self, request, product_id: UUID, id: UUID):
         """
         Get a product variant by ID
@@ -349,6 +347,7 @@ class ProductController:
             500: dict,
         },
     )
+    @transaction.atomic
     def delete_product_variant(self, request, product_id: UUID, id: UUID):
         """
         Delete a product variant
