@@ -61,3 +61,22 @@ class ProductVariant(AbstractBaseModel):
         verbose_name_plural = "Product Variants"
         ordering = ["position"]
         unique_together = ["product", "sku"]
+        indexes = [
+            # Core lookup indexes
+            models.Index(fields=["sku"]),
+            models.Index(fields=["barcode"]),
+            models.Index(fields=["product"]),
+            models.Index(fields=["is_active"]),
+            # Inventory and pricing indexes
+            models.Index(fields=["inventory_quantity"]),
+            models.Index(fields=["price"]),
+            models.Index(fields=["position"]),
+            # Compound indexes for common queries
+            models.Index(fields=["product", "is_active"]),
+            models.Index(fields=["product", "position"]),
+            models.Index(fields=["is_active", "inventory_quantity"]),
+            models.Index(fields=["product", "price"]),
+            # Date-based indexes
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+        ]

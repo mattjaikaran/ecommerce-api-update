@@ -1,19 +1,24 @@
+"""Product management controller with modern decorator-based approach."""
+
 import logging
 from uuid import UUID
 
-from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import models, transaction
 from django.shortcuts import get_object_or_404
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
-from ninja_extra.permissions import IsAuthenticated
 
-from core.cache.decorators import cached_view
+from api.decorators import (
+    admin_endpoint,
+    create_endpoint,
+    delete_endpoint,
+    detail_endpoint,
+    list_endpoint,
+    search_and_filter,
+    update_endpoint,
+)
 from products.models import (
     Product,
-    ProductOption,
-    ProductOptionValue,
     ProductVariant,
-    ProductVariantOption,
 )
 from products.schemas import (
     ProductCreateSchema,
@@ -30,321 +35,259 @@ logger = logging.getLogger(__name__)
 
 @api_controller("/products", tags=["Products"])
 class ProductController:
-    permission_classes = [IsAuthenticated]
+    """Product management controller with comprehensive decorators."""
 
-    @http_get(
-        "",
-        response={
-            200: list[ProductListSchema],
-            400: dict,
-            404: dict,
+    @http_get("", response={200: list[ProductListSchema], 400: dict})
+    @list_endpoint(
+        cache_timeout=300,
+        select_related=["category", "created_by", "updated_by"],
+        prefetch_related=[
+            "variants",
+            "tags",
+            "collections",
+            "images",
+            "attributes",
+            "reviews",
+        ],
+        search_fields=["name", "description", "slug"],
+        filter_fields={
+            "category_id": "exact",
+            "status": "exact",
+            "is_active": "boolean",
+            "featured": "boolean",
+            "type": "exact",
         },
+        ordering_fields=[
+            "name",
+            "price",
+            "created_at",
+            "updated_at",
+            "featured",
+            "quantity",
+        ],
     )
-    @cached_view(timeout=300, key_prefix="products")
-    def list_products(self):
-        """Get all products"""
-        try:
-            products = (
-                Product.objects.select_related(
-                    "category",
-                    "created_by",
-                    "updated_by",
-                )
-                .prefetch_related(
-                    "variants",
-                    "tags",
-                    "collections",
-                    "images",
-                )
-                .all()
-            )
-            return 200, [ProductListSchema.from_orm(product) for product in products]
-        except Exception as e:
-            logger.error(f"Error listing products: {e}")
-            return 400, {"error": "Error listing products", "message": str(e)}
+    @search_and_filter(
+        search_fields=["name", "description", "slug"],
+        filter_fields={
+            "category_id": "exact",
+            "status": "exact",
+            "is_active": "boolean",
+            "featured": "boolean",
+            "type": "exact",
+        },
+        ordering_fields=["name", "price", "created_at", "featured"],
+    )
+    def list_products(self, request):
+        """Get all products with advanced filtering and optimization."""
+        return 200, Product.objects.filter(is_active=True)
 
-    @http_get(
-        "/{id}",
-        response={
-            200: ProductSchema,
-            400: dict,
-            404: dict,
-        },
-        tags=["Products"],
+    @http_get("/{product_id}", response={200: ProductSchema, 400: dict, 404: dict})
+    @detail_endpoint(
+        cache_timeout=600,
+        select_related=["category", "created_by", "updated_by"],
+        prefetch_related=[
+            "variants__options__option",
+            "variants__options__value",
+            "tags",
+            "collections",
+            "images",
+            "attributes__attribute",
+            "reviews__customer__user",
+            "bundles__bundle_items__product",
+        ],
     )
-    @cached_view(timeout=300, key_prefix="product")
-    def get_product(self, id: UUID):
-        """Get a product by ID"""
-        try:
-            product = (
-                Product.objects.select_related(
-                    "category",
-                    "brand",
-                )
-                .prefetch_related(
-                    "variants",
-                    "tags",
-                    "collections",
-                )
-                .get(id=id)
-            )
-            return 200, ProductSchema.from_orm(product)
-        except Product.DoesNotExist:
-            return 404, {"error": "Product not found"}
-        except Exception as e:
-            logger.error(f"Error getting product: {e}")
-            return 400, {"error": "Error getting product", "message": str(e)}
+    def get_product(self, request, product_id: UUID):
+        """Get a specific product by ID with complete related data."""
+        product = get_object_or_404(Product, id=product_id, is_active=True)
+        return 200, ProductSchema.from_orm(product)
+
+    @http_post("", response={201: ProductSchema, 400: dict})
+    @create_endpoint(require_admin=True)
+    @transaction.atomic
+    def create_product(self, request, payload: ProductCreateSchema):
+        """Create a new product."""
+        product = Product.objects.create(
+            **payload.dict(),
+            created_by=request.user,
+            updated_by=request.user,
+        )
+        return 201, ProductSchema.from_orm(product)
+
+    @http_put("/{product_id}", response={200: ProductSchema, 400: dict, 404: dict})
+    @update_endpoint(require_admin=True)
+    @transaction.atomic
+    def update_product(self, request, product_id: UUID, payload: ProductUpdateSchema):
+        """Update a product."""
+        product = get_object_or_404(Product, id=product_id)
+
+        for field, value in payload.dict(exclude_unset=True).items():
+            setattr(product, field, value)
+
+        product.updated_by = request.user
+        product.save()
+
+        return 200, ProductSchema.from_orm(product)
+
+    @http_delete("/{product_id}", response={204: None, 404: dict})
+    @delete_endpoint(require_admin=True)
+    def delete_product(self, request, product_id: UUID):
+        """Soft delete a product."""
+        product = get_object_or_404(Product, id=product_id)
+        product.is_active = False
+        product.is_deleted = True
+        product.deleted_by = request.user
+        product.save()
+        return 204, None
+
+    @http_get("/{product_id}/variants", response={200: list[ProductVariantSchema]})
+    @list_endpoint(
+        cache_timeout=300,
+        select_related=["product"],
+        prefetch_related=["options__option", "options__value"],
+        filter_fields={"is_active": "boolean"},
+        ordering_fields=["position", "name", "price"],
+    )
+    def get_product_variants(self, request, product_id: UUID):
+        """Get all variants for a product."""
+        product = get_object_or_404(Product, id=product_id, is_active=True)
+        return 200, product.variants.filter(is_active=True).order_by("position")
 
     @http_post(
-        "",
-        response={
-            201: ProductSchema,
-            400: dict,
-        },
-        tags=["Products"],
+        "/{product_id}/variants", response={201: ProductVariantSchema, 400: dict}
     )
-    @transaction.atomic
-    def create_product(self, payload: ProductCreateSchema):
-        """Create a new product"""
-        try:
-            product = Product.objects.create(**payload.dict())
-            return 201, ProductSchema.from_orm(product)
-        except Exception as e:
-            logger.error(f"Error creating product: {e}")
-            return 400, {"error": "Error creating product", "message": str(e)}
-
-    @http_put(
-        "/{id}",
-        response={
-            200: ProductSchema,
-            400: dict,
-            404: dict,
-        },
-        tags=["Products"],
-    )
-    @transaction.atomic
-    def update_product(self, id: UUID, payload: ProductUpdateSchema):
-        """Update a product"""
-        try:
-            product = get_object_or_404(Product, id=id)
-            for key, value in payload.dict(exclude_unset=True).items():
-                setattr(product, key, value)
-            product.save()
-            return 200, ProductSchema.from_orm(product)
-        except Product.DoesNotExist:
-            return 404, {"error": "Product not found"}
-        except Exception as e:
-            logger.error(f"Error updating product: {e}")
-            return 400, {"error": "Error updating product", "message": str(e)}
-
-    @http_delete(
-        "/{id}",
-        response={
-            204: None,
-            400: dict,
-            404: dict,
-        },
-        tags=["Products"],
-    )
-    @transaction.atomic
-    def delete_product(self, id: UUID):
-        """Delete a product"""
-        try:
-            product = get_object_or_404(Product, id=id)
-            product.delete()
-            return 204, None
-        except Product.DoesNotExist:
-            return 404, {"error": "Product not found"}
-        except Exception as e:
-            logger.error(f"Error deleting product: {e}")
-            return 400, {"error": "Error deleting product", "message": str(e)}
-
-    # Product Variant endpoints
-    @http_get(
-        "/{product_id}/variants",
-        response={
-            200: list[ProductVariantSchema],
-            404: dict,
-            500: dict,
-        },
-    )
-    @cached_view(timeout=300, key_prefix="products")
-    def list_product_variants(self, request, product_id: UUID):
-        """Get all variants for a product"""
-        try:
-            variants = ProductVariant.objects.filter(
-                product_id=product_id
-            ).prefetch_related(
-                "options",
-                "images",
-            )
-            return 200, [ProductVariantSchema.from_orm(variant) for variant in variants]
-        except Exception as e:
-            logger.error(f"Error listing variants for product {product_id}: {e}")
-            return 500, {
-                "error": "An error occurred while fetching product variants",
-                "message": str(e),
-            }
-
-    @http_get(
-        "/{product_id}/variants/{id}",
-        response={
-            200: ProductVariantSchema,
-            404: dict,
-            500: dict,
-        },
-    )
-    @cached_view(timeout=300, key_prefix="products")
-    def get_product_variant(self, request, product_id: UUID, id: UUID):
-        """Get a product variant by ID"""
-        try:
-            variant = get_object_or_404(
-                ProductVariant.objects.prefetch_related(
-                    "options",
-                    "images",
-                ),
-                product_id=product_id,
-                id=id,
-            )
-            return 200, ProductVariantSchema.from_orm(variant)
-        except ProductVariant.DoesNotExist:
-            return 404, {"error": "Product variant not found"}
-        except Exception as e:
-            logger.error(f"Error getting variant {id} for product {product_id}: {e}")
-            return 500, {
-                "error": "An error occurred while fetching the product variant",
-                "message": str(e),
-            }
-
-    @http_post(
-        "/{product_id}/variants",
-        response={
-            201: ProductVariantSchema,
-            400: dict,
-            404: dict,
-            500: dict,
-        },
-    )
+    @create_endpoint(require_admin=True)
     @transaction.atomic
     def create_product_variant(
         self, request, product_id: UUID, payload: ProductVariantCreateSchema
     ):
-        """Create a new product variant"""
-        try:
-            # Ensure product exists
-            product = get_object_or_404(Product, id=product_id)
+        """Create a new product variant."""
+        product = get_object_or_404(Product, id=product_id)
 
-            # Create variant
-            variant_data = payload.dict(exclude={"options"})
-            variant_data["product_id"] = product_id
-            variant = ProductVariant.objects.create(**variant_data)
+        variant = ProductVariant.objects.create(
+            product=product,
+            **payload.dict(),
+            created_by=request.user,
+            updated_by=request.user,
+        )
 
-            # Create variant options if provided
-            if hasattr(payload, "options"):
-                for option in payload.options:
-                    ProductVariantOption.objects.create(
-                        variant=variant,
-                        option_id=option.option_id,
-                        value_id=option.value_id,
-                    )
-
-            return 201, ProductVariantSchema.from_orm(variant)
-        except Product.DoesNotExist:
-            return 404, {"error": "Product not found"}
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            logger.error(f"Error creating variant for product {product_id}: {e}")
-            return 500, {
-                "error": "An error occurred while creating the product variant",
-                "message": str(e),
-            }
+        return 201, ProductVariantSchema.from_orm(variant)
 
     @http_put(
-        "/{product_id}/variants/{id}",
-        response={
-            200: ProductVariantSchema,
-            400: dict,
-            404: dict,
-            500: dict,
-        },
+        "/{product_id}/variants/{variant_id}",
+        response={200: ProductVariantSchema, 400: dict, 404: dict},
     )
+    @update_endpoint(require_admin=True)
     @transaction.atomic
     def update_product_variant(
-        self, request, product_id: UUID, id: UUID, payload: ProductVariantUpdateSchema
+        self,
+        request,
+        product_id: UUID,
+        variant_id: UUID,
+        payload: ProductVariantUpdateSchema,
     ):
-        """Update a product variant"""
-        try:
-            variant = get_object_or_404(
-                ProductVariant,
-                product_id=product_id,
-                id=id,
-            )
+        """Update a product variant."""
+        product = get_object_or_404(Product, id=product_id)
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
 
-            # Update variant fields
-            variant_data = payload.dict(exclude={"options"}, exclude_unset=True)
-            for attr, value in variant_data.items():
-                setattr(variant, attr, value)
-            variant.save()
+        for field, value in payload.dict(exclude_unset=True).items():
+            setattr(variant, field, value)
 
-            # Update variant options if provided
-            if "options" in payload.dict():
-                # Delete existing options
-                variant.options.all().delete()
+        variant.updated_by = request.user
+        variant.save()
 
-                # Create new options
-                for option_data in payload.options:
-                    option = get_object_or_404(
-                        ProductOption, id=option_data["option_id"]
-                    )
-                    value = get_object_or_404(
-                        ProductOptionValue, id=option_data["value_id"]
-                    )
-
-                    ProductVariantOption.objects.create(
-                        variant=variant,
-                        option=option,
-                        value=value,
-                    )
-
-            return 200, ProductVariantSchema.from_orm(variant)
-        except ProductVariant.DoesNotExist:
-            return 404, {"error": "Product variant not found"}
-        except (ProductOption.DoesNotExist, ProductOptionValue.DoesNotExist):
-            return 404, {"error": "Referenced option or value not found"}
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            logger.error(f"Error updating variant {id} for product {product_id}: {e}")
-            return 500, {
-                "error": "An error occurred while updating the product variant",
-                "message": str(e),
-            }
+        return 200, ProductVariantSchema.from_orm(variant)
 
     @http_delete(
-        "/{product_id}/variants/{id}",
-        response={
-            204: dict,
-            404: dict,
-            500: dict,
-        },
+        "/{product_id}/variants/{variant_id}",
+        response={204: None, 404: dict},
     )
-    @transaction.atomic
-    def delete_product_variant(self, request, product_id: UUID, id: UUID):
-        """Delete a product variant"""
-        try:
-            variant = get_object_or_404(
-                ProductVariant,
-                product_id=product_id,
-                id=id,
-            )
-            variant.delete()
-            return 204, {"message": "Product variant deleted successfully"}
-        except ProductVariant.DoesNotExist:
-            return 404, {"error": "Product variant not found"}
-        except Exception as e:
-            logger.error(f"Error deleting variant {id} for product {product_id}: {e}")
-            return 500, {
-                "error": "An error occurred while deleting the product variant",
-                "message": str(e),
-            }
+    @delete_endpoint(require_admin=True)
+    def delete_product_variant(self, request, product_id: UUID, variant_id: UUID):
+        """Soft delete a product variant."""
+        product = get_object_or_404(Product, id=product_id)
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+
+        variant.is_active = False
+        variant.is_deleted = True
+        variant.deleted_by = request.user
+        variant.save()
+
+        return 204, None
+
+    @http_get("/search", response={200: list[ProductListSchema]})
+    @list_endpoint(
+        cache_timeout=180,
+        select_related=["category"],
+        prefetch_related=["variants", "tags", "images"],
+        search_fields=["name", "description", "slug", "category__name"],
+        filter_fields={
+            "category_id": "exact",
+            "status": "exact",
+            "featured": "boolean",
+            "price_min": "gte",
+            "price_max": "lte",
+        },
+        ordering_fields=["name", "price", "created_at", "featured"],
+    )
+    @search_and_filter(
+        search_fields=["name", "description", "slug", "category__name"],
+        filter_fields={
+            "category_id": "exact",
+            "status": "exact",
+            "featured": "boolean",
+        },
+        ordering_fields=["name", "price", "created_at", "featured"],
+    )
+    def search_products(self, request):
+        """Advanced product search with comprehensive filtering."""
+        return 200, Product.objects.filter(is_active=True, status="published")
+
+    @http_get("/featured", response={200: list[ProductListSchema]})
+    @list_endpoint(
+        cache_timeout=600,
+        select_related=["category"],
+        prefetch_related=["variants", "images", "tags"],
+        ordering_fields=["created_at", "name", "price"],
+    )
+    def get_featured_products(self, request):
+        """Get featured products."""
+        return 200, Product.objects.filter(
+            is_active=True, featured=True, status="published"
+        ).order_by("-created_at")
+
+    @http_get("/categories/{category_id}", response={200: list[ProductListSchema]})
+    @list_endpoint(
+        cache_timeout=300,
+        select_related=["category"],
+        prefetch_related=["variants", "images"],
+        filter_fields={
+            "status": "exact",
+            "featured": "boolean",
+        },
+        ordering_fields=["name", "price", "created_at"],
+    )
+    @search_and_filter(
+        filter_fields={
+            "status": "exact",
+            "featured": "boolean",
+        },
+        ordering_fields=["name", "price", "created_at"],
+    )
+    def get_products_by_category(self, request, category_id: UUID):
+        """Get products by category."""
+        return 200, Product.objects.filter(
+            category_id=category_id, is_active=True, status="published"
+        )
+
+    @http_get("/low-stock", response={200: list[ProductListSchema]})
+    @admin_endpoint(
+        cache_timeout=60,
+        select_related=["category"],
+        prefetch_related=["variants"],
+        ordering_fields=["quantity", "name"],
+    )
+    def get_low_stock_products(self, request):
+        """Get products with low stock levels."""
+        return 200, Product.objects.filter(
+            is_active=True, quantity__lte=models.F("low_stock_threshold")
+        ).order_by("quantity")

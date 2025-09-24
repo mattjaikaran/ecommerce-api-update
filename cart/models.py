@@ -22,6 +22,20 @@ class Cart(AbstractBaseModel):
     class Meta:
         verbose_name = "Cart"
         verbose_name_plural = "Carts"
+        indexes = [
+            # Core lookup indexes
+            models.Index(fields=["session_key"]),
+            models.Index(fields=["customer"]),
+            models.Index(fields=["is_active"]),
+            models.Index(fields=["expires_at"]),
+            # Date-based indexes
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+            # Compound indexes for common queries
+            models.Index(fields=["customer", "is_active"]),
+            models.Index(fields=["session_key", "is_active"]),
+            models.Index(fields=["expires_at", "is_active"]),
+        ]
 
 
 class CartItem(AbstractBaseModel):
@@ -36,3 +50,13 @@ class CartItem(AbstractBaseModel):
     class Meta:
         verbose_name = "Cart Item"
         verbose_name_plural = "Cart Items"
+        indexes = [
+            # Core lookup indexes
+            models.Index(fields=["cart"]),
+            models.Index(fields=["product_variant"]),
+            # Date-based indexes
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+            # Compound indexes for common queries
+            models.Index(fields=["cart", "product_variant"]),
+        ]

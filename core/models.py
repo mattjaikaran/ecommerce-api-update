@@ -67,6 +67,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         ordering = ["-date_joined"]
+        indexes = [
+            # Core lookup indexes
+            models.Index(fields=["email"]),
+            models.Index(fields=["username"]),
+            models.Index(fields=["is_staff"]),
+            models.Index(fields=["is_superuser"]),
+            models.Index(fields=["date_joined"]),
+            # Compound indexes for common queries
+            models.Index(fields=["is_staff", "is_superuser"]),
+            models.Index(fields=["email", "is_staff"]),
+        ]
 
 
 class AbstractBaseModel(models.Model):
@@ -99,6 +110,18 @@ class AbstractBaseModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["-created_at"]
+        indexes = [
+            # Common indexes for all models inheriting from AbstractBaseModel
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+            models.Index(fields=["is_active"]),
+            models.Index(fields=["is_deleted"]),
+            models.Index(fields=["created_by"]),
+            models.Index(fields=["updated_by"]),
+            # Compound indexes for common queries
+            models.Index(fields=["is_active", "is_deleted"]),
+            models.Index(fields=["created_at", "is_active"]),
+        ]
 
 
 class OneTimePassword(models.Model):
@@ -153,6 +176,23 @@ class Address(AbstractBaseModel):
         ordering = ["-created_at"]
         verbose_name = "Address"
         verbose_name_plural = "Addresses"
+        indexes = [
+            # Core lookup indexes
+            models.Index(fields=["user"]),
+            models.Index(fields=["is_default"]),
+            models.Index(fields=["is_billing"]),
+            models.Index(fields=["is_shipping"]),
+            models.Index(fields=["is_billing_default"]),
+            models.Index(fields=["is_shipping_default"]),
+            models.Index(fields=["city"]),
+            models.Index(fields=["state"]),
+            models.Index(fields=["country"]),
+            # Compound indexes for common queries
+            models.Index(fields=["user", "is_billing"]),
+            models.Index(fields=["user", "is_shipping"]),
+            models.Index(fields=["user", "is_default"]),
+            models.Index(fields=["country", "state"]),
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.address_line_1}"

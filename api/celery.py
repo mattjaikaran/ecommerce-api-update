@@ -34,4 +34,7 @@ app.conf.timezone = "UTC"
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):
     """Debug task for testing Celery setup."""
-    print(f"Request: {self.request!r}")
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.info("Celery debug task executed: %r", self.request)

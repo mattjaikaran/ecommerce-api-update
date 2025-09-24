@@ -90,3 +90,30 @@ class Product(AbstractBaseModel):
         verbose_name = "Product"
         verbose_name_plural = "Products"
         ordering = ["-created_at"]
+        indexes = [
+            # Core lookup indexes
+            models.Index(fields=["slug"]),
+            models.Index(fields=["name"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["is_active"]),
+            models.Index(fields=["featured"]),
+            # Category and classification indexes
+            models.Index(fields=["category"]),
+            models.Index(fields=["type"]),
+            # Price and inventory indexes
+            models.Index(fields=["price"]),
+            models.Index(fields=["quantity"]),
+            models.Index(fields=["low_stock_threshold"]),
+            # Date-based indexes for sorting/filtering
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["updated_at"]),
+            # Compound indexes for common queries
+            models.Index(fields=["category", "status"]),
+            models.Index(fields=["category", "is_active"]),
+            models.Index(fields=["status", "is_active"]),
+            models.Index(fields=["featured", "is_active"]),
+            models.Index(fields=["category", "price"]),
+            models.Index(fields=["created_at", "status"]),
+            # Search optimization indexes
+            models.Index(fields=["name", "status"]),
+        ]
