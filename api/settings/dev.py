@@ -39,9 +39,10 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# Add debug toolbar for development
+# Add debug toolbar and extensions for development
 INSTALLED_APPS += [
     "debug_toolbar",  # django-debug-toolbar for debugging
+    "django_extensions",  # django-extensions for additional development tools
 ]
 
 MIDDLEWARE += [
@@ -76,7 +77,7 @@ DEBUG_TOOLBAR_PANELS = [
 
 
 # Configure debug toolbar to work with Docker
-def show_toolbar(request):
+def show_toolbar(request):  # noqa: ARG001
     return True
 
 
@@ -103,3 +104,18 @@ LOGGING["loggers"].update(
 # Celery settings for development
 CELERY_TASK_ALWAYS_EAGER = env("CELERY_TASK_ALWAYS_EAGER", default=False)
 CELERY_TASK_EAGER_PROPAGATES = True
+
+# Django Extensions settings for hot reloading
+# Enable automatic reloading of templates and static files
+USE_L10N = True
+USE_TZ = True
+
+# Auto-reload settings for development server
+# This enables automatic reloading when files change
+RUNSERVER_PLUS_PRINT_SQL = True
+
+# Additional settings for faster development experience
+THUMBNAIL_DEBUG = True
+
+# Enable template debug mode for better error reporting
+TEMPLATES[0]["OPTIONS"]["debug"] = True

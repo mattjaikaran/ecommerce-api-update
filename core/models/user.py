@@ -56,24 +56,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email", "first_name", "last_name"]
 
-    @property
-    def full_name(self):
-        """Return the user's full name."""
-        return f"{self.first_name} {self.last_name}"
-
-    def __str__(self):
-        return self.email
-
-    def clean(self):
-        """Validate the user data."""
-        super().clean()
-        if User.objects.filter(email=self.email).exclude(pk=self.pk).exists():
-            raise ValidationError({"email": "A user with that email already exists."})
-        if User.objects.filter(username=self.username).exclude(pk=self.pk).exists():
-            raise ValidationError(
-                {"username": "A user with that username already exists."}
-            )
-
     class Meta:
         ordering = ["-date_joined"]
         indexes = [
@@ -87,3 +69,21 @@ class User(AbstractBaseUser, PermissionsMixin):
             models.Index(fields=["is_staff", "is_superuser"]),
             models.Index(fields=["email", "is_staff"]),
         ]
+
+    def __str__(self):
+        return f"{self.full_name} - {self.email}"
+
+    @property
+    def full_name(self):
+        """Return the user's full name."""
+        return f"{self.first_name} {self.last_name}"
+
+    def clean(self):
+        """Validate the user data."""
+        super().clean()
+        if User.objects.filter(email=self.email).exclude(pk=self.pk).exists():
+            raise ValidationError({"email": "A user with that email already exists."})
+        if User.objects.filter(username=self.username).exclude(pk=self.pk).exists():
+            raise ValidationError(
+                {"username": "A user with that username already exists."}
+            )

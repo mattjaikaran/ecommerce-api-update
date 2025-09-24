@@ -83,9 +83,6 @@ class Product(AbstractBaseModel):
     seo_keywords = models.TextField(null=True, blank=True)
     meta_data = models.JSONField(default=dict, blank=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
@@ -117,3 +114,6 @@ class Product(AbstractBaseModel):
             # Search optimization indexes
             models.Index(fields=["name", "status"]),
         ]
+
+    def __str__(self):
+        return self.name

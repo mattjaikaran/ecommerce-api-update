@@ -3,14 +3,15 @@
 This module provides common utility functions and helpers used across the ecommerce API.
 """
 
-from .cache import (
-    cache_key_builder,
+# Import cache utilities from core.cache (centralized location)
+from core.cache.settings import (
+    clear_cache_pattern,
+    delete_cached_data,
     get_cached_data,
-    invalidate_cache_pattern,
     set_cached_data,
 )
+
 from .currency import format_currency
-from .email import send_email_template
 from .file_utils import get_file_url, sanitize_filename, upload_file_to_storage
 from .formatting import create_slug, truncate_text
 from .generators import generate_order_number, generate_secure_hash, generate_unique_id
@@ -26,15 +27,13 @@ from .text_processing import chunks, deep_merge_dicts
 from .validation import convert_to_bool, validate_phone_number
 
 __all__ = [
-    # Cache utilities
-    "cache_key_builder",
+    # Cache utilities (from core.cache)
+    "clear_cache_pattern",
+    "delete_cached_data",
     "get_cached_data",
-    "invalidate_cache_pattern",
     "set_cached_data",
     # Currency utilities
     "format_currency",
-    # Email utilities
-    "send_email_template",
     # File utilities
     "get_file_url",
     "sanitize_filename",

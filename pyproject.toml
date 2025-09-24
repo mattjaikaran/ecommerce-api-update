@@ -31,6 +31,7 @@ dependencies = [
     # Django Extensions
     "django-cors-headers>=4.6.0",
     "django-debug-toolbar>=4.4.6",
+    "django-extensions>=3.2.3",
     "django-flags>=5.0.13",
     "django-import-export>=4.3.1",
     "django-js-asset>=2.2.0",
@@ -291,6 +292,7 @@ ignore = [
     "COM812",  # Trailing comma missing (handled by formatter)
     "ISC001",  # Implicitly concatenated string literals (conflicts with formatter)
     "DJ001",   # Avoid using `null=True` on string-based fields
+    "DJ012",   # Order of model's inner classes, methods, and fields
     "TRY003",  # Avoid specifying long messages outside the exception class
     "PLR0913", # Too many arguments to function call
     "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
