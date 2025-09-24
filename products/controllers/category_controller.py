@@ -1,18 +1,18 @@
-from typing import List
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.core.exceptions import ValidationError
+import logging
 from uuid import UUID
+
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
 
 from products.models import ProductCategory
 from products.schemas import (
-    CategorySchema,
     CategoryCreateSchema,
+    CategorySchema,
     CategoryUpdateSchema,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +21,9 @@ logger = logging.getLogger(__name__)
 class CategoryController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[CategorySchema], 404: dict, 500: dict})
+    @http_get("", response={200: list[CategorySchema], 404: dict, 500: dict})
     def list_categories(self, request):
-        """
-        Get all product categories
-        """
+        """Get all product categories"""
         try:
             categories = ProductCategory.objects.prefetch_related(
                 "children", "products"
@@ -42,9 +40,7 @@ class CategoryController:
 
     @http_get("/{id}", response={200: CategorySchema, 404: dict, 500: dict})
     def get_category(self, request, id: UUID):
-        """
-        Get a category by ID
-        """
+        """Get a category by ID"""
         try:
             category = get_object_or_404(
                 ProductCategory.objects.prefetch_related("children", "products"),
@@ -63,9 +59,7 @@ class CategoryController:
     @http_post("", response={201: CategorySchema, 400: dict, 500: dict})
     @transaction.atomic
     def create_category(self, request, payload: CategoryCreateSchema):
-        """
-        Create a new category
-        """
+        """Create a new category"""
         try:
             category = ProductCategory.objects.create(**payload.dict())
             return 201, CategorySchema.from_orm(category)
@@ -81,9 +75,7 @@ class CategoryController:
     @http_put("/{id}", response={200: CategorySchema, 400: dict, 404: dict, 500: dict})
     @transaction.atomic
     def update_category(self, request, id: UUID, payload: CategoryUpdateSchema):
-        """
-        Update a category
-        """
+        """Update a category"""
         try:
             category = get_object_or_404(ProductCategory, id=id)
             for attr, value in payload.dict(exclude_unset=True).items():
@@ -103,9 +95,7 @@ class CategoryController:
 
     @http_delete("/{id}", response={204: dict, 404: dict, 500: dict})
     def delete_category(self, request, id: UUID):
-        """
-        Delete a category
-        """
+        """Delete a category"""
         try:
             category = get_object_or_404(ProductCategory, id=id)
             category.delete()
@@ -119,11 +109,9 @@ class CategoryController:
                 "message": str(e),
             }
 
-    @http_get("/tree", response={200: List[CategorySchema], 500: dict})
+    @http_get("/tree", response={200: list[CategorySchema], 500: dict})
     def get_category_tree(self):
-        """
-        Get category tree (only root categories with their children)
-        """
+        """Get category tree (only root categories with their children)"""
         try:
             categories = ProductCategory.objects.filter(parent=None).prefetch_related(
                 "children",

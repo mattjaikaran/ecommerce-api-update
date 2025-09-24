@@ -1,16 +1,13 @@
-from django.db import transaction
-from typing import List
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import (
     api_controller,
     http_get,
     http_post,
-    http_put,
-    http_delete,
 )
 from ninja_extra.permissions import IsAuthenticated
-from ninja.pagination import paginate
 
 from orders.models import (
     Order,
@@ -30,7 +27,7 @@ class TaxController:
     @http_get(
         "/",
         response={
-            200: List[TaxSchema],
+            200: list[TaxSchema],
             404: dict,
             500: dict,
         },

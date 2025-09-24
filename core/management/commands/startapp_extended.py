@@ -1,7 +1,6 @@
-from django.core.management.commands.startapp import Command as StartAppCommand
-from django.core.management.base import CommandError
-from django.utils.termcolors import colorize
 import os
+
+from django.core.management.commands.startapp import Command as StartAppCommand
 
 
 def smart_pluralize(singular):
@@ -39,8 +38,7 @@ def smart_pluralize(singular):
     if singular.endswith("y"):
         if singular[-2] in "aeiou":
             return singular + "s"
-        else:
-            return singular[:-1] + "ies"
+        return singular[:-1] + "ies"
 
     # Words ending in 'is'
     if singular.endswith("is"):
@@ -196,7 +194,7 @@ class Command(StartAppCommand):
 
 __all__ = ['{model_name}']
 """
-        elif dir_name == "schemas":
+        if dir_name == "schemas":
             return f"""from .{model_name.lower()} import {model_name}Schema, {model_name}CreateSchema, {model_name}UpdateSchema
 
 __all__ = [
@@ -205,18 +203,17 @@ __all__ = [
     '{model_name}UpdateSchema',
 ]
 """
-        elif dir_name == "controllers":
+        if dir_name == "controllers":
             return f"""from .{model_name.lower()}_controller import {model_name}Controller
 
 __all__ = ['{model_name}Controller']
 """
-        elif dir_name == "admin":
+        if dir_name == "admin":
             return f"""from .{model_name.lower()} import {model_name}Admin
 
 __all__ = ['{model_name}Admin']
 """
-        else:
-            return ""
+        return ""
 
     def create_model_file(self, app_name, file_path, model_name):
         content = f"""from django.db import models

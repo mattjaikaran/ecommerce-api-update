@@ -1,8 +1,10 @@
 from django.db import models
+
 from core.models import AbstractBaseModel
+
+from .choices import PriceAction
 from .product import Product
 from .product_variant import ProductVariant
-from .choices import PriceAction
 
 
 class ProductPriceHistory(AbstractBaseModel):

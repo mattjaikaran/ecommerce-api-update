@@ -1,6 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from ..models import PaymentTransaction, OrderPayment
+
+from ..models import OrderPayment, PaymentTransaction
 
 
 @admin.register(PaymentTransaction)

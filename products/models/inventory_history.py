@@ -1,8 +1,10 @@
 from django.db import models
+
 from core.models import AbstractBaseModel
+
+from .choices import InventoryAction
 from .product import Product
 from .product_variant import ProductVariant
-from .choices import InventoryAction
 
 
 class ProductInventoryHistory(AbstractBaseModel):

@@ -1,30 +1,31 @@
-from typing import List
+import logging
 from uuid import UUID
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
+
 from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
+
 from products.models import (
     Product,
     ProductAttribute,
+    ProductAttributeAssignment,
     ProductAttributeGroup,
     ProductAttributeValue,
-    ProductAttributeAssignment,
 )
 from products.schemas import (
-    AttributeSchema,
-    AttributeValueSchema,
+    AttributeAssignmentCreateSchema,
     AttributeAssignmentSchema,
     AttributeCreateSchema,
-    AttributeUpdateSchema,
-    AttributeGroupSchema,
     AttributeGroupCreateSchema,
+    AttributeGroupSchema,
     AttributeGroupUpdateSchema,
+    AttributeSchema,
+    AttributeUpdateSchema,
     AttributeValueCreateSchema,
+    AttributeValueSchema,
     AttributeValueUpdateSchema,
-    AttributeAssignmentCreateSchema,
     ProductSchema,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ logger = logging.getLogger(__name__)
 class AttributeController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[AttributeSchema], 500: dict})
+    @http_get("", response={200: list[AttributeSchema], 500: dict})
     def list_attributes(self, request):
         """Get all attributes"""
         try:
@@ -110,7 +111,7 @@ class AttributeController:
                 "message": str(e),
             }
 
-    @http_get("/{attribute_id}/values", response={200: List[AttributeValueSchema]})
+    @http_get("/{attribute_id}/values", response={200: list[AttributeValueSchema]})
     def list_attribute_values(self, attribute_id: UUID):
         """List all values for a specific attribute"""
         try:
@@ -179,7 +180,7 @@ class AttributeController:
                 "message": str(e),
             }
 
-    @http_get("/products/{product_id}", response={200: List[AttributeAssignmentSchema]})
+    @http_get("/products/{product_id}", response={200: list[AttributeAssignmentSchema]})
     def list_product_attributes(self, product_id: UUID):
         """List all attributes assigned to a product"""
         try:
@@ -235,7 +236,7 @@ class AttributeController:
                 "message": str(e),
             }
 
-    @http_get("/groups", response={200: List[AttributeGroupSchema]})
+    @http_get("/groups", response={200: list[AttributeGroupSchema]})
     def list_attribute_groups(self):
         """List all attribute groups"""
         try:
@@ -331,7 +332,7 @@ class AttributeController:
                 "message": str(e),
             }
 
-    @http_get("/groups/{group_id}/attributes", response={200: List[AttributeSchema]})
+    @http_get("/groups/{group_id}/attributes", response={200: list[AttributeSchema]})
     def list_attributes_in_group(self, group_id: UUID):
         """List all attributes in a specific attribute group"""
         try:
@@ -345,7 +346,7 @@ class AttributeController:
                 "message": str(e),
             }
 
-    @http_get("/groups/{group_id}/products", response={200: List[ProductSchema]})
+    @http_get("/groups/{group_id}/products", response={200: list[ProductSchema]})
     def list_products_in_group(self, group_id: UUID):
         """List all products in a specific attribute group"""
         try:

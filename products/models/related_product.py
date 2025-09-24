@@ -1,7 +1,9 @@
 from django.db import models
+
 from core.models import AbstractBaseModel
-from .product import Product
+
 from .choices import RelatedProductType
+from .product import Product
 
 
 class RelatedProduct(AbstractBaseModel):

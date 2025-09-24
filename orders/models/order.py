@@ -1,14 +1,15 @@
-from django.db import models
-from django.core.validators import MinValueValidator
 import uuid
+
+from django.core.validators import MinValueValidator
+from django.db import models
+
 from core.models import AbstractBaseModel, Address, Customer, CustomerGroup
-from .choices import OrderStatus, PaymentStatus, PaymentMethod, ShippingMethod
+
+from .choices import OrderStatus, PaymentMethod, PaymentStatus, ShippingMethod
 
 
 class Order(AbstractBaseModel):
-    """
-    Model representing an order.
-    """
+    """Model representing an order."""
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     order_number = models.CharField(max_length=32, unique=True)

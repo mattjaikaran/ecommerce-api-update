@@ -1,8 +1,10 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+
 from core.models import AbstractBaseModel
-from .order import Order
+
 from .choices import OrderStatus
+from .order import Order
 
 User = get_user_model()
 

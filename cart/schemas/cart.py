@@ -1,42 +1,43 @@
-from typing import List, Optional
-from ninja import Schema
 from datetime import datetime
 from uuid import UUID
+
+from ninja import Schema
+
+from core.schemas import CustomerSchema, UserSchema
 from products.schemas import ProductVariantSchema
-from core.schemas import UserSchema, CustomerSchema
 
 
 class CartItemSchema(Schema):
-    id: Optional[UUID] = None
-    cart: Optional[UUID] = None
-    product_variant: Optional[ProductVariantSchema] = None
+    id: UUID | None = None
+    cart: UUID | None = None
+    product_variant: ProductVariantSchema | None = None
     quantity: int = 1
     price: float = 0.0
     total_price: float = 0.0
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    created_by: Optional[UserSchema] = None
-    updated_by: Optional[UserSchema] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    created_by: UserSchema | None = None
+    updated_by: UserSchema | None = None
     is_active: bool = True
     is_deleted: bool = False
-    deleted_at: Optional[datetime] = None
-    deleted_by: Optional[UserSchema] = None
+    deleted_at: datetime | None = None
+    deleted_by: UserSchema | None = None
 
 
 class CartSchema(Schema):
-    id: Optional[UUID] = None
-    customer: Optional[CustomerSchema] = None
-    items: List[CartItemSchema] = []
-    session_key: Optional[str] = None
-    expires_at: Optional[datetime] = None
+    id: UUID | None = None
+    customer: CustomerSchema | None = None
+    items: list[CartItemSchema] = []
+    session_key: str | None = None
+    expires_at: datetime | None = None
     subtotal: float = 0.0
     total_price: float = 0.0
     total_quantity: int = 0
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    created_by: Optional[UserSchema] = None
-    updated_by: Optional[UserSchema] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    created_by: UserSchema | None = None
+    updated_by: UserSchema | None = None
     is_active: bool = True
     is_deleted: bool = False
-    deleted_at: Optional[datetime] = None
-    deleted_by: Optional[UserSchema] = None
+    deleted_at: datetime | None = None
+    deleted_by: UserSchema | None = None

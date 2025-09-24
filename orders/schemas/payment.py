@@ -1,7 +1,8 @@
-from ninja import Schema
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
+
+from ninja import Schema
 from pydantic import Field
 
 

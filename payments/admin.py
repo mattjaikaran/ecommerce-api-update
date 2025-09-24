@@ -1,8 +1,8 @@
 # Import all admin classes
 from .admin import (
     PaymentMethodAdmin,
-    TransactionAdmin,
     RefundAdmin,
+    TransactionAdmin,
 )
 
 # No need to register models here as they are registered using the @admin.register decorator

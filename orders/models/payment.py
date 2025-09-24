@@ -1,8 +1,10 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
+
 from core.models import AbstractBaseModel
-from .order import Order
+
 from .choices import PaymentMethod, PaymentStatus
+from .order import Order
 
 
 class PaymentTransaction(AbstractBaseModel):

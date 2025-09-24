@@ -1,20 +1,21 @@
-from typing import List
-from uuid import UUID
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from ..models import Product, ProductBundle, BundleItem
-from ..schemas.bundle import (
-    BundleSchema,
-    BundleCreateSchema,
-    BundleUpdateSchema,
-    BundleItemSchema,
-    BundleItemCreateSchema,
-    BundleItemUpdateSchema,
-)
 import logging
 from decimal import Decimal
+from uuid import UUID
+
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
+
+from ..models import BundleItem, Product, ProductBundle
+from ..schemas.bundle import (
+    BundleCreateSchema,
+    BundleItemCreateSchema,
+    BundleItemSchema,
+    BundleItemUpdateSchema,
+    BundleSchema,
+    BundleUpdateSchema,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 class BundleController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[BundleSchema], 500: dict})
+    @http_get("", response={200: list[BundleSchema], 500: dict})
     def list_bundles(self, request):
         """Get all bundles"""
         try:
@@ -170,7 +171,7 @@ class BundleController:
                 "message": str(e),
             }
 
-    @http_get("/{bundle_id}/items", response={200: List[BundleItemSchema]})
+    @http_get("/{bundle_id}/items", response={200: list[BundleItemSchema]})
     def list_bundle_items(self, bundle_id: UUID):
         """List all items in a bundle"""
         try:

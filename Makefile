@@ -1,9 +1,9 @@
 # Makefile for Django Ninja Boilerplate
 
 # Variables
-PYTHON := python
+PYTHON := uv run python
 MANAGE := $(PYTHON) manage.py
-PIP := pip
+UV := uv
 SCRIPTS_DIR := scripts
 
 # Django commands
@@ -35,9 +35,8 @@ install:
 	@if [ -z "$(filter-out $@,$(MAKECMDGOALS))" ]; then \
 		echo "Usage: make install <library-name>"; \
 	else \
-		pip install $(filter-out $@,$(MAKECMDGOALS)) && \
-		pip freeze > requirements.txt && \
-		echo "Installed $(filter-out $@,$(MAKECMDGOALS)) and updated requirements.txt"; \
+		uv add $(filter-out $@,$(MAKECMDGOALS)) && \
+		echo "Installed $(filter-out $@,$(MAKECMDGOALS)) and updated pyproject.toml"; \
 	fi
 
 %:
@@ -69,11 +68,19 @@ test:
 # Linting and formatting
 .PHONY: lint
 lint:
-	flake8 .
+	$(UV) run ruff check .
 
 .PHONY: format
 format:
-	black .
+	$(UV) run ruff format .
+
+.PHONY: lint-fix
+lint-fix:
+	$(UV) run ruff check --fix .
+
+.PHONY: check
+check: lint
+	$(UV) run ruff format --check .
 
 .PHONY: generate-core-data
 generate-core-data:
@@ -116,8 +123,10 @@ help:
 	@echo "  createsuperuser            - Create a superuser"
 	@echo "  create-superuser           - Create a superuser using custom script"
 	@echo "  test                       - Run the Django test suite"
-	@echo "  lint                       - Run linting"
-	@echo "  format                     - Run formatter"
+	@echo "  lint                       - Run linting with ruff"
+	@echo "  format                     - Run formatter with ruff"
+	@echo "  lint-fix                   - Run linting with auto-fix"
+	@echo "  check                      - Run linting and format check"
 	@echo "  generate-core-data         - Generate core data"
 	@echo "  generate-secret-key        - Generate secret key"
 	@echo "  db-setup                   - Setup the database"

@@ -1,29 +1,29 @@
-from typing import Optional
-from uuid import UUID
 from datetime import datetime
 from decimal import Decimal
+from uuid import UUID
+
 from ninja import Schema
 
 
 class PriceHistorySchema(Schema):
     id: UUID
     product_id: UUID
-    variant_id: Optional[UUID]
+    variant_id: UUID | None
     action: str
     previous_price: Decimal
     new_price: Decimal
-    reason: Optional[str]
-    notes: Optional[str]
+    reason: str | None
+    notes: str | None
     created_at: datetime
     date_modified: datetime
 
 
 class PriceAdjustmentSchema(Schema):
-    variant_id: Optional[UUID]
+    variant_id: UUID | None
     action: str
     new_price: Decimal
-    reason: Optional[str]
-    notes: Optional[str]
+    reason: str | None
+    notes: str | None
 
 
 class PriceAdjustmentResponseSchema(Schema):
@@ -38,7 +38,7 @@ class BulkPriceAdjustmentSchema(Schema):
 
 class PriceAnalyticsSchema(Schema):
     product_id: UUID
-    variant_id: Optional[UUID]
+    variant_id: UUID | None
     current_price: Decimal
     average_price: Decimal
     lowest_price: Decimal
@@ -46,20 +46,20 @@ class PriceAnalyticsSchema(Schema):
     price_changes_count: int
     last_change_date: datetime
     price_trend: str  # "increasing", "decreasing", "stable"
-    competitor_price: Optional[Decimal]
-    suggested_price: Optional[Decimal]
+    competitor_price: Decimal | None
+    suggested_price: Decimal | None
 
 
 class PricingRuleSchema(Schema):
     id: UUID
     name: str
-    description: Optional[str]
+    description: str | None
     rule_type: str  # "markup", "margin", "fixed", "competitor_based"
     value: Decimal
-    min_price: Optional[Decimal]
-    max_price: Optional[Decimal]
-    start_date: Optional[datetime]
-    end_date: Optional[datetime]
+    min_price: Decimal | None
+    max_price: Decimal | None
+    start_date: datetime | None
+    end_date: datetime | None
     is_active: bool
     created_at: datetime
     date_modified: datetime

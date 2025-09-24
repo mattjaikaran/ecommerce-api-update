@@ -1,21 +1,21 @@
-from ninja import Schema
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
+
+from ninja import Schema
 
 
 class CategorySchema(Schema):
     id: UUID
     name: str
     slug: str
-    description: Optional[str] = None
-    parent_id: Optional[UUID] = None
-    image: Optional[str] = None
+    description: str | None = None
+    parent_id: UUID | None = None
+    image: str | None = None
     is_active: bool = True
     position: int = 0
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
@@ -24,25 +24,25 @@ class CategorySchema(Schema):
 class CategoryCreateSchema(Schema):
     name: str
     slug: str
-    description: Optional[str] = None
-    parent_id: Optional[UUID] = None
-    image: Optional[str] = None
+    description: str | None = None
+    parent_id: UUID | None = None
+    image: str | None = None
     is_active: bool = True
     position: int = 0
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
     meta_data: dict = {}
 
 
 class CategoryUpdateSchema(Schema):
-    name: Optional[str] = None
-    slug: Optional[str] = None
-    description: Optional[str] = None
-    parent_id: Optional[UUID] = None
-    image: Optional[str] = None
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
-    is_active: Optional[bool] = None
-    position: Optional[int] = None
+    name: str | None = None
+    slug: str | None = None
+    description: str | None = None
+    parent_id: UUID | None = None
+    image: str | None = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
+    is_active: bool | None = None
+    position: int | None = None

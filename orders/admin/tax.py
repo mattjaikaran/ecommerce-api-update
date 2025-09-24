@@ -1,6 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from ..models import Tax, OrderTax
+
+from ..models import OrderTax, Tax
 
 
 @admin.register(Tax)

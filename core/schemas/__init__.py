@@ -1,26 +1,26 @@
-from .users import (
-    UserSchema,
-    UserSignupSchema,
-    UserLoginSchema,
-    UserLogoutSchema,
-    UserUpdateSchema,
+from .address import (
+    AddressCreateSchema,
+    AddressSchema,
 )
 from .auth import (
     PasswordlessLoginRequest,
     PasswordlessLoginVerify,
 )
-from .address import (
-    AddressSchema,
-    AddressCreateSchema,
+from .customer import (
+    CustomerCreateSchema,
+    CustomerSchema,
+    CustomerUpdateSchema,
 )
 from .feedback import (
-    CustomerFeedbackSchema,
     CustomerFeedbackCreateSchema,
+    CustomerFeedbackSchema,
 )
-from .customer import (
-    CustomerSchema,
-    CustomerCreateSchema,
-    CustomerUpdateSchema,
+from .users import (
+    UserLoginSchema,
+    UserLogoutSchema,
+    UserSchema,
+    UserSignupSchema,
+    UserUpdateSchema,
 )
 
 all = [

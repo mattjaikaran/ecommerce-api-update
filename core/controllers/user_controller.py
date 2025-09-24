@@ -1,6 +1,7 @@
-from uuid import UUID
 import logging
-from django.contrib.auth import get_user_model, authenticate
+from uuid import UUID
+
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404

@@ -1,12 +1,13 @@
-from django.core.management.base import BaseCommand
+import logging
+import time
+
 from django.apps import apps
 from django.core.cache import cache
-from core.cache.warming import CacheWarmer
+from django.core.management.base import BaseCommand
+
 from core.cache.preload import CachePreloader
 from core.cache.versioning import VersionedCache
-from typing import List, Any
-import time
-import logging
+from core.cache.warming import CacheWarmer
 
 logger = logging.getLogger(__name__)
 
@@ -70,10 +71,10 @@ class Command(BaseCommand):
             )
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"Error during operation: {str(e)}"))
-            logger.error(f"Cache operation error: {str(e)}", exc_info=True)
+            self.stdout.write(self.style.ERROR(f"Error during operation: {e!s}"))
+            logger.error(f"Cache operation error: {e!s}", exc_info=True)
 
-    def warm_cache(self, models: List[str], chunk_size: int, timeout: int) -> None:
+    def warm_cache(self, models: list[str], chunk_size: int, timeout: int) -> None:
         """Warm cache for specified models."""
         warmer = CacheWarmer()
 
@@ -87,7 +88,7 @@ class Command(BaseCommand):
                     warmer.warm_model(model, chunk_size, timeout)
                 except Exception as e:
                     self.stdout.write(
-                        self.style.ERROR(f"Error warming {model_path}: {str(e)}")
+                        self.style.ERROR(f"Error warming {model_path}: {e!s}")
                     )
         else:
             # Warm all models
@@ -97,7 +98,7 @@ class Command(BaseCommand):
                         self.stdout.write(f"Warming cache for {model._meta.label}...")
                         warmer.warm_model(model, chunk_size, timeout)
 
-    def clear_cache(self, models: List[str]) -> None:
+    def clear_cache(self, models: list[str]) -> None:
         """Clear cache for specified models."""
         if models:
             # Clear specific models
@@ -113,14 +114,14 @@ class Command(BaseCommand):
                     )
                 except Exception as e:
                     self.stdout.write(
-                        self.style.ERROR(f"Error clearing {model_path}: {str(e)}")
+                        self.style.ERROR(f"Error clearing {model_path}: {e!s}")
                     )
         else:
             # Clear all cache
             cache.clear()
             self.stdout.write(self.style.SUCCESS("Cleared all cache"))
 
-    def preload_cache(self, models: List[str]) -> None:
+    def preload_cache(self, models: list[str]) -> None:
         """Preload cache with common queries."""
         preloader = CachePreloader()
 
@@ -128,7 +129,7 @@ class Command(BaseCommand):
             # Preload specific models
             for model_path in models:
                 try:
-                    method_name = f'preload_{model_path.split(".")[-1].lower()}s'
+                    method_name = f"preload_{model_path.split('.')[-1].lower()}s"
                     if hasattr(preloader, method_name):
                         self.stdout.write(f"Preloading {model_path}...")
                         getattr(preloader, method_name)()
@@ -138,7 +139,7 @@ class Command(BaseCommand):
                         )
                 except Exception as e:
                     self.stdout.write(
-                        self.style.ERROR(f"Error preloading {model_path}: {str(e)}")
+                        self.style.ERROR(f"Error preloading {model_path}: {e!s}")
                     )
         else:
             # Preload all
@@ -157,7 +158,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(str(stats))
 
-    def show_versions(self, models: List[str]) -> None:
+    def show_versions(self, models: list[str]) -> None:
         """Show cache versions for models."""
         self.stdout.write("\nCache Versions:")
         self.stdout.write("-" * 40)
@@ -175,7 +176,7 @@ class Command(BaseCommand):
                 except Exception as e:
                     self.stdout.write(
                         self.style.ERROR(
-                            f"Error getting version for {model_path}: {str(e)}"
+                            f"Error getting version for {model_path}: {e!s}"
                         )
                     )
         else:

@@ -1,7 +1,9 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+
 from core.models import AbstractBaseModel
 from products.models import ProductVariant
+
 from .order import Order
 
 

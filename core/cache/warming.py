@@ -1,18 +1,17 @@
-from django.core.cache import cache
-from django.conf import settings
-from django.db.models import Model, QuerySet
-from typing import List, Type, Optional, Any, Dict
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
+
+from django.db.models import Model, QuerySet
+
 from .versioning import VersionedCache
 
 logger = logging.getLogger(__name__)
 
 
 class CacheWarmer:
-    """
-    Manages cache warming for different data types.
+    """Manages cache warming for different data types.
     Usage:
         warmer = CacheWarmer()
         warmer.warm_model(Product, chunk_size=100)
@@ -26,7 +25,7 @@ class CacheWarmer:
         self.max_workers = max_workers
 
     def warm_model(
-        self, model: Type[Model], chunk_size: int = 100, timeout: Optional[int] = None
+        self, model: type[Model], chunk_size: int = 100, timeout: int | None = None
     ) -> None:
         """Warm cache for all instances of a model."""
         cache_ns = model._meta.model_name
@@ -65,10 +64,10 @@ class CacheWarmer:
         )
 
     def warm_querysets(
-        self, querysets: List[tuple[str, QuerySet]], timeout: Optional[int] = None
+        self, querysets: list[tuple[str, QuerySet]], timeout: int | None = None
     ) -> None:
-        """
-        Warm cache for specific querysets.
+        """Warm cache for specific querysets.
+
         Args:
             querysets: List of (cache_key, queryset) tuples
             timeout: Cache timeout in seconds
@@ -95,11 +94,11 @@ class CacheWarmer:
     def warm_custom_data(
         self,
         namespace: str,
-        data_items: List[tuple[str, Any]],
-        timeout: Optional[int] = None,
+        data_items: list[tuple[str, Any]],
+        timeout: int | None = None,
     ) -> None:
-        """
-        Warm cache with custom data items.
+        """Warm cache with custom data items.
+
         Args:
             namespace: Cache namespace
             data_items: List of (cache_key, data) tuples

@@ -1,8 +1,8 @@
-from django.db import models
 from django.core.validators import MinValueValidator
-from core.models import AbstractBaseModel
+from django.db import models
+
+from core.models import AbstractBaseModel, Customer
 from products.models import ProductVariant
-from core.models import Customer
 
 
 class Cart(AbstractBaseModel):

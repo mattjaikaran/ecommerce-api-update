@@ -1,16 +1,16 @@
-from typing import List
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.core.exceptions import ValidationError
-from uuid import UUID
 import logging
+from uuid import UUID
 
-from products.models import ProductTag, Product
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
+
+from products.models import Product, ProductTag
 from products.schemas import (
-    ProductTagSchema,
     ProductTagCreateSchema,
+    ProductTagSchema,
     ProductTagUpdateSchema,
 )
 
@@ -21,11 +21,9 @@ logger = logging.getLogger(__name__)
 class TagController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[ProductTagSchema], 500: dict})
+    @http_get("", response={200: list[ProductTagSchema], 500: dict})
     def list_tags(self, request):
-        """
-        Get all product tags
-        """
+        """Get all product tags"""
         try:
             tags = ProductTag.objects.prefetch_related("products").all()
             return 200, [ProductTagSchema.from_orm(tag) for tag in tags]
@@ -38,9 +36,7 @@ class TagController:
 
     @http_get("/{id}", response={200: ProductTagSchema, 404: dict, 500: dict})
     def get_tag(self, request, id: UUID):
-        """
-        Get a product tag by ID
-        """
+        """Get a product tag by ID"""
         try:
             tag = get_object_or_404(
                 ProductTag.objects.prefetch_related("products"),
@@ -59,9 +55,7 @@ class TagController:
     @http_post("", response={201: ProductTagSchema, 400: dict, 500: dict})
     @transaction.atomic
     def create_tag(self, request, payload: ProductTagCreateSchema):
-        """
-        Create a new product tag
-        """
+        """Create a new product tag"""
         try:
             tag = ProductTag.objects.create(**payload.dict())
             return 201, ProductTagSchema.from_orm(tag)
@@ -79,9 +73,7 @@ class TagController:
     )
     @transaction.atomic
     def update_tag(self, request, id: UUID, payload: ProductTagUpdateSchema):
-        """
-        Update a product tag
-        """
+        """Update a product tag"""
         try:
             tag = get_object_or_404(ProductTag, id=id)
             for attr, value in payload.dict(exclude_unset=True).items():
@@ -101,9 +93,7 @@ class TagController:
 
     @http_delete("/{id}", response={204: dict, 404: dict, 500: dict})
     def delete_tag(self, request, id: UUID):
-        """
-        Delete a product tag
-        """
+        """Delete a product tag"""
         try:
             tag = get_object_or_404(ProductTag, id=id)
             tag.delete()
@@ -122,9 +112,7 @@ class TagController:
         response={200: ProductTagSchema, 404: dict, 500: dict},
     )
     def add_product(self, request, id: UUID, product_id: UUID):
-        """
-        Add a product to a tag
-        """
+        """Add a product to a tag"""
         try:
             tag = get_object_or_404(ProductTag, id=id)
             product = get_object_or_404(Product, id=product_id)
@@ -144,9 +132,7 @@ class TagController:
         response={200: ProductTagSchema, 404: dict, 500: dict},
     )
     def remove_product(self, request, id: UUID, product_id: UUID):
-        """
-        Remove a product from a tag
-        """
+        """Remove a product from a tag"""
         try:
             tag = get_object_or_404(ProductTag, id=id)
             product = get_object_or_404(Product, id=product_id)
@@ -164,10 +150,8 @@ class TagController:
     @http_post(
         "/{id}/products/bulk", response={200: ProductTagSchema, 404: dict, 500: dict}
     )
-    def bulk_add_products(self, request, id: UUID, product_ids: List[UUID]):
-        """
-        Add multiple products to a tag
-        """
+    def bulk_add_products(self, request, id: UUID, product_ids: list[UUID]):
+        """Add multiple products to a tag"""
         try:
             tag = get_object_or_404(ProductTag, id=id)
             products = Product.objects.filter(id__in=product_ids)
@@ -185,10 +169,8 @@ class TagController:
     @http_delete(
         "/{id}/products/bulk", response={200: ProductTagSchema, 404: dict, 500: dict}
     )
-    def bulk_remove_products(self, request, id: UUID, product_ids: List[UUID]):
-        """
-        Remove multiple products from a tag
-        """
+    def bulk_remove_products(self, request, id: UUID, product_ids: list[UUID]):
+        """Remove multiple products from a tag"""
         try:
             tag = get_object_or_404(ProductTag, id=id)
             products = Product.objects.filter(id__in=product_ids)

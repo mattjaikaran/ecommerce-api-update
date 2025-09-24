@@ -1,28 +1,28 @@
 from .choices import (
-    OrderStatus,
-    PaymentStatus,
-    PaymentMethod,
-    ShippingMethod,
     FulfillmentStatus,
+    OrderStatus,
+    PaymentMethod,
+    PaymentStatus,
     RefundStatus,
+    ShippingMethod,
     TaxType,
 )
-from .order import Order
-from .order_line_item import OrderLineItem
+from .discount import OrderDiscount
 from .fulfillment import (
-    FulfillmentOrder,
     FulfillmentLineItem,
+    FulfillmentOrder,
     OrderFulfillment,
     OrderFulfillmentItem,
     OrderFulfillmentTracking,
     OrderFulfillmentTrackingUrl,
 )
-from .payment import PaymentTransaction, OrderPayment
-from .refund import Refund
-from .tax import Tax, OrderTax
-from .note import OrderNote
 from .history import OrderHistory
-from .discount import OrderDiscount
+from .note import OrderNote
+from .order import Order
+from .order_line_item import OrderLineItem
+from .payment import OrderPayment, PaymentTransaction
+from .refund import Refund
+from .tax import OrderTax, Tax
 
 __all__ = [
     # Choices

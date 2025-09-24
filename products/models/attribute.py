@@ -1,8 +1,10 @@
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
+
 from core.models import AbstractBaseModel
-from .product import Product
+
 from .choices import AttributeDisplayType, AttributeValidationType
+from .product import Product
 
 
 class ProductAttribute(AbstractBaseModel):
@@ -65,7 +67,8 @@ class ProductAttribute(AbstractBaseModel):
     def validate_value(self, value):
         """Validate a value against this attribute's validation rules"""
         import re
-        from django.core.validators import validate_email, URLValidator
+
+        from django.core.validators import URLValidator, validate_email
 
         if not value:
             if self.is_required:
@@ -151,7 +154,7 @@ class ProductAttributeValue(AbstractBaseModel):
         """Get swatch data based on the attribute display type"""
         if self.attribute.display_type == AttributeDisplayType.COLOR:
             return {"type": "color", "value": self.color_code}
-        elif self.attribute.display_type == AttributeDisplayType.IMAGE:
+        if self.attribute.display_type == AttributeDisplayType.IMAGE:
             return {"type": "image", "url": self.image.url if self.image else None}
         return None
 

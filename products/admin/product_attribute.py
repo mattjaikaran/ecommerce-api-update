@@ -1,6 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from ..models import ProductAttribute, ProductAttributeValue, ProductAttributeAssignment
+
+from ..models import ProductAttribute, ProductAttributeAssignment, ProductAttributeValue
 
 
 @admin.register(ProductAttribute)

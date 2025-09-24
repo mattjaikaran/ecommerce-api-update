@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# lint.sh
+# lint.sh - Modern linting and formatting with ruff
 
-source env/bin/activate
-flake8 .
-black .
-isort .
+echo "🔍 Running ruff linting..."
+uv run ruff check .
+
+echo "✨ Running ruff formatting..."
+uv run ruff format .
+
+echo "✅ Linting and formatting complete!"

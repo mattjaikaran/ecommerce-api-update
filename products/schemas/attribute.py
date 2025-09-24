@@ -1,6 +1,6 @@
-from typing import Optional, List
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
+
 from ninja import Schema
 
 
@@ -12,7 +12,7 @@ class AttributeValueSchema(Schema):
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
-    date_modified: Optional[datetime] = None
+    date_modified: datetime | None = None
 
 
 class AttributeValueCreateSchema(Schema):
@@ -22,66 +22,66 @@ class AttributeValueCreateSchema(Schema):
 
 
 class AttributeValueUpdateSchema(Schema):
-    value: Optional[str] = None
-    position: Optional[int] = None
-    meta_data: Optional[dict] = None
+    value: str | None = None
+    position: int | None = None
+    meta_data: dict | None = None
 
 
 class AttributeSchema(Schema):
     id: UUID
     name: str
     code: str
-    description: Optional[str] = None
+    description: str | None = None
     is_filterable: bool = True
     position: int = 0
-    values: List[AttributeValueSchema] = []
+    values: list[AttributeValueSchema] = []
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
-    date_modified: Optional[datetime] = None
+    date_modified: datetime | None = None
 
 
 class AttributeCreateSchema(Schema):
     name: str
     code: str
-    description: Optional[str] = None
+    description: str | None = None
     is_filterable: bool = True
     position: int = 0
     meta_data: dict = {}
 
 
 class AttributeUpdateSchema(Schema):
-    name: Optional[str] = None
-    code: Optional[str] = None
-    description: Optional[str] = None
-    is_filterable: Optional[bool] = None
-    position: Optional[int] = None
-    meta_data: Optional[dict] = None
+    name: str | None = None
+    code: str | None = None
+    description: str | None = None
+    is_filterable: bool | None = None
+    position: int | None = None
+    meta_data: dict | None = None
 
 
 class AttributeGroupSchema(Schema):
     id: UUID
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     position: int = 0
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
-    date_modified: Optional[datetime] = None
+    date_modified: datetime | None = None
 
 
 class AttributeGroupCreateSchema(Schema):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     position: int = 0
     meta_data: dict = {}
 
 
 class AttributeGroupUpdateSchema(Schema):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    position: Optional[int] = None
-    meta_data: Optional[dict] = None
+    name: str | None = None
+    description: str | None = None
+    position: int | None = None
+    meta_data: dict | None = None
 
 
 class AttributeAssignmentSchema(Schema):
@@ -92,7 +92,7 @@ class AttributeAssignmentSchema(Schema):
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
-    date_modified: Optional[datetime] = None
+    date_modified: datetime | None = None
 
 
 class AttributeAssignmentCreateSchema(Schema):
@@ -114,7 +114,7 @@ class AttributeGroupProductSchema(Schema):
     id: UUID
     name: str
     slug: str
-    description: Optional[str]
+    description: str | None
     created_at: datetime
     date_modified: datetime
 
@@ -124,13 +124,13 @@ class AttributeGroupProductCreateSchema(Schema):
 
 
 class AttributeGroupProductUpdateSchema(Schema):
-    product_ids: Optional[list[UUID]]
+    product_ids: list[UUID] | None
 
 
 class ProductAttributeGroupSchema(Schema):
     id: UUID
     name: str
-    description: Optional[str]
+    description: str | None
     position: int
     attributes: list[AttributeSchema]
     created_at: datetime
@@ -139,6 +139,6 @@ class ProductAttributeGroupSchema(Schema):
 
 class ProductAttributeGroupCreateSchema(Schema):
     name: str
-    description: Optional[str]
+    description: str | None
     position: int = 0
     attribute_ids: list[UUID]

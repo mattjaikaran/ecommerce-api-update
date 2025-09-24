@@ -1,4 +1,5 @@
-from ninja_extra import api_controller, http_get, http_post
+from ninja_extra import api_controller, http_get
+
 from payments.schemas import PaymentMethodSchema
 
 

@@ -1,8 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List
-from ninja import Schema
+from typing import List, Optional
 from uuid import UUID
+
+from ninja import Schema
 from pydantic import Field
 
 
@@ -27,21 +28,21 @@ class CartItemUpdateSchema(Schema):
 
 class CartSchema(Schema):
     id: UUID
-    customer_id: Optional[UUID] = None
-    session_key: Optional[str] = None
-    expires_at: Optional[datetime] = None
+    customer_id: UUID | None = None
+    session_key: str | None = None
+    expires_at: datetime | None = None
     subtotal: Decimal = Field(ge=0)
     total_price: Decimal = Field(ge=0)
     total_quantity: int = Field(ge=0)
     is_active: bool = True
-    items: List[CartItemSchema]
+    items: list[CartItemSchema]
     created_at: datetime
     updated_at: datetime
 
 
 __all__ = [
-    "CartSchema",
-    "CartItemSchema",
     "CartItemCreateSchema",
+    "CartItemSchema",
     "CartItemUpdateSchema",
+    "CartSchema",
 ]

@@ -1,9 +1,11 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
+
 from core.models import AbstractBaseModel
+
+from .choices import FulfillmentStatus, ShippingMethod
 from .order import Order
 from .order_line_item import OrderLineItem
-from .choices import FulfillmentStatus, ShippingMethod
 
 
 class FulfillmentOrder(AbstractBaseModel):

@@ -1,17 +1,16 @@
 from .admin import (
-    ProductAdmin,
-    ProductCategoryAdmin,
-    ProductVariantAdmin,
-    ProductAttributeAdmin,
-    ProductAttributeValueAdmin,
-    ProductAttributeAssignmentAdmin,
-    ProductBundleAdmin,
     BundleItemAdmin,
+    ProductAdmin,
+    ProductAttributeAdmin,
+    ProductAttributeAssignmentAdmin,
+    ProductAttributeValueAdmin,
+    ProductBundleAdmin,
+    ProductCategoryAdmin,
+    ProductCollectionAdmin,
     ProductReviewAdmin,
     ProductTagAdmin,
-    ProductCollectionAdmin,
+    ProductVariantAdmin,
 )
-
 
 __all__ = [
     ProductAdmin,

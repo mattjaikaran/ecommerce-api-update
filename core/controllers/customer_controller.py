@@ -1,15 +1,16 @@
-from typing import List
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from core.models import Customer
-from core.schemas.customer import (
-    CustomerSchema,
-    CustomerCreateSchema,
-    CustomerUpdateSchema,
-)
 import logging
 from uuid import UUID
+
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
+
+from core.models import Customer
+from core.schemas.customer import (
+    CustomerCreateSchema,
+    CustomerSchema,
+    CustomerUpdateSchema,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 class CustomerController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[CustomerSchema], 500: dict})
+    @http_get("", response={200: list[CustomerSchema], 500: dict})
     def list_customers(self, request):
         """Get all customers"""
         try:

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from ..models import ProductTag, ProductCollection
+
+from ..models import ProductCollection, ProductTag
 
 
 @admin.register(ProductTag)

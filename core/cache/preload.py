@@ -1,17 +1,17 @@
-from django.apps import apps
-from django.core.cache import cache
-from django.db.models import Q, Count
-from typing import Dict, Any, List
-from .warming import CacheWarmer
-from .versioning import VersionedCache
 import logging
+from typing import Any
+
+from django.apps import apps
+from django.db.models import Count, Q
+
+from .versioning import VersionedCache
+from .warming import CacheWarmer
 
 logger = logging.getLogger(__name__)
 
 
 class CachePreloader:
-    """
-    Manages preloading of common queries and data patterns.
+    """Manages preloading of common queries and data patterns.
     Usage:
         preloader = CachePreloader()
         preloader.preload_all()
@@ -59,7 +59,9 @@ class CachePreloader:
                 Q(popular=True) | Q(featured=True)
             )
             self.warmer.warm_model(
-                Product, queryset=popular_products, timeout=3600  # 1 hour
+                Product,
+                queryset=popular_products,
+                timeout=3600,  # 1 hour
             )
 
             logger.info("Completed product cache preload")
@@ -122,7 +124,7 @@ class CachePreloader:
         except Exception as e:
             logger.error(f"Error preloading user data: {e}")
 
-    def _build_category_tree(self, categories) -> List[Dict[str, Any]]:
+    def _build_category_tree(self, categories) -> list[dict[str, Any]]:
         """Build a hierarchical category tree with stats."""
 
         def build_node(category):

@@ -1,15 +1,15 @@
 import logging
-from typing import List
 from decimal import Decimal
-from django.db import transaction
+
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from ninja_extra import (
     api_controller,
+    http_delete,
     http_get,
     http_post,
     http_put,
-    http_delete,
 )
 from ninja_extra.permissions import IsAuthenticated
 
@@ -19,13 +19,13 @@ from orders.models import (
     OrderStatus,
 )
 from orders.schemas import (
-    OrderHistorySchema,
-    OrderSchema,
     OrderCreateSchema,
-    OrderUpdateSchema,
-    OrderLineItemSchema,
+    OrderHistorySchema,
     OrderLineItemCreateSchema,
+    OrderLineItemSchema,
     OrderLineItemUpdateSchema,
+    OrderSchema,
+    OrderUpdateSchema,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 class OrderController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[OrderSchema], 500: dict})
+    @http_get("", response={200: list[OrderSchema], 500: dict})
     def list_orders(self, request):
         """List all orders."""
         try:
@@ -399,7 +399,7 @@ class OrderController:
     @http_get(
         "/{order_id}/history",
         response={
-            200: List[OrderHistorySchema],
+            200: list[OrderHistorySchema],
             404: dict,
             500: dict,
         },

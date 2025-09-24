@@ -1,14 +1,16 @@
+import random
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from faker import Faker
-import random
+
 from orders.models import (
+    FulfillmentLineItem,
+    FulfillmentOrder,
+    FulfillmentStatus,
     Order,
     OrderStatus,
-    FulfillmentOrder,
-    FulfillmentLineItem,
-    FulfillmentStatus,
 )
-from django.contrib.auth import get_user_model
 
 fake = Faker()
 User = get_user_model()

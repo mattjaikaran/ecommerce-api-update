@@ -1,7 +1,7 @@
-from ninja import Schema
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
+
+from ninja import Schema
 from pydantic import Field
 
 
@@ -10,7 +10,7 @@ class ReviewSchema(Schema):
     product_id: UUID
     user_id: UUID
     rating: int = Field(ge=1, le=5)
-    title: Optional[str] = None
+    title: str | None = None
     comment: str
     is_verified: bool = False
     is_featured: bool = False
@@ -22,13 +22,13 @@ class ReviewSchema(Schema):
 class ReviewCreateSchema(Schema):
     product_id: UUID
     rating: int = Field(ge=1, le=5)
-    title: Optional[str] = None
+    title: str | None = None
     comment: str
     meta_data: dict = {}
 
 
 class ReviewUpdateSchema(Schema):
     rating: int = Field(ge=1, le=5)
-    title: Optional[str] = None
+    title: str | None = None
     comment: str
-    meta_data: Optional[dict] = None
+    meta_data: dict | None = None

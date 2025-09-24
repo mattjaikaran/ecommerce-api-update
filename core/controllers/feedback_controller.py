@@ -1,14 +1,13 @@
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+
 from core.models import CustomerFeedback
-from core.schemas import CustomerFeedbackSchema, CustomerFeedbackCreateSchema
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from typing import List
+from core.schemas import CustomerFeedbackCreateSchema, CustomerFeedbackSchema
 
 
 @api_controller("/feedback", tags=["Feedback"])
 class FeedbackController:
-
     @http_get(
-        "/feedback", response={200: List[CustomerFeedbackSchema], 400: dict, 500: dict}
+        "/feedback", response={200: list[CustomerFeedbackSchema], 400: dict, 500: dict}
     )
     def list_feedback(self, request):
         try:

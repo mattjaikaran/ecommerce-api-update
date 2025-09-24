@@ -1,12 +1,14 @@
+import random
+from datetime import timedelta
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from faker import Faker
-from datetime import timedelta
-import random
+
 from cart.models import Cart, CartItem
-from products.models import ProductVariant
 from core.models import Customer
-from django.contrib.auth import get_user_model
+from products.models import ProductVariant
 
 fake = Faker()
 User = get_user_model()

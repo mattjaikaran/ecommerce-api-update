@@ -1,14 +1,13 @@
-from django.core.cache import cache
-from django.conf import settings
-from typing import Optional, Any
 import hashlib
-import json
 import time
+from typing import Any
+
+from django.conf import settings
+from django.core.cache import cache
 
 
 class CacheVersion:
-    """
-    Manages cache versioning to handle cache invalidation.
+    """Manages cache versioning to handle cache invalidation.
     Usage:
         version = CacheVersion('products')
         version.increment()  # Invalidates all product cache
@@ -40,8 +39,7 @@ class CacheVersion:
 
 
 class VersionedCache:
-    """
-    Cache wrapper that includes versioning.
+    """Cache wrapper that includes versioning.
     Usage:
         cache = VersionedCache('products')
         cache.set('item:1', item_data)
@@ -61,7 +59,7 @@ class VersionedCache:
         """Get value from cache with versioning."""
         return cache.get(self._versioned_key(key), default)
 
-    def set(self, key: str, value: Any, timeout: Optional[int] = None) -> bool:
+    def set(self, key: str, value: Any, timeout: int | None = None) -> bool:
         """Set value in cache with versioning."""
         return cache.set(self._versioned_key(key), value, timeout)
 

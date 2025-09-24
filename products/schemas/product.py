@@ -1,47 +1,48 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, List
 from uuid import UUID
+
 from ninja import Schema
 from pydantic import Field, validator
-from .product_option import ProductVariantSchema, ProductImageSchema
+
+from .collection import CollectionSchema
+from .product_option import ProductImageSchema, ProductVariantSchema
 from .review import ReviewSchema
 from .tag import TagSchema
-from .collection import CollectionSchema
 
 
 class ProductSchema(Schema):
     id: UUID
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     category_id: UUID
     type: str = "physical"
     tax_class: str = "standard"
     shipping_class: str = "standard"
     price: Decimal = Field(ge=0)
-    compare_at_price: Optional[Decimal] = None
-    cost_price: Optional[Decimal] = None
+    compare_at_price: Decimal | None = None
+    cost_price: Decimal | None = None
     quantity: int = 0
     low_stock_threshold: int = 10
-    weight: Optional[Decimal] = None
-    length: Optional[Decimal] = None
-    width: Optional[Decimal] = None
-    height: Optional[Decimal] = None
-    digital_file: Optional[str] = None
-    download_limit: Optional[int] = None
+    weight: Decimal | None = None
+    length: Decimal | None = None
+    width: Decimal | None = None
+    height: Decimal | None = None
+    digital_file: str | None = None
+    download_limit: int | None = None
     is_active: bool = True
     status: str = "draft"
     featured: bool = False
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
     meta_data: dict = {}
-    variants: List[ProductVariantSchema]
-    images: List[ProductImageSchema]
-    reviews: List[ReviewSchema]
-    tags: List[TagSchema]
-    collections: List[CollectionSchema]
+    variants: list[ProductVariantSchema]
+    images: list[ProductImageSchema]
+    reviews: list[ReviewSchema]
+    tags: list[TagSchema]
+    collections: list[CollectionSchema]
     created_at: datetime
     updated_at: datetime
 
@@ -55,28 +56,28 @@ class ProductSchema(Schema):
 class ProductCreateSchema(Schema):
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     category_id: UUID
     type: str = "physical"
     tax_class: str = "standard"
     shipping_class: str = "standard"
     price: Decimal = Field(ge=0)
-    compare_at_price: Optional[Decimal] = None
-    cost_price: Optional[Decimal] = None
+    compare_at_price: Decimal | None = None
+    cost_price: Decimal | None = None
     quantity: int = 0
     low_stock_threshold: int = 10
-    weight: Optional[Decimal] = None
-    length: Optional[Decimal] = None
-    width: Optional[Decimal] = None
-    height: Optional[Decimal] = None
-    digital_file: Optional[str] = None
-    download_limit: Optional[int] = None
+    weight: Decimal | None = None
+    length: Decimal | None = None
+    width: Decimal | None = None
+    height: Decimal | None = None
+    digital_file: str | None = None
+    download_limit: int | None = None
     is_active: bool = True
     status: str = "draft"
     featured: bool = False
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
     meta_data: dict = {}
 
 
@@ -85,12 +86,12 @@ class ProductListSchema(Schema):
     name: str
     slug: str
     price: Decimal = Field(ge=0)
-    compare_at_price: Optional[Decimal] = None
+    compare_at_price: Decimal | None = None
     status: str = "draft"
     featured: bool = False
     is_active: bool = True
     category_id: UUID
-    thumbnail: Optional[str] = None
+    thumbnail: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -113,19 +114,19 @@ class ProductListSchema(Schema):
 class ProductUpdateSchema(Schema):
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     category_id: UUID
     type: str = "physical"
     tax_class: str = "standard"
     shipping_class: str = "standard"
     price: Decimal = Field(ge=0)
-    compare_at_price: Optional[Decimal] = None
-    cost_price: Optional[Decimal] = None
+    compare_at_price: Decimal | None = None
+    cost_price: Decimal | None = None
     quantity: int = 0
     low_stock_threshold: int = 10
-    weight: Optional[Decimal] = None
-    length: Optional[Decimal] = None
-    width: Optional[Decimal] = None
-    height: Optional[Decimal] = None
-    digital_file: Optional[str] = None
-    download_limit: Optional[int] = None
+    weight: Decimal | None = None
+    length: Decimal | None = None
+    width: Decimal | None = None
+    height: Decimal | None = None
+    digital_file: str | None = None
+    download_limit: int | None = None

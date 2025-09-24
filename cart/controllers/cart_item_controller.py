@@ -1,20 +1,20 @@
 import logging
-from typing import List
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
+from uuid import UUID
+
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+
 from cart.models import Cart, CartItem
-from cart.schemas import CartItemSchema, CartItemCreateSchema, CartItemUpdateSchema
+from cart.schemas import CartItemCreateSchema, CartItemSchema, CartItemUpdateSchema
 from core.models import Customer
 from products.models import ProductVariant
-from django.shortcuts import get_object_or_404
-from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
 
 @api_controller("/cart", tags=["Cart Items"])
 class CartItemController:
-
-    @http_get("/items", response={200: List[CartItemSchema], 404: dict, 500: dict})
+    @http_get("/items", response={200: list[CartItemSchema], 404: dict, 500: dict})
     def list_cart_items(self, request):
         """List all items in the current user's cart"""
         try:
@@ -33,7 +33,7 @@ class CartItemController:
                 return 200, []
 
         except Exception as e:
-            logger.error(f"Error listing cart items: {str(e)}")
+            logger.error(f"Error listing cart items: {e!s}")
             return 500, {
                 "message": "Internal server error - list_cart_items",
                 "error": str(e),
@@ -83,7 +83,7 @@ class CartItemController:
         except ProductVariant.DoesNotExist:
             return 404, {"message": "Product variant not found"}
         except Exception as e:
-            logger.error(f"Error creating cart item: {str(e)}")
+            logger.error(f"Error creating cart item: {e!s}")
             return 500, {
                 "message": "Internal server error - create_cart_item",
                 "error": str(e),
@@ -118,7 +118,7 @@ class CartItemController:
         except CartItem.DoesNotExist:
             return 404, {"message": "Cart item not found"}
         except Exception as e:
-            logger.error(f"Error updating cart item: {str(e)}")
+            logger.error(f"Error updating cart item: {e!s}")
             return 500, {
                 "message": "Internal server error - update_cart_item",
                 "error": str(e),
@@ -147,7 +147,7 @@ class CartItemController:
         except CartItem.DoesNotExist:
             return 404, {"message": "Cart item not found"}
         except Exception as e:
-            logger.error(f"Error deleting cart item: {str(e)}")
+            logger.error(f"Error deleting cart item: {e!s}")
             return 500, {
                 "message": "Internal server error - delete_cart_item",
                 "error": str(e),

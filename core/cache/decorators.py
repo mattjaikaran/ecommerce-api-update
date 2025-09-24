@@ -1,13 +1,15 @@
+from collections.abc import Callable
 from functools import wraps
+from typing import Any
+
 from django.core.cache import cache
-from .settings import cache_key_prefix, CACHE_TTL
-from typing import Any, Callable, Optional
 from ninja.responses import Response
 
+from .settings import CACHE_TTL, cache_key_prefix
 
-def cached_view(timeout: Optional[int] = CACHE_TTL, key_prefix: str = "view"):
-    """
-    Cache decorator for API views.
+
+def cached_view(timeout: int | None = CACHE_TTL, key_prefix: str = "view"):
+    """Cache decorator for API views.
     Usage:
         @http_get('')
         @cached_view(timeout=300, key_prefix='products')
@@ -49,9 +51,8 @@ def cached_view(timeout: Optional[int] = CACHE_TTL, key_prefix: str = "view"):
     return decorator
 
 
-def cached_method(timeout: Optional[int] = CACHE_TTL, key_prefix: str = "method"):
-    """
-    Cache decorator for class methods.
+def cached_method(timeout: int | None = CACHE_TTL, key_prefix: str = "method"):
+    """Cache decorator for class methods.
     Usage:
         @cached_method(timeout=300, key_prefix='user')
         def get_user_data(self, user_id):

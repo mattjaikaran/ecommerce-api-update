@@ -1,24 +1,35 @@
-from django.contrib import admin
-from django.urls import path
+from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+from ninja import Redoc
 from ninja_extra import NinjaExtraAPI
 from ninja_jwt.controller import NinjaJWTDefaultController
-from core.controllers import UserController, AuthController, CustomerController
+
+from cart.controllers import CartController, CartItemController
+from core.controllers import AuthController, CustomerController, UserController
+from orders.controllers import OrderController
 from products.controllers import (
-    ProductController,
-    CategoryController,
-    CollectionController,
-    TagController,
-    ProductOptionController,
     AttributeController,
     BundleController,
+    CategoryController,
+    CollectionController,
+    ProductController,
+    ProductOptionController,
     ReviewController,
+    TagController,
 )
-from cart.controllers import CartController, CartItemController
-from orders.controllers import OrderController
-from ninja import Redoc
-from debug_toolbar.toolbar import debug_toolbar_urls
+
+# Health check imports
+from .healthcheck import (
+    health_check_all,
+    health_check_service,
+    health_check_simple,
+    liveness_check,
+    monitoring_info,
+    readiness_check,
+)
 
 # admin site settings
 admin.site.site_header = "E-Commerce Admin"
@@ -57,10 +68,26 @@ api.register_controllers(
     OrderController,
 )
 
+# Health check patterns
+health_patterns = [
+    path("health/", health_check_simple, name="health-simple"),
+    path("health/all/", health_check_all, name="health-all"),
+    path("health/<str:service_name>/", health_check_service, name="health-service"),
+    path("readiness/", readiness_check, name="readiness"),
+    path("liveness/", liveness_check, name="liveness"),
+    path("monitoring/", monitoring_info, name="monitoring"),
+]
+
 urlpatterns = [
+    # Admin
     path("admin/", admin.site.urls),
+    # API
     path("api/", api.urls),
-] + debug_toolbar_urls()
+    # Health checks
+    path("", include(health_patterns)),
+    # Debug toolbar (development only)
+    *debug_toolbar_urls(),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,7 +1,9 @@
-from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+
 from core.models import AbstractBaseModel
+
 from .product import Product
 
 User = get_user_model()

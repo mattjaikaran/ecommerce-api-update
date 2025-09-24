@@ -1,19 +1,21 @@
+import random
+from decimal import Decimal
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from faker import Faker
-from decimal import Decimal
-import random
+
+from core.models import Address, Customer, CustomerGroup
 from orders.models import (
     Order,
     OrderLineItem,
     OrderStatus,
-    PaymentStatus,
     PaymentMethod,
+    PaymentStatus,
     ShippingMethod,
 )
 from products.models import ProductVariant
-from core.models import Customer, Address, CustomerGroup
-from django.contrib.auth import get_user_model
 
 fake = Faker()
 User = get_user_model()

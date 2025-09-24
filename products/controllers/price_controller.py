@@ -1,23 +1,24 @@
-from typing import List
-from uuid import UUID
-from ninja_extra import api_controller, http_get, http_post, http_put
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from ..models import Product, ProductVariant, ProductPriceHistory, PriceAction
-from ..schemas.price import (
-    PriceHistorySchema,
-    PriceAdjustmentSchema,
-    PriceAdjustmentResponseSchema,
-)
 import logging
+from uuid import UUID
+
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_get, http_post
+from ninja_extra.permissions import IsAuthenticated
+
+from ..models import PriceAction, Product, ProductPriceHistory, ProductVariant
+from ..schemas.price import (
+    PriceAdjustmentResponseSchema,
+    PriceAdjustmentSchema,
+    PriceHistorySchema,
+)
 
 logger = logging.getLogger(__name__)
 
 
 @api_controller("/prices", tags=["Prices"], permissions=[IsAuthenticated])
 class PriceController:
-    @http_get("/{product_id}/history", response={200: List[PriceHistorySchema]})
+    @http_get("/{product_id}/history", response={200: list[PriceHistorySchema]})
     def get_price_history(self, product_id: UUID):
         """Get price history for a product"""
         try:
@@ -32,7 +33,7 @@ class PriceController:
 
     @http_get(
         "/{product_id}/variant/{variant_id}/history",
-        response={200: List[PriceHistorySchema]},
+        response={200: list[PriceHistorySchema]},
     )
     def get_variant_price_history(self, product_id: UUID, variant_id: UUID):
         """Get price history for a product variant"""
@@ -109,11 +110,11 @@ class PriceController:
             }
 
     @http_post(
-        "/{product_id}/bulk-adjust", response={200: List[PriceAdjustmentResponseSchema]}
+        "/{product_id}/bulk-adjust", response={200: list[PriceAdjustmentResponseSchema]}
     )
     @transaction.atomic
     def bulk_adjust_prices(
-        self, product_id: UUID, adjustments: List[PriceAdjustmentSchema]
+        self, product_id: UUID, adjustments: list[PriceAdjustmentSchema]
     ):
         """Bulk adjust prices for product variants"""
         try:

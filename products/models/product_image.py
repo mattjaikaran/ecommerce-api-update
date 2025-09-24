@@ -1,5 +1,7 @@
 from django.db import models
+
 from core.models import AbstractBaseModel
+
 from .product import Product
 from .product_variant import ProductVariant
 

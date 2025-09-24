@@ -1,9 +1,9 @@
-from ninja import Schema
 from datetime import datetime
-from typing import Optional, List
-from pydantic import Field, validator
 from decimal import Decimal
 from uuid import UUID
+
+from ninja import Schema
+from pydantic import Field, validator
 
 
 class ProductOptionValueSchema(Schema):
@@ -18,7 +18,7 @@ class ProductOptionSchema(Schema):
     id: UUID
     name: str
     position: int = 0
-    values: List[ProductOptionValueSchema]
+    values: list[ProductOptionValueSchema]
     created_at: datetime
     updated_at: datetime
 
@@ -26,13 +26,13 @@ class ProductOptionSchema(Schema):
 class ProductOptionCreateSchema(Schema):
     name: str
     position: int = 0
-    values: List[ProductOptionValueSchema]
+    values: list[ProductOptionValueSchema]
 
 
 class ProductOptionUpdateSchema(Schema):
-    name: Optional[str] = None
-    position: Optional[int] = None
-    values: Optional[List[ProductOptionValueSchema]] = None
+    name: str | None = None
+    position: int | None = None
+    values: list[ProductOptionValueSchema] | None = None
 
 
 class ProductVariantOptionSchema(Schema):
@@ -46,9 +46,9 @@ class ProductVariantOptionSchema(Schema):
 class ProductImageSchema(Schema):
     id: UUID
     product_id: UUID
-    variant_id: Optional[UUID] = None
+    variant_id: UUID | None = None
     image: str
-    alt_text: Optional[str] = None
+    alt_text: str | None = None
     position: int = 0
     created_at: datetime
     updated_at: datetime
@@ -59,21 +59,21 @@ class ProductVariantSchema(Schema):
     product_id: UUID
     name: str
     sku: str
-    barcode: Optional[str] = None
+    barcode: str | None = None
     price: Decimal = Field(ge=0)
-    compare_at_price: Optional[Decimal] = None
-    cost_price: Optional[Decimal] = None
+    compare_at_price: Decimal | None = None
+    cost_price: Decimal | None = None
     inventory_quantity: int = 0
     low_stock_threshold: int = 10
-    weight: Optional[Decimal] = None
-    length: Optional[Decimal] = None
-    width: Optional[Decimal] = None
-    height: Optional[Decimal] = None
+    weight: Decimal | None = None
+    length: Decimal | None = None
+    width: Decimal | None = None
+    height: Decimal | None = None
     position: int = 0
     is_active: bool = True
     meta_data: dict = {}
-    options: List[ProductVariantOptionSchema]
-    images: List[ProductImageSchema]
+    options: list[ProductVariantOptionSchema]
+    images: list[ProductImageSchema]
     created_at: datetime
     updated_at: datetime
 
@@ -87,28 +87,28 @@ class ProductVariantSchema(Schema):
 class ProductVariantCreateSchema(Schema):
     name: str
     sku: str
-    barcode: Optional[str] = None
+    barcode: str | None = None
     price: Decimal = Field(ge=0)
-    compare_at_price: Optional[Decimal] = None
-    cost_price: Optional[Decimal] = None
+    compare_at_price: Decimal | None = None
+    cost_price: Decimal | None = None
     inventory_quantity: int = 0
     low_stock_threshold: int = 10
-    weight: Optional[Decimal] = None
-    length: Optional[Decimal] = None
-    width: Optional[Decimal] = None
-    height: Optional[Decimal] = None
+    weight: Decimal | None = None
+    length: Decimal | None = None
+    width: Decimal | None = None
+    height: Decimal | None = None
 
 
 class ProductVariantUpdateSchema(Schema):
-    name: Optional[str] = None
-    sku: Optional[str] = None
-    barcode: Optional[str] = None
-    price: Optional[Decimal] = None
-    compare_at_price: Optional[Decimal] = None
-    cost_price: Optional[Decimal] = None
-    inventory_quantity: Optional[int] = None
-    low_stock_threshold: Optional[int] = None
-    weight: Optional[Decimal] = None
-    length: Optional[Decimal] = None
-    width: Optional[Decimal] = None
-    height: Optional[Decimal] = None
+    name: str | None = None
+    sku: str | None = None
+    barcode: str | None = None
+    price: Decimal | None = None
+    compare_at_price: Decimal | None = None
+    cost_price: Decimal | None = None
+    inventory_quantity: int | None = None
+    low_stock_threshold: int | None = None
+    weight: Decimal | None = None
+    length: Decimal | None = None
+    width: Decimal | None = None
+    height: Decimal | None = None

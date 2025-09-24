@@ -1,18 +1,20 @@
+import random
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 from faker import Faker
-import random
+
 from products.models import (
+    BundleItem,
     Product,
-    ProductOption,
-    ProductOptionValue,
     ProductAttribute,
     ProductAttributeValue,
     ProductBundle,
-    BundleItem,
+    ProductOption,
+    ProductOptionValue,
     ProductTag,
 )
-from django.contrib.auth import get_user_model
 
 fake = Faker()
 User = get_user_model()
@@ -149,7 +151,7 @@ class Command(BaseCommand):
 
         # Generate Product Bundles
         for i in range(bundles_count):
-            name = f"{fake.word().title()} Bundle {i+1}"
+            name = f"{fake.word().title()} Bundle {i + 1}"
             bundle = ProductBundle.objects.create(
                 name=name,
                 slug=slugify(name),

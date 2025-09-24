@@ -1,7 +1,7 @@
-from typing import Optional, List
-from uuid import UUID
 from datetime import datetime
 from decimal import Decimal
+from uuid import UUID
+
 from ninja import Schema
 from pydantic import Field
 
@@ -21,7 +21,7 @@ class BundleItemSchema(Schema):
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
-    date_modified: Optional[datetime] = None
+    date_modified: datetime | None = None
 
 
 class BundleItemCreateSchema(BundleItemBaseSchema):
@@ -29,62 +29,62 @@ class BundleItemCreateSchema(BundleItemBaseSchema):
 
 
 class BundleItemUpdateSchema(Schema):
-    product_id: Optional[UUID] = None
-    quantity: Optional[int] = None
-    position: Optional[int] = None
-    meta_data: Optional[dict] = None
+    product_id: UUID | None = None
+    quantity: int | None = None
+    position: int | None = None
+    meta_data: dict | None = None
 
 
 class BundleBaseSchema(Schema):
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     discount_percentage: Decimal = Field(ge=0, le=100)
     is_active: bool = True
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
 
 
 class BundleSchema(Schema):
     id: UUID
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     discount_percentage: Decimal = Field(ge=0, le=100)
     total_price: Decimal = Field(ge=0)
     discounted_price: Decimal = Field(ge=0)
     is_active: bool = True
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
     meta_data: dict = {}
-    items: List[BundleItemSchema] = []
+    items: list[BundleItemSchema] = []
     created_at: datetime
     updated_at: datetime
-    date_modified: Optional[datetime] = None
+    date_modified: datetime | None = None
 
 
 class BundleCreateSchema(Schema):
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     discount_percentage: Decimal = Field(ge=0, le=100)
     is_active: bool = True
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
     meta_data: dict = {}
-    items: List[dict] = []  # List of {product_id: UUID, quantity: int, position: int}
+    items: list[dict] = []  # List of {product_id: UUID, quantity: int, position: int}
 
 
 class BundleUpdateSchema(Schema):
-    name: Optional[str] = None
-    slug: Optional[str] = None
-    description: Optional[str] = None
-    discount_percentage: Optional[Decimal] = None
-    is_active: Optional[bool] = None
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    meta_data: Optional[dict] = None
-    items: Optional[List[dict]] = (
+    name: str | None = None
+    slug: str | None = None
+    description: str | None = None
+    discount_percentage: Decimal | None = None
+    is_active: bool | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    meta_data: dict | None = None
+    items: list[dict] | None = (
         None  # List of {product_id: UUID, quantity: int, position: int}
     )
 
@@ -98,7 +98,7 @@ class BundleAnalyticsSchema(Schema):
     conversion_rate: Decimal
     views: int
     start_date: datetime
-    end_date: Optional[datetime]
+    end_date: datetime | None
     is_active: bool
 
 
@@ -106,12 +106,12 @@ class BundleSearchSchema(Schema):
     id: UUID
     name: str
     slug: str
-    description: Optional[str]
+    description: str | None
     discount_percentage: Decimal
     total_price: Decimal
     discounted_price: Decimal
     product_count: int
     is_active: bool
-    start_date: Optional[datetime]
-    end_date: Optional[datetime]
+    start_date: datetime | None
+    end_date: datetime | None
     relevance_score: float

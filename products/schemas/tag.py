@@ -1,14 +1,14 @@
-from ninja import Schema
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
+
+from ninja import Schema
 
 
 class TagSchema(Schema):
     id: UUID
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
@@ -17,12 +17,12 @@ class TagSchema(Schema):
 class TagCreateSchema(Schema):
     name: str
     slug: str
-    description: Optional[str] = None
+    description: str | None = None
     meta_data: dict = {}
 
 
 class TagUpdateSchema(Schema):
-    name: Optional[str] = None
-    slug: Optional[str] = None
-    description: Optional[str] = None
-    meta_data: Optional[dict] = None
+    name: str | None = None
+    slug: str | None = None
+    description: str | None = None
+    meta_data: dict | None = None

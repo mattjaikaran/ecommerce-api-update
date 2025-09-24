@@ -1,27 +1,26 @@
-from django.db import transaction
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import (
     api_controller,
+    http_delete,
     http_get,
     http_post,
     http_put,
-    http_delete,
 )
-from typing import List
 from ninja_extra.permissions import IsAuthenticated
-from ninja.pagination import paginate
 
 from orders.models import (
-    Order,
-    OrderStatus,
+    FulfillmentLineItem,
     FulfillmentOrder,
     FulfillmentStatus,
-    FulfillmentLineItem,
+    Order,
+    OrderStatus,
 )
 from orders.schemas import (
-    FulfillmentSchema,
     FulfillmentCreateSchema,
+    FulfillmentSchema,
     FulfillmentUpdateSchema,
 )
 
@@ -33,7 +32,7 @@ class FulfillmentController:
     @http_get(
         "/",
         response={
-            200: List[FulfillmentSchema],
+            200: list[FulfillmentSchema],
             404: dict,
             500: dict,
         },

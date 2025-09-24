@@ -1,7 +1,7 @@
-from django.db import transaction
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
-from typing import List
+from ninja.pagination import paginate
 from ninja_extra import (
     api_controller,
     http_get,
@@ -9,7 +9,6 @@ from ninja_extra import (
     http_put,
 )
 from ninja_extra.permissions import IsAuthenticated
-from ninja.pagination import paginate
 
 from orders.models import (
     Order,
@@ -21,8 +20,8 @@ from orders.models import (
 )
 from orders.schemas import (
     PaymentTransactionSchema,
-    RefundSchema,
     RefundCreateSchema,
+    RefundSchema,
     RefundUpdateSchema,
 )
 
@@ -34,7 +33,7 @@ class PaymentController:
     @http_get(
         "/",
         response={
-            200: List[PaymentTransactionSchema],
+            200: list[PaymentTransactionSchema],
             404: dict,
             500: dict,
         },
@@ -220,7 +219,7 @@ class PaymentController:
     @http_get(
         "/refunds",
         response={
-            200: List[RefundSchema],
+            200: list[RefundSchema],
             404: dict,
             500: dict,
         },

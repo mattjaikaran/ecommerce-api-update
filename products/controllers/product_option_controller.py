@@ -1,16 +1,16 @@
-from typing import List
-from uuid import UUID
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.core.exceptions import ValidationError
 import logging
+from uuid import UUID
+
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
 
 from products.models import ProductOption, ProductOptionValue
 from products.schemas import (
-    ProductOptionSchema,
     ProductOptionCreateSchema,
+    ProductOptionSchema,
     ProductOptionUpdateSchema,
 )
 
@@ -21,11 +21,9 @@ logger = logging.getLogger(__name__)
 class ProductOptionController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[ProductOptionSchema], 500: dict})
+    @http_get("", response={200: list[ProductOptionSchema], 500: dict})
     def list_options(self):
-        """
-        Get all product options
-        """
+        """Get all product options"""
         try:
             options = ProductOption.objects.prefetch_related("values").all()
             return 200, options
@@ -38,9 +36,7 @@ class ProductOptionController:
 
     @http_get("/{id}", response={200: ProductOptionSchema, 404: dict, 500: dict})
     def get_option(self, id: UUID):
-        """
-        Get a product option by ID
-        """
+        """Get a product option by ID"""
         try:
             option = get_object_or_404(
                 ProductOption.objects.prefetch_related("values"),
@@ -60,9 +56,7 @@ class ProductOptionController:
     @http_post("", response={201: ProductOptionSchema, 400: dict, 500: dict})
     @transaction.atomic
     def create_option(self, payload: ProductOptionCreateSchema):
-        """
-        Create a new product option with values
-        """
+        """Create a new product option with values"""
         try:
             # Create option
             option = ProductOption.objects.create(
@@ -91,9 +85,7 @@ class ProductOptionController:
     )
     @transaction.atomic
     def update_option(self, id: UUID, payload: ProductOptionUpdateSchema):
-        """
-        Update a product option and its values
-        """
+        """Update a product option and its values"""
         try:
             option = get_object_or_404(ProductOption, id=id)
 
@@ -130,9 +122,7 @@ class ProductOptionController:
 
     @http_delete("/{id}", response={204: dict, 400: dict, 404: dict, 500: dict})
     def delete_option(self, id: UUID):
-        """
-        Delete a product option
-        """
+        """Delete a product option"""
         try:
             option = get_object_or_404(ProductOption, id=id)
 

@@ -1,16 +1,16 @@
-from typing import List
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.core.exceptions import ValidationError
-from uuid import UUID
 import logging
+from uuid import UUID
 
-from products.models import ProductReview, Product
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
+
+from products.models import Product, ProductReview
 from products.schemas import (
-    ProductReviewSchema,
     ProductReviewCreateSchema,
+    ProductReviewSchema,
     ProductReviewUpdateSchema,
 )
 
@@ -21,11 +21,9 @@ logger = logging.getLogger(__name__)
 class ReviewController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[ProductReviewSchema], 500: dict})
+    @http_get("", response={200: list[ProductReviewSchema], 500: dict})
     def list_reviews(self, request):
-        """
-        Get all product reviews
-        """
+        """Get all product reviews"""
         try:
             reviews = ProductReview.objects.select_related("product", "user").all()
             return 200, [ProductReviewSchema.from_orm(review) for review in reviews]
@@ -38,9 +36,7 @@ class ReviewController:
 
     @http_get("/{id}", response={200: ProductReviewSchema, 404: dict, 500: dict})
     def get_review(self, request, id: UUID):
-        """
-        Get a product review by ID
-        """
+        """Get a product review by ID"""
         try:
             review = get_object_or_404(
                 ProductReview.objects.select_related("product", "user"),
@@ -57,12 +53,10 @@ class ReviewController:
 
     @http_get(
         "/products/{product_id}",
-        response={200: List[ProductReviewSchema], 404: dict, 500: dict},
+        response={200: list[ProductReviewSchema], 404: dict, 500: dict},
     )
     def get_product_reviews(self, product_id: str):
-        """
-        Get all reviews for a specific product
-        """
+        """Get all reviews for a specific product"""
         try:
             reviews = ProductReview.objects.filter(
                 product_id=product_id
@@ -79,9 +73,7 @@ class ReviewController:
     )
     @transaction.atomic
     def create_review(self, payload: ProductReviewCreateSchema, request):
-        """
-        Create a new product review
-        """
+        """Create a new product review"""
         try:
             # Ensure product exists
             product = get_object_or_404(Product, id=payload.product_id)
@@ -115,9 +107,7 @@ class ReviewController:
     )
     @transaction.atomic
     def update_review(self, id: str, payload: ProductReviewUpdateSchema, request):
-        """
-        Update a product review
-        """
+        """Update a product review"""
         try:
             review = get_object_or_404(ProductReview, id=id)
 
@@ -143,9 +133,7 @@ class ReviewController:
 
     @http_delete("/{id}", response={204: dict, 404: dict, 500: dict})
     def delete_review(self, id: str, request):
-        """
-        Delete a product review
-        """
+        """Delete a product review"""
         try:
             review = get_object_or_404(ProductReview, id=id)
 
@@ -165,9 +153,7 @@ class ReviewController:
 
     @http_put("/{id}/verify", response={200: ProductReviewSchema, 404: dict, 500: dict})
     def verify_review(self, id: str, request):
-        """
-        Verify a product review (admin only)
-        """
+        """Verify a product review (admin only)"""
         try:
             if not request.user.is_staff:
                 return 403, {"error": "Only administrators can verify reviews"}
@@ -189,9 +175,7 @@ class ReviewController:
         "/{id}/feature", response={200: ProductReviewSchema, 404: dict, 500: dict}
     )
     def feature_review(self, id: str, request):
-        """
-        Feature/unfeature a product review (admin only)
-        """
+        """Feature/unfeature a product review (admin only)"""
         try:
             if not request.user.is_staff:
                 return 403, {"error": "Only administrators can feature reviews"}

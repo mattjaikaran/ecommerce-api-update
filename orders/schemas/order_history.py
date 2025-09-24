@@ -1,6 +1,8 @@
 from datetime import datetime
-from .order import OrderSchema
+
 from ninja import Schema
+
+from .order import OrderSchema
 
 
 class OrderHistorySchema(Schema):

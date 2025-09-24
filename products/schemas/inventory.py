@@ -1,30 +1,30 @@
-from typing import Optional
-from uuid import UUID
 from datetime import datetime
 from decimal import Decimal
+from uuid import UUID
+
 from ninja import Schema
 
 
 class InventoryHistorySchema(Schema):
     id: UUID
     product_id: UUID
-    variant_id: Optional[UUID]
+    variant_id: UUID | None
     action: str
     quantity: int
     previous_quantity: int
     new_quantity: int
-    reference: Optional[str]
-    notes: Optional[str]
+    reference: str | None
+    notes: str | None
     created_at: datetime
     date_modified: datetime
 
 
 class InventoryAdjustmentSchema(Schema):
-    variant_id: Optional[UUID]
-    quantity: Optional[int]
-    new_quantity: Optional[int]
-    reference: Optional[str]
-    notes: Optional[str]
+    variant_id: UUID | None
+    quantity: int | None
+    new_quantity: int | None
+    reference: str | None
+    notes: str | None
 
 
 class InventoryAdjustmentResponseSchema(Schema):
@@ -35,17 +35,17 @@ class InventoryAdjustmentResponseSchema(Schema):
 
 class LowStockAlertSchema(Schema):
     product_id: UUID
-    variant_id: Optional[UUID]
+    variant_id: UUID | None
     current_quantity: int
     threshold: int
-    last_restock_date: Optional[datetime]
-    average_daily_sales: Optional[Decimal]
-    suggested_reorder_quantity: Optional[int]
+    last_restock_date: datetime | None
+    average_daily_sales: Decimal | None
+    suggested_reorder_quantity: int | None
 
 
 class InventorySnapshotSchema(Schema):
     product_id: UUID
-    variant_id: Optional[UUID]
+    variant_id: UUID | None
     quantity: int
     reserved_quantity: int
     available_quantity: int

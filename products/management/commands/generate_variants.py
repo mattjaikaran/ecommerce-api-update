@@ -1,11 +1,13 @@
+import random
+from decimal import Decimal
+
 from django.core.management.base import BaseCommand
+from django.db import IntegrityError
 from django.utils.text import slugify
 from faker import Faker
-from decimal import Decimal
-import random
-from products.models import Product, ProductVariant
+
 from core.models import User
-from django.db import IntegrityError
+from products.models import Product, ProductVariant
 
 fake = Faker()
 
@@ -49,10 +51,10 @@ class Command(BaseCommand):
                 while True:
                     try:
                         # Generate variant name based on attributes (size, color, etc.)
-                        variant_name = f"{product.name} - Variant {i+1}"
+                        variant_name = f"{product.name} - Variant {i + 1}"
                         # Add attempt number to SKU if we've tried before
                         sku_suffix = f"-{attempt}" if attempt > 0 else ""
-                        sku = f"{slugify(product.name)[:10]}-V{i+1}{sku_suffix}"
+                        sku = f"{slugify(product.name)[:10]}-V{i + 1}{sku_suffix}"
 
                         # Adjust price slightly from base price
                         price_adjustment = Decimal(
@@ -100,9 +102,8 @@ class Command(BaseCommand):
                             # If SKU already exists, increment attempt and try again
                             attempt += 1
                             continue
-                        else:
-                            # If it's some other integrity error, raise it
-                            raise e
+                        # If it's some other integrity error, raise it
+                        raise e
 
         self.stdout.write(
             self.style.SUCCESS(f"Successfully created {total_variants} variants")

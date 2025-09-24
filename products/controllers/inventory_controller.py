@@ -1,23 +1,24 @@
-from typing import List
+import logging
 from uuid import UUID
+
+from django.db import transaction
+from django.shortcuts import get_object_or_404
 from ninja_extra import api_controller, http_get, http_post
 from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from ..models import Product, ProductVariant, ProductInventoryHistory, InventoryAction
+
+from ..models import InventoryAction, Product, ProductInventoryHistory, ProductVariant
 from ..schemas import (
-    InventoryHistorySchema,
-    InventoryAdjustmentSchema,
     InventoryAdjustmentResponseSchema,
+    InventoryAdjustmentSchema,
+    InventoryHistorySchema,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 @api_controller("/inventory", tags=["Inventory"], permissions=[IsAuthenticated])
 class InventoryController:
-    @http_get("/{product_id}/history", response={200: List[InventoryHistorySchema]})
+    @http_get("/{product_id}/history", response={200: list[InventoryHistorySchema]})
     def get_inventory_history(self, product_id: UUID):
         """Get inventory history for a product"""
         try:
@@ -32,7 +33,7 @@ class InventoryController:
 
     @http_get(
         "/{product_id}/variant/{variant_id}/history",
-        response={200: List[InventoryHistorySchema]},
+        response={200: list[InventoryHistorySchema]},
     )
     def get_variant_inventory_history(self, product_id: UUID, variant_id: UUID):
         """Get inventory history for a product variant"""

@@ -1,15 +1,16 @@
-from .admin import UserAdmin, CustomerFeedbackAdmin
-from django.contrib import admin
-from django.urls import path
-from django.template.response import TemplateResponse
-from django.core.cache import cache
-from django.contrib import messages
-from django.shortcuts import redirect
-from unfold.admin import ModelAdmin
-from .cache.warming import CacheWarmer
-from .cache.versioning import VersionedCache
-from django.apps import apps
 import json
+
+from django.apps import apps
+from django.contrib import admin, messages
+from django.core.cache import cache
+from django.shortcuts import redirect
+from django.template.response import TemplateResponse
+from django.urls import path
+from unfold.admin import ModelAdmin
+
+from .admin import CustomerFeedbackAdmin, UserAdmin
+from .cache.versioning import VersionedCache
+from .cache.warming import CacheWarmer
 
 __all__ = [
     UserAdmin,

@@ -1,7 +1,9 @@
 from django.db import models
+
 from core.models import AbstractBaseModel
-from .product import Product
+
 from .attribute import ProductAttribute, ProductAttributeAssignment
+from .product import Product
 
 
 class ProductAttributeGroup(AbstractBaseModel):

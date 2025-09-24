@@ -1,11 +1,11 @@
-from ninja import Schema
 from datetime import datetime
-from core.schemas import UserSchema
+
+from ninja import Schema
 
 
 class AddressSchema(Schema):
     id: int
-    user: UserSchema
+    user: "UserSchema"
     address_line_1: str
     address_line_2: str
     city: str

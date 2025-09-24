@@ -1,11 +1,13 @@
 import logging
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
+import uuid
+from datetime import datetime
+
+from django.contrib.auth.models import AnonymousUser
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+
 from cart.models import Cart
 from cart.schemas import CartSchema
 from core.models import Customer
-from django.contrib.auth.models import AnonymousUser
-from datetime import datetime
-import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ class CartController:
         except Customer.DoesNotExist:
             return 404, {"message": "Customer profile not found"}
         except Exception as e:
-            logger.error(f"Error getting cart: {str(e)}")
+            logger.error(f"Error getting cart: {e!s}")
             return 500, {
                 "message": "Internal server error - get_cart",
                 "error": str(e),
@@ -62,7 +64,7 @@ class CartController:
         except Customer.DoesNotExist:
             return 404, {"message": "Customer profile not found"}
         except Exception as e:
-            logger.error(f"Error creating cart: {str(e)}")
+            logger.error(f"Error creating cart: {e!s}")
             return 500, {
                 "message": "Internal server error - create_cart",
                 "error": str(e),
@@ -83,7 +85,7 @@ class CartController:
         except (Customer.DoesNotExist, Cart.DoesNotExist):
             return 404, {"message": "Cart not found"}
         except Exception as e:
-            logger.error(f"Error updating cart: {str(e)}")
+            logger.error(f"Error updating cart: {e!s}")
             return 500, {
                 "message": "Internal server error - update_cart",
                 "error": str(e),
@@ -108,7 +110,7 @@ class CartController:
         except Cart.DoesNotExist:
             return 404, {"message": "Active cart not found"}
         except Exception as e:
-            logger.error(f"Error deleting cart: {str(e)}")
+            logger.error(f"Error deleting cart: {e!s}")
             return 500, {
                 "message": "Internal server error - delete_cart",
                 "error": str(e),

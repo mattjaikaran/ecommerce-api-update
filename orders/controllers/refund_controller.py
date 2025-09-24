@@ -1,12 +1,12 @@
-from orders.models import Refund
-from orders.schemas import RefundSchema, RefundCreateSchema
 from ninja_extra import api_controller, http_get, http_post
-from typing import List
+
+from orders.models import Refund
+from orders.schemas import RefundCreateSchema, RefundSchema
 
 
 @api_controller("/refunds", tags=["Refunds"])
 class RefundController:
-    @http_get("/", response={200: List[RefundSchema], 404: dict, 500: dict})
+    @http_get("/", response={200: list[RefundSchema], 404: dict, 500: dict})
     def list_refunds(self, request):
         try:
             return 200, Refund.objects.all()

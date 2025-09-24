@@ -1,20 +1,20 @@
 from .admin import (
-    OrderAdmin,
-    OrderLineItemAdmin,
-    FulfillmentOrderAdmin,
     FulfillmentLineItemAdmin,
+    FulfillmentOrderAdmin,
+    OrderAdmin,
+    OrderDiscountAdmin,
     OrderFulfillmentAdmin,
     OrderFulfillmentItemAdmin,
     OrderFulfillmentTrackingAdmin,
     OrderFulfillmentTrackingUrlAdmin,
-    PaymentTransactionAdmin,
+    OrderHistoryAdmin,
+    OrderLineItemAdmin,
+    OrderNoteAdmin,
     OrderPaymentAdmin,
+    OrderTaxAdmin,
+    PaymentTransactionAdmin,
     RefundAdmin,
     TaxAdmin,
-    OrderTaxAdmin,
-    OrderNoteAdmin,
-    OrderHistoryAdmin,
-    OrderDiscountAdmin,
 )
 
 __all__ = [

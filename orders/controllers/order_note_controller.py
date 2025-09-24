@@ -1,24 +1,23 @@
-from django.db import transaction
-from typing import List
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import (
     api_controller,
+    http_delete,
     http_get,
     http_post,
     http_put,
-    http_delete,
 )
 from ninja_extra.permissions import IsAuthenticated
-from ninja.pagination import paginate
 
 from orders.models import (
     Order,
     OrderNote,
 )
 from orders.schemas import (
-    OrderNoteSchema,
     OrderNoteCreateSchema,
+    OrderNoteSchema,
 )
 
 
@@ -29,7 +28,7 @@ class OrderNoteController:
     @http_get(
         "/",
         response={
-            200: List[OrderNoteSchema],
+            200: list[OrderNoteSchema],
             404: dict,
             500: dict,
         },
@@ -214,7 +213,7 @@ class OrderNoteController:
     @http_get(
         "/customer",
         response={
-            200: List[OrderNoteSchema],
+            200: list[OrderNoteSchema],
             404: dict,
             500: dict,
         },
@@ -241,7 +240,7 @@ class OrderNoteController:
     @http_get(
         "/staff",
         response={
-            200: List[OrderNoteSchema],
+            200: list[OrderNoteSchema],
             404: dict,
             500: dict,
         },

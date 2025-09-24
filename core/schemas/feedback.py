@@ -1,12 +1,12 @@
-from ninja import Schema
 from datetime import datetime
 from uuid import UUID
-from core.schemas import UserSchema
+
+from ninja import Schema
 
 
 class CustomerFeedbackSchema(Schema):
     id: UUID
-    customer: UserSchema
+    customer: "UserSchema"
     feedback: str
     rating: int
     created_at: datetime

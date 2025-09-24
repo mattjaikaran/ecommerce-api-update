@@ -1,7 +1,10 @@
-from django.db import models
 import uuid
+
+from django.db import models
+
 from core.models import AbstractBaseModel
-from .choices import ProductStatus, ProductType, TaxClass, ShippingClass
+
+from .choices import ProductStatus, ProductType, ShippingClass, TaxClass
 from .product_category import ProductCategory
 
 

@@ -1,11 +1,10 @@
-from typing import List
-from django.db import transaction
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
+from django.db import transaction
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import api_controller, http_get, http_post
 from ninja_extra.permissions import IsAuthenticated
-from ninja.pagination import paginate
 
 from orders.models import (
     Order,
@@ -18,7 +17,7 @@ from orders.schemas import OrderHistorySchema
 class OrderHistoryController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: List[OrderHistorySchema], 404: dict, 500: dict})
+    @http_get("", response={200: list[OrderHistorySchema], 404: dict, 500: dict})
     @paginate
     def list_history(self, request, order_id: str):
         """Get a paginated list of history entries for an order."""
@@ -61,7 +60,7 @@ class OrderHistoryController:
 
     @http_get(
         "/status/{status}",
-        response={200: List[OrderHistorySchema], 404: dict, 500: dict},
+        response={200: list[OrderHistorySchema], 404: dict, 500: dict},
     )
     @paginate
     def list_history_by_status(self, request, order_id: str, status: str):
@@ -84,7 +83,7 @@ class OrderHistoryController:
 
     @http_get(
         "/user/{user_id}",
-        response={200: List[OrderHistorySchema], 404: dict, 500: dict},
+        response={200: list[OrderHistorySchema], 404: dict, 500: dict},
     )
     @paginate
     def list_history_by_user(self, request, order_id: str, user_id: str):
@@ -112,7 +111,7 @@ class OrderHistoryController:
             }
 
     @http_get(
-        "/date-range", response={200: List[OrderHistorySchema], 404: dict, 500: dict}
+        "/date-range", response={200: list[OrderHistorySchema], 404: dict, 500: dict}
     )
     @paginate
     def list_history_by_date_range(

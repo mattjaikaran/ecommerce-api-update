@@ -1,18 +1,18 @@
-from typing import List
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.core.exceptions import ValidationError
+import logging
 from uuid import UUID
 
-from products.models import ProductCollection, Product
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
+
+from products.models import Product, ProductCollection
 from products.schemas import (
-    CollectionSchema,
     CollectionCreateSchema,
+    CollectionSchema,
     CollectionUpdateSchema,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class CollectionController:
     permission_classes = [IsAuthenticated]
 
     @http_get(
-        "", response={200: List[CollectionSchema], 400: dict, 404: dict, 500: dict}
+        "", response={200: list[CollectionSchema], 400: dict, 404: dict, 500: dict}
     )
     def list_collections(self, request):
         """Get all collections"""
@@ -153,7 +153,7 @@ class CollectionController:
     @http_post(
         "/{id}/products/bulk", response={200: CollectionSchema, 404: dict, 500: dict}
     )
-    def bulk_add_products(self, request, id: UUID, product_ids: List[UUID]):
+    def bulk_add_products(self, request, id: UUID, product_ids: list[UUID]):
         """Add multiple products to a collection"""
         try:
             collection = get_object_or_404(ProductCollection, id=id)
@@ -172,7 +172,7 @@ class CollectionController:
     @http_delete(
         "/{id}/products/bulk", response={200: CollectionSchema, 404: dict, 500: dict}
     )
-    def bulk_remove_products(self, request, id: UUID, product_ids: List[UUID]):
+    def bulk_remove_products(self, request, id: UUID, product_ids: list[UUID]):
         """Remove multiple products from a collection"""
         try:
             collection = get_object_or_404(ProductCollection, id=id)

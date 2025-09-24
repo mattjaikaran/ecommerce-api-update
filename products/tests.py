@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from .models import Product
 
 
@@ -16,7 +17,7 @@ class ProductsTests(TestCase):
         self.assertTrue(isinstance(self.products.description, str))
 
     def test_api_list(self):
-        response = self.client.get(f"/products/")
+        response = self.client.get("/products/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
 

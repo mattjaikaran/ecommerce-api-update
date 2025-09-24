@@ -1,16 +1,18 @@
+import random
+from decimal import Decimal
+
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 from faker import Faker
-from decimal import Decimal
-import random
+
 from core.models import User
 from products.models import (
     Product,
     ProductCategory,
     ProductStatus,
     ProductType,
-    TaxClass,
     ShippingClass,
+    TaxClass,
 )
 
 fake = Faker()

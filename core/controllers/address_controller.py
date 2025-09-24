@@ -1,13 +1,12 @@
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+
 from core.models import Address
-from core.schemas import AddressSchema, AddressCreateSchema
-from typing import List
+from core.schemas import AddressCreateSchema, AddressSchema
 
 
 @api_controller("/addresses", tags=["Addresses"])
 class AddressController:
-
-    @http_get("", response={200: List[AddressSchema], 404: dict, 500: dict})
+    @http_get("", response={200: list[AddressSchema], 404: dict, 500: dict})
     def list_addresses(self, request):
         try:
             addresses = Address.objects.filter(user=request.user)

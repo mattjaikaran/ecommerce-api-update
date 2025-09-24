@@ -1,21 +1,21 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from uuid import UUID
+
 from ninja import Schema
 from pydantic import Field
-from uuid import UUID
 
 
 class RefundSchema(Schema):
     id: UUID
     order_id: UUID
-    transaction_id: Optional[str] = None
+    transaction_id: str | None = None
     amount: Decimal = Field(ge=0)
     status: str
     reason: str
-    notes: Optional[str] = None
+    notes: str | None = None
     refund_transaction_id: UUID
-    gateway_response: Optional[dict] = None
+    gateway_response: dict | None = None
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
@@ -23,14 +23,14 @@ class RefundSchema(Schema):
 
 class RefundCreateSchema(Schema):
     order_id: UUID
-    transaction_id: Optional[str] = None
+    transaction_id: str | None = None
     amount: Decimal = Field(ge=0)
     reason: str
-    notes: Optional[str] = None
+    notes: str | None = None
     meta_data: dict = {}
 
 
 class RefundUpdateSchema(Schema):
-    status: Optional[str] = None
-    notes: Optional[str] = None
-    meta_data: Optional[dict] = None
+    status: str | None = None
+    notes: str | None = None
+    meta_data: dict | None = None

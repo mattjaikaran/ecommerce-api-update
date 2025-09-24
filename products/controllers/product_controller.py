@@ -1,28 +1,28 @@
-from typing import List
-from ninja_extra import api_controller, http_get, http_post, http_put, http_delete
-from ninja_extra.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db import transaction
-from django.core.exceptions import ValidationError
-from uuid import UUID
 import logging
+from uuid import UUID
+
+from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
+from ninja_extra.permissions import IsAuthenticated
 
 from core.cache.decorators import cached_view
 from products.models import (
     Product,
-    ProductVariant,
     ProductOption,
     ProductOptionValue,
+    ProductVariant,
     ProductVariantOption,
 )
 from products.schemas import (
-    ProductSchema,
     ProductCreateSchema,
-    ProductVariantSchema,
-    ProductVariantCreateSchema,
-    ProductVariantUpdateSchema,
     ProductListSchema,
+    ProductSchema,
     ProductUpdateSchema,
+    ProductVariantCreateSchema,
+    ProductVariantSchema,
+    ProductVariantUpdateSchema,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,16 +35,14 @@ class ProductController:
     @http_get(
         "",
         response={
-            200: List[ProductListSchema],
+            200: list[ProductListSchema],
             400: dict,
             404: dict,
         },
     )
     @cached_view(timeout=300, key_prefix="products")
     def list_products(self):
-        """
-        Get all products
-        """
+        """Get all products"""
         try:
             products = (
                 Product.objects.select_related(
@@ -76,9 +74,7 @@ class ProductController:
     )
     @cached_view(timeout=300, key_prefix="product")
     def get_product(self, id: UUID):
-        """
-        Get a product by ID
-        """
+        """Get a product by ID"""
         try:
             product = (
                 Product.objects.select_related(
@@ -109,9 +105,7 @@ class ProductController:
     )
     @transaction.atomic
     def create_product(self, payload: ProductCreateSchema):
-        """
-        Create a new product
-        """
+        """Create a new product"""
         try:
             product = Product.objects.create(**payload.dict())
             return 201, ProductSchema.from_orm(product)
@@ -130,9 +124,7 @@ class ProductController:
     )
     @transaction.atomic
     def update_product(self, id: UUID, payload: ProductUpdateSchema):
-        """
-        Update a product
-        """
+        """Update a product"""
         try:
             product = get_object_or_404(Product, id=id)
             for key, value in payload.dict(exclude_unset=True).items():
@@ -156,9 +148,7 @@ class ProductController:
     )
     @transaction.atomic
     def delete_product(self, id: UUID):
-        """
-        Delete a product
-        """
+        """Delete a product"""
         try:
             product = get_object_or_404(Product, id=id)
             product.delete()
@@ -173,16 +163,14 @@ class ProductController:
     @http_get(
         "/{product_id}/variants",
         response={
-            200: List[ProductVariantSchema],
+            200: list[ProductVariantSchema],
             404: dict,
             500: dict,
         },
     )
     @cached_view(timeout=300, key_prefix="products")
     def list_product_variants(self, request, product_id: UUID):
-        """
-        Get all variants for a product
-        """
+        """Get all variants for a product"""
         try:
             variants = ProductVariant.objects.filter(
                 product_id=product_id
@@ -208,9 +196,7 @@ class ProductController:
     )
     @cached_view(timeout=300, key_prefix="products")
     def get_product_variant(self, request, product_id: UUID, id: UUID):
-        """
-        Get a product variant by ID
-        """
+        """Get a product variant by ID"""
         try:
             variant = get_object_or_404(
                 ProductVariant.objects.prefetch_related(
@@ -243,9 +229,7 @@ class ProductController:
     def create_product_variant(
         self, request, product_id: UUID, payload: ProductVariantCreateSchema
     ):
-        """
-        Create a new product variant
-        """
+        """Create a new product variant"""
         try:
             # Ensure product exists
             product = get_object_or_404(Product, id=product_id)
@@ -289,9 +273,7 @@ class ProductController:
     def update_product_variant(
         self, request, product_id: UUID, id: UUID, payload: ProductVariantUpdateSchema
     ):
-        """
-        Update a product variant
-        """
+        """Update a product variant"""
         try:
             variant = get_object_or_404(
                 ProductVariant,
@@ -349,9 +331,7 @@ class ProductController:
     )
     @transaction.atomic
     def delete_product_variant(self, request, product_id: UUID, id: UUID):
-        """
-        Delete a product variant
-        """
+        """Delete a product variant"""
         try:
             variant = get_object_or_404(
                 ProductVariant,

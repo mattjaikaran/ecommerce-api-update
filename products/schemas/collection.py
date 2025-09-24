@@ -1,20 +1,20 @@
-from ninja import Schema
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
+
+from ninja import Schema
 
 
 class CollectionSchema(Schema):
     id: UUID
     name: str
     slug: str
-    description: Optional[str] = None
-    image: Optional[str] = None
+    description: str | None = None
+    image: str | None = None
     is_active: bool = True
     position: int = 0
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
     meta_data: dict = {}
     created_at: datetime
     updated_at: datetime
@@ -23,31 +23,31 @@ class CollectionSchema(Schema):
 class CollectionCreateSchema(Schema):
     name: str
     slug: str
-    description: Optional[str] = None
-    image: Optional[str] = None
+    description: str | None = None
+    image: str | None = None
     is_active: bool = True
     position: int = 0
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
     meta_data: dict = {}
 
 
 class CollectionUpdateSchema(Schema):
-    name: Optional[str] = None
-    slug: Optional[str] = None
-    description: Optional[str] = None
-    image: Optional[str] = None
-    is_active: Optional[bool] = None
-    position: Optional[int] = None
-    seo_title: Optional[str] = None
-    seo_description: Optional[str] = None
-    seo_keywords: Optional[str] = None
-    meta_data: Optional[dict] = None
+    name: str | None = None
+    slug: str | None = None
+    description: str | None = None
+    image: str | None = None
+    is_active: bool | None = None
+    position: int | None = None
+    seo_title: str | None = None
+    seo_description: str | None = None
+    seo_keywords: str | None = None
+    meta_data: dict | None = None
 
 
 class CollectionProductSchema(Schema):
     id: UUID
     name: str
     slug: str
-    image: Optional[str] = None
+    image: str | None = None
