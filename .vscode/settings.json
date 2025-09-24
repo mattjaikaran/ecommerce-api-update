@@ -14,7 +14,7 @@
     "files.trimTrailingWhitespace": true,
     "editor.wordBasedSuggestions": "off",
     "editor.defaultFormatter": "charliermarsh.ruff",
-    "editor.rulers": [88, 120]
+    "editor.rulers": [88]
   },
   
   // JSON Settings

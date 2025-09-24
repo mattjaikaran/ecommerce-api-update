@@ -1,12 +1,14 @@
 import logging
 from uuid import UUID
 
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from ninja_extra.permissions import IsAuthenticated
 
+from api.decorators import handle_exceptions, log_api_call
+from api.exceptions import BadRequestError
 from products.models import ProductOption, ProductOptionValue
 from products.schemas import (
     ProductOptionCreateSchema,
@@ -21,128 +23,88 @@ logger = logging.getLogger(__name__)
 class ProductOptionController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: list[ProductOptionSchema], 500: dict})
-    def list_options(self):
-        """Get all product options"""
-        try:
-            options = ProductOption.objects.prefetch_related("values").all()
-            return 200, options
-        except Exception as e:
-            logger.error(f"An error occurred while fetching options: {e}")
-            return 500, {
-                "error": "An error occurred while fetching options",
-                "message": str(e),
-            }
+    @http_get("", response={200: list[ProductOptionSchema]})
+    @handle_exceptions
+    @log_api_call()
+    @paginate
+    def list_options(self, request):
+        """Get paginated list of product options."""
+        options = ProductOption.objects.prefetch_related("values").order_by(
+            "position", "name"
+        )
+        return 200, options
 
-    @http_get("/{id}", response={200: ProductOptionSchema, 404: dict, 500: dict})
-    def get_option(self, id: UUID):
-        """Get a product option by ID"""
-        try:
-            option = get_object_or_404(
-                ProductOption.objects.prefetch_related("values"),
-                id=id,
-            )
-            return 200, option
-        except ProductOption.DoesNotExist:
-            logger.error(f"Option not found with ID: {id}")
-            return 404, {"error": "Option not found"}
-        except Exception as e:
-            logger.error(f"An error occurred while fetching the option: {e}")
-            return 500, {
-                "error": "An error occurred while fetching the option",
-                "message": str(e),
-            }
+    @http_get("/{id}", response={200: ProductOptionSchema})
+    @handle_exceptions
+    @log_api_call()
+    def get_option(self, request, id: UUID):
+        """Get product option by ID."""
+        option = get_object_or_404(
+            ProductOption.objects.prefetch_related("values"),
+            id=id,
+        )
+        return 200, option
 
-    @http_post("", response={201: ProductOptionSchema, 400: dict, 500: dict})
+    @http_post("", response={201: ProductOptionSchema})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
-    def create_option(self, payload: ProductOptionCreateSchema):
-        """Create a new product option with values"""
-        try:
-            # Create option
-            option = ProductOption.objects.create(
-                name=payload.name,
-                position=payload.position,
+    def create_option(self, request, payload: ProductOptionCreateSchema):
+        """Create new product option with values."""
+        # Create option
+        option = ProductOption.objects.create(
+            name=payload.name,
+            position=payload.position,
+        )
+
+        # Create option values
+        for value_name in payload.values:
+            ProductOptionValue.objects.create(
+                option=option,
+                name=value_name,
             )
 
-            # Create option values
+        return 201, option
+
+    @http_put("/{id}", response={200: ProductOptionSchema})
+    @handle_exceptions
+    @log_api_call()
+    @transaction.atomic
+    def update_option(self, request, id: UUID, payload: ProductOptionUpdateSchema):
+        """Update product option and its values."""
+        option = get_object_or_404(ProductOption, id=id)
+
+        # Update option fields
+        option.name = payload.name
+        option.position = payload.position
+        option.save()
+
+        # Update values if provided
+        if payload.values:
+            # Delete existing values
+            option.values.all().delete()
+
+            # Create new values
             for value_name in payload.values:
                 ProductOptionValue.objects.create(
                     option=option,
                     name=value_name,
                 )
 
-            return 201, option
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while creating the option",
-                "message": str(e),
-            }
+        return 200, option
 
-    @http_put(
-        "/{id}", response={200: ProductOptionSchema, 400: dict, 404: dict, 500: dict}
-    )
-    @transaction.atomic
-    def update_option(self, id: UUID, payload: ProductOptionUpdateSchema):
-        """Update a product option and its values"""
-        try:
-            option = get_object_or_404(ProductOption, id=id)
+    @http_delete("/{id}", response={204: None})
+    @handle_exceptions
+    @log_api_call()
+    def delete_option(self, request, id: UUID):
+        """Delete product option."""
+        option = get_object_or_404(ProductOption, id=id)
 
-            # Update option fields
-            option.name = payload.name
-            option.position = payload.position
-            option.save()
+        # Check if option is being used by any variants
+        if option.productvariantoption_set.exists():
+            raise BadRequestError(
+                "Cannot delete option that is being used by product variants"
+            )
 
-            # Update values if provided
-            if payload.values:
-                # Delete existing values
-                option.values.all().delete()
-
-                # Create new values
-                for value_name in payload.values:
-                    ProductOptionValue.objects.create(
-                        option=option,
-                        name=value_name,
-                    )
-
-            return 200, option
-        except ProductOption.DoesNotExist:
-            logger.error(f"Option not found with ID: {id}")
-            return 404, {"error": "Option not found"}
-        except ValidationError as e:
-            logger.error(f"Validation error while updating option: {e}")
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            logger.error(f"An error occurred while updating the option: {e}")
-            return 500, {
-                "error": "An error occurred while updating the option",
-                "message": str(e),
-            }
-
-    @http_delete("/{id}", response={204: dict, 400: dict, 404: dict, 500: dict})
-    def delete_option(self, id: UUID):
-        """Delete a product option"""
-        try:
-            option = get_object_or_404(ProductOption, id=id)
-
-            # Check if option is being used by any variants
-            if option.productvariantoption_set.exists():
-                logger.warning(
-                    f"Cannot delete option {id} as it is being used by product variants"
-                )
-                return 400, {
-                    "error": "Cannot delete option that is being used by product variants"
-                }
-
-            option.delete()
-            return 204, {"message": "Option deleted successfully"}
-        except ProductOption.DoesNotExist:
-            logger.error(f"Option not found with ID: {id}")
-            return 404, {"error": "Option not found"}
-        except Exception as e:
-            logger.error(f"An error occurred while deleting the option: {e}")
-            return 500, {
-                "error": "An error occurred while deleting the option",
-                "message": str(e),
-            }
+        option.delete()
+        return 204, None

@@ -1,12 +1,13 @@
 import logging
 from uuid import UUID
 
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from ninja_extra.permissions import IsAuthenticated
 
+from api.decorators import handle_exceptions, log_api_call
 from products.models import ProductCategory
 from products.schemas import (
     CategoryCreateSchema,
@@ -21,106 +22,65 @@ logger = logging.getLogger(__name__)
 class CategoryController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: list[CategorySchema], 404: dict, 500: dict})
+    @http_get("", response={200: list[CategorySchema]})
+    @handle_exceptions
+    @log_api_call()
+    @paginate
     def list_categories(self, request):
-        """Get all product categories"""
-        try:
-            categories = ProductCategory.objects.prefetch_related(
-                "children", "products"
-            ).all()
-            return 200, [CategorySchema.from_orm(category) for category in categories]
-        except ProductCategory.DoesNotExist:
-            return 404, {"error": "Categories not found"}
-        except Exception as e:
-            logger.error(f"Error listing categories: {e}")
-            return 500, {
-                "error": "An error occurred while fetching categories",
-                "message": str(e),
-            }
+        """Get paginated list of product categories."""
+        categories = ProductCategory.objects.prefetch_related(
+            "children", "products"
+        ).order_by("name")
+        return 200, categories
 
-    @http_get("/{id}", response={200: CategorySchema, 404: dict, 500: dict})
+    @http_get("/{id}", response={200: CategorySchema})
+    @handle_exceptions
+    @log_api_call()
     def get_category(self, request, id: UUID):
-        """Get a category by ID"""
-        try:
-            category = get_object_or_404(
-                ProductCategory.objects.prefetch_related("children", "products"),
-                id=id,
-            )
-            return 200, CategorySchema.from_orm(category)
-        except ProductCategory.DoesNotExist:
-            return 404, {"error": "Category not found"}
-        except Exception as e:
-            logger.error(f"Error getting category {id}: {e}")
-            return 500, {
-                "error": "An error occurred while fetching category",
-                "message": str(e),
-            }
+        """Get category by ID."""
+        category = get_object_or_404(
+            ProductCategory.objects.prefetch_related("children", "products"),
+            id=id,
+        )
+        return 200, category
 
-    @http_post("", response={201: CategorySchema, 400: dict, 500: dict})
+    @http_post("", response={201: CategorySchema})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
     def create_category(self, request, payload: CategoryCreateSchema):
-        """Create a new category"""
-        try:
-            category = ProductCategory.objects.create(**payload.dict())
-            return 201, CategorySchema.from_orm(category)
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            logger.error(f"Error creating category: {e}")
-            return 500, {
-                "error": "An error occurred while creating category",
-                "message": str(e),
-            }
+        """Create new product category."""
+        category = ProductCategory.objects.create(**payload.dict())
+        return 201, category
 
-    @http_put("/{id}", response={200: CategorySchema, 400: dict, 404: dict, 500: dict})
+    @http_put("/{id}", response={200: CategorySchema})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
     def update_category(self, request, id: UUID, payload: CategoryUpdateSchema):
-        """Update a category"""
-        try:
-            category = get_object_or_404(ProductCategory, id=id)
-            for attr, value in payload.dict(exclude_unset=True).items():
-                setattr(category, attr, value)
-            category.save()
-            return 200, CategorySchema.from_orm(category)
-        except ProductCategory.DoesNotExist:
-            return 404, {"error": "Category not found"}
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            logger.error(f"Error updating category {id}: {e}")
-            return 500, {
-                "error": "An error occurred while updating category",
-                "message": str(e),
-            }
+        """Update existing category."""
+        category = get_object_or_404(ProductCategory, id=id)
+        for attr, value in payload.dict(exclude_unset=True).items():
+            setattr(category, attr, value)
+        category.save()
+        return 200, category
 
-    @http_delete("/{id}", response={204: dict, 404: dict, 500: dict})
+    @http_delete("/{id}", response={204: None})
+    @handle_exceptions
+    @log_api_call()
     def delete_category(self, request, id: UUID):
-        """Delete a category"""
-        try:
-            category = get_object_or_404(ProductCategory, id=id)
-            category.delete()
-            return 204, {"message": "Category deleted successfully"}
-        except ProductCategory.DoesNotExist:
-            return 404, {"error": "Category not found"}
-        except Exception as e:
-            logger.error(f"Error deleting category {id}: {e}")
-            return 500, {
-                "error": "An error occurred while deleting category",
-                "message": str(e),
-            }
+        """Delete category."""
+        category = get_object_or_404(ProductCategory, id=id)
+        category.delete()
+        return 204, None
 
-    @http_get("/tree", response={200: list[CategorySchema], 500: dict})
-    def get_category_tree(self):
-        """Get category tree (only root categories with their children)"""
-        try:
-            categories = ProductCategory.objects.filter(parent=None).prefetch_related(
-                "children",
-                "products",
-            )
-            return 200, categories
-        except Exception as e:
-            logger.error(f"Error fetching category tree: {e}")
-            return 500, {
-                "error": "An error occurred while fetching the category tree",
-                "message": str(e),
-            }
+    @http_get("/tree", response={200: list[CategorySchema]})
+    @handle_exceptions
+    @log_api_call()
+    def get_category_tree(self, request):
+        """Get category tree (root categories with children)."""
+        categories = ProductCategory.objects.filter(parent=None).prefetch_related(
+            "children",
+            "products",
+        )
+        return 200, categories

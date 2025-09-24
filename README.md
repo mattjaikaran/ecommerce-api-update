@@ -4,71 +4,100 @@ E-Commerce API built with Django Ninja and Postgres
 
 ## Technologies
 
-- Python 3.11
+- Python 3.12
+- [uv](https://docs.astral.sh/uv/) - Fast Python package installer and resolver
 - [Django 5.2](https://docs.djangoproject.com/en/5.2/)
 - [Django Ninja](https://django-ninja.dev/)
 - [Django Ninja Extra](https://eadwincode.github.io/django-ninja-extra/) a collection of extra features for Django Ninja
 - [Django Ninja JWT](https://eadwincode.github.io/django-ninja-jwt/)
   - [Django Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/) abstraction for Django Ninja
-- [Postgres](https://www.postgresql.org/docs/) database
+- [PostgreSQL 17](https://www.postgresql.org/docs/) database
+- [Redis 7.2](https://redis.io/) for caching and Celery
 - [Pydantic](https://docs.pydantic.dev/latest/)
 - [Django Unfold Admin](https://unfoldadmin.com/)
   - [Unfold Docs](https://github.com/unfoldadmin/django-unfold)
-- Docker & Docker Compose
+- Docker & Docker Compose (optimized for OrbStack)
+- [Celery](https://docs.celeryq.dev/) for background tasks
+- [Flower](https://flower.readthedocs.io/) for Celery monitoring
 - pytest for testing
 - Gunicorn for production serving
 
 #### Dev Tools & Features
 
-- Makefile to run commands
-- PyTest for unit tests
-- Custom Start App command to create a new app
+- **uv** for fast dependency management and virtual environments
+- **Ruff** for super-fast linting and formatting (configured in `pyproject.toml`)
+- **Makefile** to run commands
+- **PyTest** for unit tests with coverage reporting
+- **Custom Start App** command to create a new app
   - with extended functionality for Django Ninja, Django Ninja Extra, and Django Unfold
   - `make startapp <app_name>`
-- [Faker](https://faker.readthedocs.io/en/master/) for generating fake data.
+- **[Faker](https://faker.readthedocs.io/en/master/)** for generating realistic test data
   - See `@/core/management/commands/generate_core_data.py` for more information
-- [Swagger](https://swagger.io/) for API documentation
+- **[Swagger UI](https://swagger.io/)** for interactive API documentation
   - [Localhost Docs](http://localhost:8000/api/docs)
-- [Debug Toolbar](https://django-debug-toolbar.readthedocs.io/en/latest) for debugging
-- [Django Environ](https://django-environ.readthedocs.io/en/latest/) for managing environment variables
-- Linting
-  - [Ruff](https://github.com/astral-sh/ruff) Formatter
-    - Configuration located in `@/.vscode/settings.json`
-  - Will run all 3 with the lint script located in `@/scripts/lint.sh`
-    - To run `./scripts/lint.sh`
+- **[Debug Toolbar](https://django-debug-toolbar.readthedocs.io/en/latest)** for debugging
+- **Environment Variables** for configuration (see `env.example`)
+- **Advanced Decorators** for clean controller code:
+  - `@handle_exceptions()` - Professional error handling
+  - `@log_api_call()` - Request/response logging
+  - `@paginate_response()` - Automatic pagination
+  - `@search_and_filter()` - Advanced filtering and search
+  - `@cached_response()` - Redis caching
+  - `@require_authentication()` / `@require_admin()` - Authorization
 
-## Quick Start with Docker
+## 🚀 Quick Start with Docker (Recommended)
 
 ```bash
 # Clone the repository
-git clone https://github.com/mattjaikaran/django-ninja-boilerplate
-cd django-ninja-boilerplate
+git clone https://github.com/mattjaikaran/ecommerce-api-update
+cd ecommerce-api-update
 
-# Create environment file
-cp .env.example .env
-# Edit .env with your settings
+# Copy environment file
+cp env.example .env
+# Edit .env with your settings (optional for development)
 
-# Start the services
+# Start all services (Django, PostgreSQL, Redis, Celery, Flower)
 docker-compose up --build
+
+# In another terminal, run migrations and create superuser
+docker-compose exec django python manage.py migrate
+docker-compose exec django python manage.py createsuperuser
+
+# Generate test data (optional)
+docker-compose exec django python manage.py generate_core_data
 ```
 
-Visit http://localhost:8000/api/docs for the API documentation.
+**🎯 Your services will be available at:**
 
-## Local Development Setup
+- **API Documentation**: http://localhost:8000/api/docs
+- **Django Admin**: http://localhost:8000/admin
+- **Flower (Celery Monitor)**: http://localhost:5555
+- **PostgreSQL**: localhost:5432
+- **Redis**: localhost:6379
+
+## 🛠️ Local Development with uv (Alternative)
 
 ```bash
-git clone https://github.com/mattjaikaran/django-ninja-boilerplate
-cd django-ninja-boilerplate
-# Create and activate virtual environment
-python3 -m venv env # create a virtual environment using the venv virtual environment
-source env/bin/activate # activate the virtual environment
-touch .env # create a new env file
-# update the .env file with necessary values -> db info, superuser info
-pip3 install -r requirements.txt # install dependencies from requirements.txt
-python3 manage.py migrate # apply migration files to your local db
-python3 manage.py create_superuser # runs custom script to create a superuser
-./scripts/generate_secret_key.sh # generate new secret key
-python3 manage.py runserver # run the local server on http://localhost:8000/admin
+# Clone and navigate
+git clone https://github.com/mattjaikaran/ecommerce-api-update
+cd ecommerce-api-update
+
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e .
+
+# Set up environment
+cp env.example .env
+# Edit .env with your local database settings
+
+# Run migrations and create superuser
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
 ```
 
 ## Commands
@@ -190,7 +219,40 @@ For more detailed documentation about the scripts, see `scripts/README.md`.
 - Use from_orm() to convert Django ORM objects to Pydantic models.
 - Django Ninja automatically handles the conversion to JSON in the HTTP response.
 
-## Production Deployment
+## 🏗️ Modern Controller Architecture
+
+All controllers follow a professional, decorator-based pattern with:
+
+**✅ No Try-Catch Bloat** - Clean code with `@handle_exceptions()`
+**✅ Professional Logging** - Automatic request/response logging with `@log_api_call()`
+**✅ Advanced Filtering** - Built-in search, filtering, and pagination
+**✅ Optimized Queries** - `select_related()` and `prefetch_related()` for performance
+**✅ Consistent Responses** - 201 for creates, 204 for deletes, proper status codes
+**✅ Redis Caching** - Intelligent caching with `@cached_response()`
+
+### Example Controller Pattern:
+
+```python
+@api_controller("/products", tags=["Products"])
+class ProductController:
+    @http_get("", response={200: list[ProductSchema]})
+    @list_endpoint(
+        cache_timeout=300,
+        select_related=["category", "created_by"],
+        prefetch_related=["variants", "tags", "images"],
+        search_fields=["name", "description", "slug"],
+        filter_fields={"category_id": "exact", "status": "exact"},
+        ordering_fields=["name", "price", "created_at"],
+    )
+    @search_and_filter(
+        search_fields=["name", "description"],
+        filter_fields={"status": "exact"},
+    )
+    def list_products(self, request):
+        return 200, Product.objects.filter(is_active=True)
+```
+
+## 🚀 Production Deployment
 
 1. Update `.env` with production settings
 2. Build and run with Docker:

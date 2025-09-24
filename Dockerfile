@@ -24,14 +24,16 @@ RUN apt-get update \
     && curl -LsSf https://astral.sh/uv/install.sh | sh \
     && rm -rf /var/lib/apt/lists/*
 
-# Add uv to PATH
-ENV PATH="/root/.local/bin:$PATH"
+# Add uv to PATH and activate virtual environment
+ENV PATH="/root/.local/bin:/app/.venv/bin:$PATH"
+ENV VIRTUAL_ENV="/app/.venv"
 
 # Copy dependency files and README for build
 COPY pyproject.toml uv.lock README.md ./
 
-# Install Python dependencies from pyproject.toml
-RUN uv pip install --system --no-cache -e .
+# Create virtual environment and install dependencies
+RUN uv venv .venv
+RUN uv pip install --no-cache -e .
 
 # Create logs directory
 RUN mkdir -p /app/logs

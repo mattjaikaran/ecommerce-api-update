@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from ninja.pagination import paginate
@@ -11,6 +10,8 @@ from ninja_extra import (
 )
 from ninja_extra.permissions import IsAuthenticated
 
+from api.decorators import handle_exceptions, log_api_call
+from api.exceptions import NotFoundError, PermissionDeniedError
 from orders.models import (
     Order,
     OrderNote,
@@ -25,245 +26,122 @@ from orders.schemas import (
 class OrderNoteController:
     permission_classes = [IsAuthenticated]
 
-    @http_get(
-        "/",
-        response={
-            200: list[OrderNoteSchema],
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_get("", response={200: list[OrderNoteSchema]})
+    @handle_exceptions
+    @log_api_call()
     @paginate
     def list_notes(self, request, order_id: str):
-        """Get a paginated list of notes for an order."""
-        try:
-            order = get_object_or_404(Order, id=order_id)
-            notes = OrderNote.objects.select_related("order", "created_by").filter(
-                order=order
-            )
+        """Get paginated list of notes for an order."""
+        order = get_object_or_404(Order, id=order_id)
+        notes = OrderNote.objects.select_related("order", "created_by").filter(
+            order=order
+        )
 
-            # Filter notes based on user role
-            if not request.user.is_staff:
-                notes = notes.filter(is_customer_visible=True)
+        # Filter notes based on user role
+        if not request.user.is_staff:
+            notes = notes.filter(is_customer_visible=True)
 
-            return 200, notes.order_by("-created_at")
-        except Order.DoesNotExist:
-            return 404, {"error": "Order not found"}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while fetching notes",
-                "message": str(e),
-            }
+        return 200, notes.order_by("-created_at")
 
-    @http_get(
-        "/{note_id}",
-        response={
-            200: OrderNoteSchema,
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_get("/{note_id}", response={200: OrderNoteSchema})
+    @handle_exceptions
+    @log_api_call()
     def get_note(self, request, order_id: str, note_id: str):
-        """Get a single note by ID."""
-        try:
-            order = get_object_or_404(Order, id=order_id)
-            note = get_object_or_404(
-                OrderNote.objects.select_related("order", "created_by"),
-                id=note_id,
-                order=order,
-            )
+        """Get single note by ID."""
+        order = get_object_or_404(Order, id=order_id)
+        note = get_object_or_404(
+            OrderNote.objects.select_related("order", "created_by"),
+            id=note_id,
+            order=order,
+        )
 
-            # Check visibility
-            if not request.user.is_staff and not note.is_customer_visible:
-                return 403, {"error": "You do not have permission to view this note"}
+        # Check visibility for non-staff users
+        if not request.user.is_staff and not note.is_customer_visible:
+            raise NotFoundError("Note not found")
 
-            return 200, note
-        except Order.DoesNotExist:
-            return 404, {"error": "Order not found"}
-        except OrderNote.DoesNotExist:
-            return 404, {"error": "Note not found"}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while fetching the note",
-                "message": str(e),
-            }
+        return 200, note
 
-    @http_post(
-        "",
-        response={
-            201: OrderNoteSchema,
-            400: dict,
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_post("", response={201: OrderNoteSchema})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
     def create_note(self, request, order_id: str, payload: OrderNoteCreateSchema):
-        """Create a new note for an order."""
-        try:
-            order = get_object_or_404(Order, id=order_id)
+        """Create new note for an order."""
+        order = get_object_or_404(Order, id=order_id)
 
-            # Only staff can create non-customer-visible notes
-            if not request.user.is_staff and not payload.is_customer_visible:
-                return 403, {
-                    "error": "You do not have permission to create private notes"
-                }
+        note = OrderNote.objects.create(
+            order=order,
+            content=payload.content,
+            is_customer_visible=payload.is_customer_visible,
+            created_by=request.user,
+        )
+        return 201, note
 
-            # Create note
-            note = OrderNote.objects.create(
-                order=order,
-                note=payload.note,
-                is_customer_visible=payload.is_customer_visible,
-                created_by=request.user,
-                meta_data=payload.meta_data,
-            )
-
-            return 201, note
-        except Order.DoesNotExist:
-            return 404, {"error": "Order not found"}
-        except ValidationError as e:
-            return 400, {"error": "Invalid data provided", "message": str(e)}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while creating the note",
-                "message": str(e),
-            }
-
-    @http_put(
-        "/{note_id}",
-        response={
-            200: OrderNoteSchema,
-            400: dict,
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_put("/{note_id}", response={200: OrderNoteSchema})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
     def update_note(
         self, request, order_id: str, note_id: str, payload: OrderNoteCreateSchema
     ):
-        """Update an existing note."""
-        try:
-            order = get_object_or_404(Order, id=order_id)
-            note = get_object_or_404(OrderNote, id=note_id, order=order)
+        """Update existing note."""
+        order = get_object_or_404(Order, id=order_id)
+        note = get_object_or_404(OrderNote, id=note_id, order=order)
 
-            # Only staff or note creator can update notes
-            if not request.user.is_staff and note.created_by != request.user:
-                return 403, {"error": "You do not have permission to update this note"}
+        # Only allow staff to update notes or the creator
+        if not request.user.is_staff and note.created_by != request.user:
+            raise PermissionDeniedError("Not authorized to update this note")
 
-            # Only staff can update visibility
-            if (
-                not request.user.is_staff
-                and payload.is_customer_visible != note.is_customer_visible
-            ):
-                return 403, {
-                    "error": "You do not have permission to change note visibility"
-                }
+        # Update note fields
+        for field, value in payload.model_dump(exclude_unset=True).items():
+            setattr(note, field, value)
+        note.save()
 
-            # Update note
-            note.note = payload.note
-            note.is_customer_visible = payload.is_customer_visible
-            note.meta_data = payload.meta_data
-            note.save()
+        return 200, note
 
-            return 200, note
-        except Order.DoesNotExist:
-            return 404, {"error": "Order not found"}
-        except OrderNote.DoesNotExist:
-            return 404, {"error": "Note not found"}
-        except ValidationError as e:
-            return 400, {"error": "Invalid data provided", "message": str(e)}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while updating the note",
-                "message": str(e),
-            }
-
-    @http_delete(
-        "/{note_id}",
-        response={
-            204: dict,
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_delete("/{note_id}", response={204: None})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
     def delete_note(self, request, order_id: str, note_id: str):
-        """Delete a note."""
-        try:
-            order = get_object_or_404(Order, id=order_id)
-            note = get_object_or_404(OrderNote, id=note_id, order=order)
+        """Delete note."""
+        order = get_object_or_404(Order, id=order_id)
+        note = get_object_or_404(OrderNote, id=note_id, order=order)
 
-            # Only staff or note creator can delete notes
-            if not request.user.is_staff and note.created_by != request.user:
-                return 403, {"error": "You do not have permission to delete this note"}
+        # Only allow staff to delete notes or the creator
+        if not request.user.is_staff and note.created_by != request.user:
+            raise PermissionDeniedError("Not authorized to delete this note")
 
-            note.delete()
-            return 204, None
-        except Order.DoesNotExist:
-            return 404, {"error": "Order not found"}
-        except OrderNote.DoesNotExist:
-            return 404, {"error": "Note not found"}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while deleting the note",
-                "message": str(e),
-            }
+        note.delete()
+        return 204, None
 
-    @http_get(
-        "/customer",
-        response={
-            200: list[OrderNoteSchema],
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_get("/customer-visible", response={200: list[OrderNoteSchema]})
+    @handle_exceptions
+    @log_api_call()
     @paginate
-    def list_customer_notes(self, request, order_id: str):
-        """Get a paginated list of customer-visible notes for an order."""
-        try:
-            order = get_object_or_404(Order, id=order_id)
-            notes = (
-                OrderNote.objects.select_related("order", "created_by")
-                .filter(order=order, is_customer_visible=True)
-                .order_by("-created_at")
-            )
-            return 200, notes
-        except Order.DoesNotExist:
-            return 404, {"error": "Order not found"}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while fetching notes",
-                "message": str(e),
-            }
+    def list_customer_visible_notes(self, request, order_id: str):
+        """Get paginated list of customer-visible notes for an order."""
+        order = get_object_or_404(Order, id=order_id)
+        notes = (
+            OrderNote.objects.select_related("order", "created_by")
+            .filter(order=order, is_customer_visible=True)
+            .order_by("-created_at")
+        )
+        return 200, notes
 
-    @http_get(
-        "/staff",
-        response={
-            200: list[OrderNoteSchema],
-            404: dict,
-            500: dict,
-        },
-    )
+    @http_get("/internal", response={200: list[OrderNoteSchema]})
+    @handle_exceptions
+    @log_api_call()
     @paginate
-    def list_staff_notes(self, request, order_id: str):
-        """Get a paginated list of staff-only notes for an order."""
-        try:
-            # Only staff can view staff notes
-            if not request.user.is_staff:
-                return 403, {"error": "You do not have permission to view staff notes"}
+    def list_internal_notes(self, request, order_id: str):
+        """Get paginated list of internal notes for an order (staff only)."""
+        if not request.user.is_staff:
+            raise PermissionDeniedError("Staff access required")
 
-            order = get_object_or_404(Order, id=order_id)
-            notes = (
-                OrderNote.objects.select_related("order", "created_by")
-                .filter(order=order, is_customer_visible=False)
-                .order_by("-created_at")
-            )
-            return 200, notes
-        except Order.DoesNotExist:
-            return 404, {"error": "Order not found"}
-        except Exception as e:
-            return 500, {
-                "error": "An error occurred while fetching notes",
-                "message": str(e),
-            }
+        order = get_object_or_404(Order, id=order_id)
+        notes = (
+            OrderNote.objects.select_related("order", "created_by")
+            .filter(order=order, is_customer_visible=False)
+            .order_by("-created_at")
+        )
+        return 200, notes

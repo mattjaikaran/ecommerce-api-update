@@ -1,12 +1,13 @@
 import logging
 from uuid import UUID
 
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import api_controller, http_delete, http_get, http_post, http_put
 from ninja_extra.permissions import IsAuthenticated
 
+from api.decorators import handle_exceptions, log_api_call
 from products.models import Product, ProductTag
 from products.schemas import (
     ProductTagCreateSchema,
@@ -21,166 +22,92 @@ logger = logging.getLogger(__name__)
 class TagController:
     permission_classes = [IsAuthenticated]
 
-    @http_get("", response={200: list[ProductTagSchema], 500: dict})
+    @http_get("", response={200: list[ProductTagSchema]})
+    @handle_exceptions
+    @log_api_call()
+    @paginate
     def list_tags(self, request):
-        """Get all product tags"""
-        try:
-            tags = ProductTag.objects.prefetch_related("products").all()
-            return 200, [ProductTagSchema.from_orm(tag) for tag in tags]
-        except Exception as e:
-            logger.error(f"Error listing tags: {e}")
-            return 500, {
-                "error": "An error occurred while fetching tags",
-                "message": str(e),
-            }
+        """Get paginated list of product tags."""
+        tags = ProductTag.objects.prefetch_related("products").order_by("name")
+        return 200, tags
 
-    @http_get("/{id}", response={200: ProductTagSchema, 404: dict, 500: dict})
+    @http_get("/{id}", response={200: ProductTagSchema})
+    @handle_exceptions
+    @log_api_call()
     def get_tag(self, request, id: UUID):
-        """Get a product tag by ID"""
-        try:
-            tag = get_object_or_404(
-                ProductTag.objects.prefetch_related("products"),
-                id=id,
-            )
-            return 200, ProductTagSchema.from_orm(tag)
-        except ProductTag.DoesNotExist:
-            return 404, {"error": "Tag not found"}
-        except Exception as e:
-            logger.error(f"Error getting tag {id}: {e}")
-            return 500, {
-                "error": "An error occurred while fetching the tag",
-                "message": str(e),
-            }
+        """Get product tag by ID."""
+        tag = get_object_or_404(
+            ProductTag.objects.prefetch_related("products"),
+            id=id,
+        )
+        return 200, tag
 
-    @http_post("", response={201: ProductTagSchema, 400: dict, 500: dict})
+    @http_post("", response={201: ProductTagSchema})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
     def create_tag(self, request, payload: ProductTagCreateSchema):
-        """Create a new product tag"""
-        try:
-            tag = ProductTag.objects.create(**payload.dict())
-            return 201, ProductTagSchema.from_orm(tag)
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            logger.error(f"Error creating tag: {e}")
-            return 500, {
-                "error": "An error occurred while creating the tag",
-                "message": str(e),
-            }
+        """Create new product tag."""
+        tag = ProductTag.objects.create(**payload.dict())
+        return 201, tag
 
-    @http_put(
-        "/{id}", response={200: ProductTagSchema, 400: dict, 404: dict, 500: dict}
-    )
+    @http_put("/{id}", response={200: ProductTagSchema})
+    @handle_exceptions
+    @log_api_call()
     @transaction.atomic
     def update_tag(self, request, id: UUID, payload: ProductTagUpdateSchema):
-        """Update a product tag"""
-        try:
-            tag = get_object_or_404(ProductTag, id=id)
-            for attr, value in payload.dict(exclude_unset=True).items():
-                setattr(tag, attr, value)
-            tag.save()
-            return 200, ProductTagSchema.from_orm(tag)
-        except ProductTag.DoesNotExist:
-            return 404, {"error": "Tag not found"}
-        except ValidationError as e:
-            return 400, {"error": "Validation error", "message": str(e)}
-        except Exception as e:
-            logger.error(f"Error updating tag {id}: {e}")
-            return 500, {
-                "error": "An error occurred while updating the tag",
-                "message": str(e),
-            }
+        """Update product tag."""
+        tag = get_object_or_404(ProductTag, id=id)
+        for attr, value in payload.dict(exclude_unset=True).items():
+            setattr(tag, attr, value)
+        tag.save()
+        return 200, tag
 
-    @http_delete("/{id}", response={204: dict, 404: dict, 500: dict})
+    @http_delete("/{id}", response={204: None})
+    @handle_exceptions
+    @log_api_call()
     def delete_tag(self, request, id: UUID):
-        """Delete a product tag"""
-        try:
-            tag = get_object_or_404(ProductTag, id=id)
-            tag.delete()
-            return 204, {"message": "Tag deleted successfully"}
-        except ProductTag.DoesNotExist:
-            return 404, {"error": "Tag not found"}
-        except Exception as e:
-            logger.error(f"Error deleting tag {id}: {e}")
-            return 500, {
-                "error": "An error occurred while deleting the tag",
-                "message": str(e),
-            }
+        """Delete product tag."""
+        tag = get_object_or_404(ProductTag, id=id)
+        tag.delete()
+        return 204, None
 
-    @http_post(
-        "/{id}/products/{product_id}",
-        response={200: ProductTagSchema, 404: dict, 500: dict},
-    )
+    @http_post("/{id}/products/{product_id}", response={200: ProductTagSchema})
+    @handle_exceptions
+    @log_api_call()
     def add_product(self, request, id: UUID, product_id: UUID):
-        """Add a product to a tag"""
-        try:
-            tag = get_object_or_404(ProductTag, id=id)
-            product = get_object_or_404(Product, id=product_id)
-            tag.products.add(product)
-            return 200, ProductTagSchema.from_orm(tag)
-        except (ProductTag.DoesNotExist, Product.DoesNotExist):
-            return 404, {"error": "Tag or product not found"}
-        except Exception as e:
-            logger.error(f"Error adding product {product_id} to tag {id}: {e}")
-            return 500, {
-                "error": "An error occurred while adding product to tag",
-                "message": str(e),
-            }
+        """Add product to tag."""
+        tag = get_object_or_404(ProductTag, id=id)
+        product = get_object_or_404(Product, id=product_id)
+        tag.products.add(product)
+        return 200, tag
 
-    @http_delete(
-        "/{id}/products/{product_id}",
-        response={200: ProductTagSchema, 404: dict, 500: dict},
-    )
+    @http_delete("/{id}/products/{product_id}", response={200: ProductTagSchema})
+    @handle_exceptions
+    @log_api_call()
     def remove_product(self, request, id: UUID, product_id: UUID):
-        """Remove a product from a tag"""
-        try:
-            tag = get_object_or_404(ProductTag, id=id)
-            product = get_object_or_404(Product, id=product_id)
-            tag.products.remove(product)
-            return 200, ProductTagSchema.from_orm(tag)
-        except (ProductTag.DoesNotExist, Product.DoesNotExist):
-            return 404, {"error": "Tag or product not found"}
-        except Exception as e:
-            logger.error(f"Error removing product {product_id} from tag {id}: {e}")
-            return 500, {
-                "error": "An error occurred while removing product from tag",
-                "message": str(e),
-            }
+        """Remove product from tag."""
+        tag = get_object_or_404(ProductTag, id=id)
+        product = get_object_or_404(Product, id=product_id)
+        tag.products.remove(product)
+        return 200, tag
 
-    @http_post(
-        "/{id}/products/bulk", response={200: ProductTagSchema, 404: dict, 500: dict}
-    )
+    @http_post("/{id}/products/bulk", response={200: ProductTagSchema})
+    @handle_exceptions
+    @log_api_call()
     def bulk_add_products(self, request, id: UUID, product_ids: list[UUID]):
-        """Add multiple products to a tag"""
-        try:
-            tag = get_object_or_404(ProductTag, id=id)
-            products = Product.objects.filter(id__in=product_ids)
-            tag.products.add(*products)
-            return 200, ProductTagSchema.from_orm(tag)
-        except ProductTag.DoesNotExist:
-            return 404, {"error": "Tag not found"}
-        except Exception as e:
-            logger.error(f"Error bulk adding products to tag {id}: {e}")
-            return 500, {
-                "error": "An error occurred while adding products to tag",
-                "message": str(e),
-            }
+        """Add multiple products to tag."""
+        tag = get_object_or_404(ProductTag, id=id)
+        products = Product.objects.filter(id__in=product_ids)
+        tag.products.add(*products)
+        return 200, tag
 
-    @http_delete(
-        "/{id}/products/bulk", response={200: ProductTagSchema, 404: dict, 500: dict}
-    )
+    @http_delete("/{id}/products/bulk", response={200: ProductTagSchema})
+    @handle_exceptions
+    @log_api_call()
     def bulk_remove_products(self, request, id: UUID, product_ids: list[UUID]):
-        """Remove multiple products from a tag"""
-        try:
-            tag = get_object_or_404(ProductTag, id=id)
-            products = Product.objects.filter(id__in=product_ids)
-            tag.products.remove(*products)
-            return 200, ProductTagSchema.from_orm(tag)
-        except ProductTag.DoesNotExist:
-            return 404, {"error": "Tag not found"}
-        except Exception as e:
-            logger.error(f"Error bulk removing products from tag {id}: {e}")
-            return 500, {
-                "error": "An error occurred while removing products from tag",
-                "message": str(e),
-            }
+        """Remove multiple products from tag."""
+        tag = get_object_or_404(ProductTag, id=id)
+        products = Product.objects.filter(id__in=product_ids)
+        tag.products.remove(*products)
+        return 200, tag

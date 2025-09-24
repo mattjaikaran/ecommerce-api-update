@@ -1,32 +1,38 @@
+from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate
 from ninja_extra import api_controller, http_get, http_post
+from ninja_extra.permissions import IsAuthenticated
 
+from api.decorators import handle_exceptions, log_api_call
 from orders.models import Refund
 from orders.schemas import RefundCreateSchema, RefundSchema
 
 
 @api_controller("/refunds", tags=["Refunds"])
 class RefundController:
-    @http_get("/", response={200: list[RefundSchema], 404: dict, 500: dict})
+    permission_classes = [IsAuthenticated]
+
+    @http_get("", response={200: list[RefundSchema]})
+    @handle_exceptions
+    @log_api_call()
+    @paginate
     def list_refunds(self, request):
-        try:
-            return 200, Refund.objects.all()
-        except Refund.DoesNotExist:
-            return 404, {"error": "Refunds not found"}
-        except Exception as e:
-            return 500, {"error": str(e)}
+        """Get paginated list of refunds."""
+        refunds = Refund.objects.select_related("order").order_by("-created_at")
+        return 200, refunds
 
-    @http_get("/{refund_id}", response={200: RefundSchema, 404: dict, 500: dict})
+    @http_get("/{refund_id}", response={200: RefundSchema})
+    @handle_exceptions
+    @log_api_call()
     def get_refund(self, request, refund_id: int):
-        try:
-            return 200, Refund.objects.get(id=refund_id)
-        except Refund.DoesNotExist:
-            return 404, {"error": "Refund not found"}
-        except Exception as e:
-            return 500, {"error get_refund": str(e)}
+        """Get specific refund by ID."""
+        refund = get_object_or_404(Refund.objects.select_related("order"), id=refund_id)
+        return 200, refund
 
-    @http_post("/", response={201: RefundSchema, 400: dict, 404: dict, 500: dict})
+    @http_post("", response={201: RefundSchema})
+    @handle_exceptions
+    @log_api_call()
     def create_refund(self, request, payload: RefundCreateSchema):
-        try:
-            return 201, Refund.objects.create(**payload.model_dump())
-        except Exception as e:
-            return 500, {"error create_refund": str(e)}
+        """Create new refund."""
+        refund = Refund.objects.create(**payload.model_dump())
+        return 201, refund

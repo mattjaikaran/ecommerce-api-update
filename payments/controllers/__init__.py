@@ -1,4 +1,4 @@
-from .payment import PaymentController
+from .payment_controller import PaymentController
 
 all = [
     PaymentController,
