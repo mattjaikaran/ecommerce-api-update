@@ -1,43 +1,41 @@
-# Ecommerce API 
+# Ecommerce API
 
-2025 update for ecommerce api using Django Ninja/Django Ninja Extra and Postgres
-
+E-Commerce API built with Django Ninja and Postgres
 
 ## Technologies
+
 - Python 3.11
-- [Django 5.1](https://docs.djangoproject.com/en/5.1/)
+- [Django 5.2](https://docs.djangoproject.com/en/5.2/)
 - [Django Ninja](https://django-ninja.dev/)
-- [Django Ninja Extra](https://eadwincode.github.io/django-ninja-extra/) a collection of extra features for Django Ninja 
+- [Django Ninja Extra](https://eadwincode.github.io/django-ninja-extra/) a collection of extra features for Django Ninja
 - [Django Ninja JWT](https://eadwincode.github.io/django-ninja-jwt/)
-    - [Django Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/) abstraction for Django Ninja
+  - [Django Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/) abstraction for Django Ninja
 - [Postgres](https://www.postgresql.org/docs/) database
 - [Pydantic](https://docs.pydantic.dev/latest/)
 - [Django Unfold Admin](https://unfoldadmin.com/)
-    - [Unfold Docs](https://github.com/unfoldadmin/django-unfold)
+  - [Unfold Docs](https://github.com/unfoldadmin/django-unfold)
 - Docker & Docker Compose
 - pytest for testing
 - Gunicorn for production serving
 
 #### Dev Tools & Features
+
 - Makefile to run commands
 - PyTest for unit tests
 - Custom Start App command to create a new app
-    - with extended functionality for Django Ninja, Django Ninja Extra, and Django Unfold
-    - `make startapp <app_name>`
+  - with extended functionality for Django Ninja, Django Ninja Extra, and Django Unfold
+  - `make startapp <app_name>`
 - [Faker](https://faker.readthedocs.io/en/master/) for generating fake data.
-    - See `@/core/management/commands/generate_core_data.py` for more information
+  - See `@/core/management/commands/generate_core_data.py` for more information
 - [Swagger](https://swagger.io/) for API documentation
   - [Localhost Docs](http://localhost:8000/api/docs)
 - [Debug Toolbar](https://django-debug-toolbar.readthedocs.io/en/latest) for debugging
 - [Django Environ](https://django-environ.readthedocs.io/en/latest/) for managing environment variables
 - Linting
-    - [Black](https://github.com/psf/black) Formatter
-        - Configuration located in `@/.vscode/settings.json`
-    - [isort](https://pycqa.github.io/isort/) sorting imports
-    - [Flake8](https://flake8.pycqa.org/en/latest/)
-    - Will run all 3 with the lint script located in `@/scripts/lint.sh`
-        - To run `./scripts/lint.sh`
-
+  - [Ruff](https://github.com/astral-sh/ruff) Formatter
+    - Configuration located in `@/.vscode/settings.json`
+  - Will run all 3 with the lint script located in `@/scripts/lint.sh`
+    - To run `./scripts/lint.sh`
 
 ## Quick Start with Docker
 
@@ -69,26 +67,30 @@ touch .env # create a new env file
 pip3 install -r requirements.txt # install dependencies from requirements.txt
 python3 manage.py migrate # apply migration files to your local db
 python3 manage.py create_superuser # runs custom script to create a superuser
-./scripts/generate_secret_key.sh # generate new secret key 
+./scripts/generate_secret_key.sh # generate new secret key
 python3 manage.py runserver # run the local server on http://localhost:8000/admin
 ```
 
 ## Commands
 
 ### Start a new Django App
+
 ```bash
-# start a new django app with extended functionality 
-# for Django Ninja, Django Ninja Extra, and Django Unfold. 
-$ make startapp <app_name> 
+# start a new django app with extended functionality
+# for Django Ninja, Django Ninja Extra, and Django Unfold.
+$ make startapp <app_name>
 ```
 
 ### Run Server
+
 ```bash
 $ make runserver
 ```
 
 ### Install a library
+
 This runs pip install <library-name> , then pip freeze > requirements.txt to update the requirements.txt file
+
 ```bash
 $ make install <library-name>
 # example
@@ -96,6 +98,7 @@ $ make install <library-name>
 ```
 
 ### Drop DB, Create DB, Migrate, Create Superuser via db-setup script
+
 ```bash
 $ make db-setup
 ```
@@ -171,6 +174,7 @@ Monitor the health of your API and dependencies:
 ### Script Features
 
 All developer scripts include:
+
 - Colored output for better visibility
 - Verbose mode for detailed information
 - Help documentation (`-h` or `--help`)
@@ -179,7 +183,6 @@ All developer scripts include:
 
 For more detailed documentation about the scripts, see `scripts/README.md`.
 
-
 ### Django Ninja Serialization
 
 - Django Ninja uses Pydantic models (Schemas) for serialization, not Django serializers like in DRF.
@@ -187,11 +190,11 @@ For more detailed documentation about the scripts, see `scripts/README.md`.
 - Use from_orm() to convert Django ORM objects to Pydantic models.
 - Django Ninja automatically handles the conversion to JSON in the HTTP response.
 
-
 ## Production Deployment
 
 1. Update `.env` with production settings
 2. Build and run with Docker:
+
 ```bash
 docker-compose -f docker-compose.prod.yml up --build -d
 ```
@@ -210,16 +213,18 @@ pytest --cov=.
 ```
 
 ## API Documentation
+
 - Swagger UI: `/api/docs`
 - ReDoc: `/api/redoc`
 
 ## Features
+
 - JWT Authentication
 - Passwordless Authentication
 - PostgreSQL Database
 - Docker & Docker Compose setup
 - Comprehensive test setup with pytest
-- Code formatting with Black and isort
+- Code formatting with Ruff
 - Production-ready with Gunicorn
 - Environment-based settings
 - Custom user model
@@ -235,50 +240,53 @@ The project includes a comprehensive Redis-based caching system with the followi
 ### Cache Management
 
 1. **Command Line Interface**:
+
    ```bash
    # Warm cache for specific models
    python manage.py cache_ops warm --models products.Product orders.Order
-   
+
    # Clear all cache
    python manage.py cache_ops clear --force
-   
+
    # Preload common queries
    python manage.py cache_ops preload
-   
+
    # Show cache statistics
    python manage.py cache_ops stats
-   
+
    # Show cache versions
    python manage.py cache_ops version
    ```
 
 2. **Cache Decorators**:
+
    ```python
    from core.cache.decorators import cached_view, cached_method
-   
+
    @api_controller('/products')
    class ProductController:
        @http_get('')
        @cached_view(timeout=300, key_prefix='products')
        def list_products(self):
            return Product.objects.all()
-   
+
        @cached_method(timeout=300, key_prefix='product')
        def get_product_data(self, product_id):
            return Product.objects.get(id=product_id)
    ```
 
 3. **Versioned Cache**:
+
    ```python
    from core.cache.versioning import VersionedCache
-   
+
    # Create versioned cache for a namespace
    cache = VersionedCache('products')
-   
+
    # Set and get data
    cache.set('featured', featured_products)
    featured = cache.get('featured')
-   
+
    # Invalidate all cache for namespace
    cache.invalidate_all()
    ```
@@ -288,17 +296,19 @@ The project includes a comprehensive Redis-based caching system with the followi
 The system includes automatic cache warming for common queries:
 
 1. **Model Cache Warming**:
+
    ```python
    from core.cache.warming import CacheWarmer
-   
+
    warmer = CacheWarmer()
    warmer.warm_model(Product, chunk_size=100)
    ```
 
 2. **Query Preloading**:
+
    ```python
    from core.cache.preload import CachePreloader
-   
+
    preloader = CachePreloader()
    preloader.preload_products()  # Preload product-related queries
    preloader.preload_all()       # Preload all common queries
@@ -319,9 +329,10 @@ The Django admin includes a cache monitoring interface at `/admin/cache-monitor/
 The system automatically invalidates cache when models are updated:
 
 1. **Signal Handlers**:
+
    ```python
    from core.cache.signals import register_cache_signals
-   
+
    # In apps.py
    def ready(self):
        register_cache_signals()

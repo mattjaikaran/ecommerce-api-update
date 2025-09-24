@@ -14,7 +14,7 @@ from django.db import models
 from django.db.models import Q, QuerySet
 from django.http import HttpRequest
 
-from .constants import CACHE_TIMEOUT_MEDIUM, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
+from .config.constants import CACHE_TIMEOUT_MEDIUM, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE
 from .exceptions import (
     AuthenticationError,
     BaseAPIException,

@@ -1,22 +1,22 @@
-# 🏗️ System Design & Technical Architecture
+# System Design & Technical Architecture
 
-## 🎯 Overview
+## Overview
 
-The ecommerce platform is built as a modern, scalable Django application with enhanced organizational structure and advanced tooling. It provides a comprehensive set of APIs for managing products, orders, carts, and user interactions, with built-in ML capabilities, enhanced developer experience, and production-ready architecture.
+The ecommerce platform is built as a Django application using Django Ninja for API development. It provides APIs for managing products, orders, carts, and user interactions with a focus on developer experience and production deployment.
 
-### ✨ Key Improvements & Features
+### Key Features
 
-- **🔧 Modern Tooling**: UV package management, enhanced Ruff configuration, comprehensive Makefile
-- **📁 Organized Structure**: Modular models, utilities, and configuration management
-- **🚀 Developer Experience**: Automated setup scripts, code quality tools, deployment automation
-- **📊 Comprehensive Documentation**: Architecture diagrams, user journeys, API documentation
-- **🐳 Containerized**: Docker-based development and deployment with multi-environment support
+- **Modern Tooling**: UV package management, Docker containerization
+- **Organized Structure**: Modular models and utilities
+- **Developer Experience**: Hot reloading, automated scripts, code quality tools
+- **API Documentation**: Swagger/OpenAPI integration
+- **Containerized Development**: Docker-based development with hot reloading
 
 ## Architecture
 
 ### Backend Architecture
 
-- Monolithic Django 4.2+ application
+- Monolithic Django 5.2+ application
 - Django Ninja Extra for API development
 - PostgreSQL for primary database
 - Redis for caching and session management
@@ -24,63 +24,55 @@ The ecommerce platform is built as a modern, scalable Django application with en
 - S3 for file storage
 - Stripe for payment processing
 
-### Machine Learning Integration
+### Technology Stack
 
-- Product recommendation engine
-- Search ranking optimization
-- Customer segmentation
-- Demand forecasting
-- Fraud detection
-- All ML models are integrated within Django using:
-  - PyTorch for model training and inference
-  - Celery for asynchronous model predictions
-  - Redis for caching predictions
-  - PostgreSQL for storing model outputs
+- Django 5.2+ with Django Ninja for API development
+- PostgreSQL for database
+- Redis for caching and Celery broker
+- Celery for background tasks
+- Docker for containerization
+- UV for fast Python package management
 
-## 🧩 Core Components
+## Core Components
 
-### Enhanced Project Structure
+### Project Structure
 
 ```
 ecommerce-api/
 ├── api/                    # Core configuration & shared utilities
-│   ├── config/            # ✨ NEW: Centralized configuration
+│   ├── config/            # Centralized configuration
 │   │   ├── constants.py   # Application constants
 │   │   ├── error_messages.py # Standardized messages
 │   │   └── settings.py    # Runtime settings
-│   └── utils/             # ✨ NEW: Organized utility modules
-│       ├── cache.py       # Cache utilities
-│       ├── email.py       # Email helpers
+│   └── utils/             # Utility modules
 │       ├── validation.py  # Data validation
-│       └── ...
+│       ├── formatting.py  # Data formatting
+│       └── pagination.py  # API pagination
 ├── core/                  # User management & core models
-│   └── models/            # ✨ NEW: Separated model files
-│       ├── user.py
-│       ├── customer.py
-│       └── ...
+│   ├── models/            # Core model files
+│   ├── controllers/       # API controllers
+│   ├── schemas/           # Pydantic schemas
+│   └── management/        # Management commands
 ├── products/              # Product catalog
-│   └── models/            # ✨ NEW: Organized product models
+│   ├── models/            # Product models
+│   ├── controllers/       # Product API endpoints
+│   └── schemas/           # Product schemas
 ├── cart/                  # Shopping cart
-│   └── models/            # ✨ NEW: Cart-specific models
 ├── orders/                # Order management
-│   └── models/            # ✨ NEW: Order-related models
 ├── payments/              # Payment processing
-│   └── models/            # ✨ NEW: Payment models
-└── scripts/               # ✨ NEW: Enhanced development scripts
-    ├── dev_setup.sh       # Complete development setup
-    ├── code_quality.sh    # Quality assurance
-    └── deploy.sh          # Deployment automation
+└── scripts/               # Development scripts
+    ├── dev_setup.sh       # Development setup
+    ├── code_quality.sh    # Code quality checks
+    └── db_setup.sh        # Database setup
 ```
 
-### API Layer (Django Ninja Extra)
+### API Layer (Django Ninja)
 
 - RESTful API endpoints with OpenAPI documentation
-- JWT authentication with refresh token support
-- Comprehensive request validation using Pydantic
-- Structured response serialization
-- API versioning with backward compatibility
-- Intelligent rate limiting with user-based quotas
+- JWT authentication
+- Request validation using Pydantic
 - Auto-generated interactive documentation (Swagger/ReDoc)
+- CORS support for frontend integration
 
 ### Database Design
 
@@ -88,313 +80,193 @@ ecommerce-api/
 - Redis for:
   - Session management
   - Cache layer
-  - Real-time analytics
-  - Queue management
-- Database optimization:
-  - Proper indexing
-  - Query optimization
-  - Connection pooling
-  - Read replicas (production)
+  - Celery message broker
+- Basic database optimization with proper indexing
 
 ### Caching Strategy
 
-- Multi-level caching:
-  - Application-level caching
-  - Database query caching
-  - API response caching
-  - Session caching
-- Cache invalidation patterns
-- Cache warming strategies
+- Redis-based caching for:
+  - Database queries
+  - API responses
+  - Session storage
+- Basic cache invalidation on model updates
 
 ### Background Processing
 
 - Celery for async tasks:
   - Order processing
   - Email notifications
-  - ML model training
   - Report generation
-  - Data exports
-- Task prioritization
-- Error handling and retries
-- Task monitoring
+- Basic error handling and retries
+- Flower for task monitoring
 
 ### File Storage
 
-- S3 for:
-  - Product images
-  - User uploads
-  - Generated reports
-  - Backup storage
-- Image processing:
-  - Thumbnail generation
-  - Image optimization
-  - Format conversion
+- Local file storage for development
+- S3 integration ready for production
+- Basic image handling for product images
 
 ### Security
 
-- JWT authentication
-- Role-based access control
-- API rate limiting
-- Input validation
-- XSS protection
-- CSRF protection
-- SQL injection prevention
-- Security headers
-- SSL/TLS encryption
+- JWT authentication with Django Ninja JWT
+- Input validation using Pydantic
+- Django's built-in security features
+- CORS configuration
+- Environment-based configuration
 
-## Machine Learning Features
+## Development & Deployment
 
-### Product Recommendations
+### Docker Configuration
 
-- Collaborative filtering
-- Content-based filtering
-- Hybrid recommendations
-- Real-time personalization
-- A/B testing framework
+The application uses Docker for both development and production environments:
 
-### Search Optimization
+#### Development Setup
 
-- Semantic search
-- Autocomplete suggestions
-- Typo tolerance
-- Relevance ranking
-- Search analytics
+- **Hot Reloading**: Enabled through volume mounting and custom Django management command
+- **Services**:
+  - Django web server with hot reloading
+  - PostgreSQL 17 database
+  - Redis for caching and Celery
+  - Celery worker and beat scheduler
+  - Flower for Celery monitoring
+- **Development Server**: Uses custom `runserver_dev.py` command for enhanced development features
 
-### Customer Analytics
+#### Docker Services
 
-- Customer segmentation
-- Churn prediction
-- Lifetime value prediction
-- Purchase pattern analysis
-- Cohort analysis
-
-### Inventory Management
-
-- Demand forecasting
-- Stock optimization
-- Reorder point prediction
-- Seasonal trend analysis
-- Supplier performance analysis
-
-### Fraud Detection
-
-- Transaction analysis
-- Behavior patterns
-- Risk scoring
-- Anomaly detection
-- Real-time alerts
-
-## Monitoring and Analytics
-
-### Application Monitoring
-
-- Performance metrics
-- Error tracking
-- Resource utilization
-- API metrics
-- User activity
-
-### Business Analytics
-
-- Sales metrics
-- Customer metrics
-- Product metrics
-- Marketing metrics
-- Financial metrics
-
-### ML Model Monitoring
-
-- Model performance
-- Prediction accuracy
-- Feature importance
-- Data drift detection
-- Model retraining triggers
-
-## 🚀 Enhanced Deployment & DevOps
-
-### Modern Development Workflow
-
-```mermaid
-graph LR
-    DEV[Local Development] --> QUALITY[Code Quality Checks]
-    QUALITY --> STAGING[Staging Environment]
-    STAGING --> PROD[Production Deployment]
-
-    DEV --> UV[UV Package Management]
-    UV --> DOCKER[Docker Containers]
-    DOCKER --> QUALITY
-
-    QUALITY --> RUFF[Ruff Linting]
-    QUALITY --> TESTS[Automated Tests]
-    QUALITY --> SECURITY[Security Scans]
-
-    STAGING --> VALIDATION[User Acceptance]
-    VALIDATION --> PROD
+```yaml
+services:
+  django: # Main Django application with hot reloading
+  db: # PostgreSQL 17 database
+  redis: # Redis for caching and Celery broker
+  celery: # Background task worker
+  celery-beat: # Task scheduler
+  flower: # Celery monitoring interface
 ```
 
-### Infrastructure
+#### Hot Reloading Setup
 
-- **🐳 Docker**: Multi-stage containerization with optimized images
-- **🌐 Nginx**: Reverse proxy with security headers and SSL termination
-- **🦄 Gunicorn**: WSGI server with worker process management
-- **⚖️ Load Balancing**: Horizontal scaling with health checks
-- **📈 Auto-scaling**: Resource-based scaling policies
+The Django service is configured for development with:
 
-### Enhanced CI/CD Pipeline
+1. **Volume Mounting**: Code changes are immediately reflected
+2. **Custom Management Command**: `python manage.py runserver_dev` provides:
 
-- **🧪 Quality Gates**: Comprehensive testing with coverage requirements
-- **🔍 Code Analysis**: Ruff linting, MyPy type checking, security scanning
-- **🔒 Security**: Vulnerability scanning, dependency checks, secret detection
-- **🚀 Deployment**: Blue-green deployments with automated rollback
-- **📊 Monitoring**: Real-time performance and error tracking
+   - Enhanced hot reloading
+   - SQL query printing (with `--print-sql` flag)
+   - Automatic admin panel refresh
+   - Threading support for better performance
 
-### Environment Strategy
+3. **Development Entrypoint**: `docker-entrypoint-dev.sh` handles:
+   - UV package management
+   - Database and Redis connectivity checks
+   - Virtual environment setup
 
-- **🛠️ Development**: Local Docker Compose with UV package management
-- **🧪 Staging**: Production-like environment for integration testing
-- **🌟 Production**: High-availability setup with monitoring and alerting
-- **🤖 ML Training**: Dedicated environment for model development
-- **🔬 ML Staging**: Model validation and A/B testing environment
-
-### Modern Tooling Integration
-
-#### Package Management with UV
+#### Running the Development Environment
 
 ```bash
-# Fast dependency installation
+# Start all services with hot reloading
+docker-compose up --build
+
+# The Django service runs with hot reloading:
+python manage.py runserver_dev 0.0.0.0:8000
+
+# Access points:
+# - API Documentation: http://localhost:8000/api/docs
+# - Admin Panel: http://localhost:8000/admin
+# - Celery Monitoring: http://localhost:5555
+```
+
+### Package Management with UV
+
+The project uses UV for fast Python package management:
+
+```bash
+# Install dependencies
 uv pip install -e .
 
-# Development dependencies
-uv pip install -e ".[dev]"
-
-# Lock file management
-uv lock
+# Development setup
+uv venv .venv
+uv pip install --python .venv/bin/python [packages]
 ```
 
-#### Enhanced Makefile Commands
+### Available Scripts
+
+Development scripts in the `scripts/` directory:
+
+- **`dev_setup.sh`**: Development environment setup
+- **`code_quality.sh`**: Linting and quality checks
+- **`db_setup.sh`**: Database setup and migrations
+- **`test_feature.sh`**: Feature testing
+- **`check_health.sh`**: API health checks
+
+### Production Deployment
+
+For production, use the production Docker Compose configuration:
 
 ```bash
-# Complete setup
-make setup
-
-# Quality assurance
-make check
-make fix
-
-# Testing
-make test
-make test-coverage
-
-# Deployment
-make prod-deploy
+docker-compose -f docker-compose.prod.yml up --build -d
 ```
 
-#### Automated Scripts
+## API Documentation
 
-- **`dev_setup.sh`**: One-command development environment setup
-- **`code_quality.sh`**: Comprehensive quality checks
-- **`deploy.sh`**: Multi-environment deployment with safety checks
+The API provides interactive documentation:
 
-## Scalability Considerations
+- **Swagger UI**: Available at `/api/docs`
+- **ReDoc**: Available at `/api/redoc`
+- **OpenAPI Schema**: Auto-generated from Django Ninja
 
-### Application Scaling
+## Testing
 
-- Horizontal scaling
-- Load balancing
-- Database sharding
-- Caching optimization
-- Connection pooling
+The project includes:
 
-### ML Scaling
+- **Unit Tests**: Using pytest
+- **Feature Testing**: Custom scripts for endpoint testing
+- **Health Checks**: Automated monitoring scripts
 
-- Model serving optimization
-- Batch prediction processing
-- Feature store implementation
-- Model versioning
-- A/B testing infrastructure
+## Current Implementation Status
 
-## 🔮 Future Enhancements & Roadmap
+### Implemented Features
 
-### ✨ Completed Improvements (This Release)
+- **Core API**: Product, Order, Cart, User management APIs
+- **Authentication**: JWT-based authentication system
+- **Database**: PostgreSQL with Django ORM
+- **Caching**: Redis integration for basic caching
+- **Background Tasks**: Celery for async processing
+- **Admin Interface**: Django Unfold admin panel
+- **Documentation**: Auto-generated API docs
+- **Development Tools**: Hot reloading, testing scripts, code quality tools
 
-- **📁 Modular Architecture**: Separated models into organized folder structures
-- **🔧 Modern Tooling**: UV package management integration
-- **📝 Enhanced Configuration**: Centralized constants and error message management
-- **🛠️ Developer Experience**: Comprehensive scripts and Makefile improvements
-- **📚 Documentation**: Architecture diagrams, user journeys, and technical docs
-- **🎯 Code Quality**: Enhanced Ruff configuration with better error handling
+### Development Focus
 
-### 🎯 Planned Features (Next Phase)
+- **Code Quality**: Consistent formatting and linting
+- **Developer Experience**: Fast setup and hot reloading
+- **API Documentation**: Interactive Swagger/ReDoc interfaces
+- **Testing**: Unit tests and feature testing scripts
+- **Containerization**: Docker-based development and deployment
 
-#### Technical Enhancements
+### Learning Project Roadmap
 
-- **🔄 GraphQL API**: Alternative to REST for complex queries
-- **📱 Mobile-First API**: Optimized endpoints for mobile applications
-- **🌐 Multi-tenancy**: Support for multiple storefronts
-- **🔄 Event Sourcing**: Enhanced audit trails and data consistency
-- **🔍 Advanced Search**: Elasticsearch integration with ML-powered relevance
+This is a public learning project designed to demonstrate modern Django development and ML integration. The roadmap includes:
 
-#### ML & AI Capabilities
+#### Immediate Goals
 
-- **🤖 Enhanced Recommendations**: Deep learning models for personalization
-- **💬 Chatbot Integration**: AI-powered customer support
-- **📊 Predictive Analytics**: Advanced business intelligence
-- **🖼️ Visual Search**: Image-based product discovery
-- **🔊 Voice Commerce**: Voice-activated shopping experience
+- Enhanced caching strategies
+- Performance optimization
+- Additional security features
+- Extended API functionality
 
-#### Performance & Scalability
+#### Machine Learning Integration (Learning Phase)
 
-- **⚡ Performance Optimization**: Query optimization and caching strategies
-- **🔄 Real-time Features**: WebSocket integration for live updates
-- **📈 Advanced Monitoring**: Distributed tracing and observability
-- **🚀 Edge Computing**: CDN integration for global performance
-- **🔧 Microservices Migration**: Gradual decomposition for specific domains
+- Product recommendation systems
+- Demand forecasting models
+- Fraud detection algorithms
+- Computer vision for product categorization
+- NLP for review analysis
 
-### 🛠️ Technical Debt Reduction
+See `machine-learning-features.md` for detailed ML roadmap and learning objectives.
 
-#### Code Quality
+#### Advanced Features (Future Learning)
 
-- **✅ Test Coverage**: Achieve 95% test coverage across all modules
-- **🔍 Type Safety**: Complete MyPy type annotations
-- **📚 Documentation**: API documentation and development guides
-- **🔒 Security Hardening**: Regular security audits and updates
-- **♿ Accessibility**: WCAG 2.1 AA compliance
-
-#### Infrastructure Modernization
-
-- **☸️ Kubernetes Migration**: Container orchestration for production
-- **🔄 CI/CD Enhancement**: GitOps workflows and automated deployments
-- **📊 Observability**: Enhanced monitoring and alerting systems
-- **🔐 Secret Management**: Secure handling of sensitive configuration
-- **🌍 Multi-region Deployment**: Global availability and disaster recovery
-
-### 📈 Success Metrics
-
-```mermaid
-graph TB
-    subgraph "Performance Metrics"
-        RESPONSE[API Response Time < 200ms]
-        UPTIME[99.9% Uptime]
-        THROUGHPUT[1000+ req/sec]
-    end
-
-    subgraph "Quality Metrics"
-        COVERAGE[95% Test Coverage]
-        BUGS[< 1 bug per 1000 LOC]
-        SECURITY[Zero critical vulnerabilities]
-    end
-
-    subgraph "Developer Experience"
-        SETUP[< 10 min setup time]
-        DEPLOY[< 5 min deployment]
-        FEEDBACK[Developer satisfaction > 8/10]
-    end
-
-    subgraph "Business Impact"
-        CONVERSION[Improved conversion rates]
-        REVENUE[Revenue growth tracking]
-        CUSTOMERS[Customer satisfaction metrics]
-    end
-```
-
-This enhanced system design provides a solid foundation for scaling the ecommerce platform while maintaining high code quality, developer productivity, and operational excellence.
+- Real-time analytics
+- A/B testing framework
+- Model monitoring and deployment
+- MLOps best practices

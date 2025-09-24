@@ -26,6 +26,17 @@ class CartItemUpdateSchema(Schema):
     quantity: int = Field(ge=1)
 
 
+class CartCreateSchema(Schema):
+    customer_id: UUID | None = None
+    session_key: str | None = None
+
+
+class CartUpdateSchema(Schema):
+    customer_id: UUID | None = None
+    session_key: str | None = None
+    is_active: bool | None = None
+
+
 class CartSchema(Schema):
     id: UUID
     customer_id: UUID | None = None
@@ -41,8 +52,10 @@ class CartSchema(Schema):
 
 
 __all__ = [
+    "CartCreateSchema",
     "CartItemCreateSchema",
     "CartItemSchema",
     "CartItemUpdateSchema",
     "CartSchema",
+    "CartUpdateSchema",
 ]

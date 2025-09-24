@@ -13,7 +13,7 @@ from django.core.cache import cache
 from django.db import connection
 from django.http import JsonResponse
 
-from .constants import HEALTH_CHECK_SERVICES
+from .config.constants import HEALTH_CHECK_SERVICES
 
 
 class HealthChecker:
