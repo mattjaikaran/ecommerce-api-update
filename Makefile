@@ -1,6 +1,6 @@
-# Makefile for Django Ecommerce API
+# Makefile for Django Ecommerce API with UV Package Management
 
-.PHONY: help build up down logs shell migrate createsuperuser test lint format clean
+.PHONY: help build up down logs shell migrate createsuperuser test lint format clean install sync
 
 # Variables
 DOCKER_COMPOSE = docker-compose
@@ -9,6 +9,7 @@ DJANGO_SERVICE = django
 DB_SERVICE = db
 REDIS_SERVICE = redis
 CELERY_SERVICE = celery
+UV = uv
 
 # Default target
 help: ## Show this help message
@@ -95,21 +96,52 @@ celery-status: ## Show Celery worker status
 celery-inspect: ## Inspect Celery workers
 	$(DOCKER_COMPOSE) exec $(CELERY_SERVICE) celery -A api inspect stats
 
+# Package Management with UV
+install: ## Install dependencies with UV
+	$(UV) pip install -e .
+
+sync: ## Sync dependencies with UV
+	$(UV) pip sync
+
+install-dev: ## Install development dependencies
+	$(UV) pip install -e ".[dev]"
+
+add: ## Add a new dependency (usage: make add PACKAGE=package-name)
+	$(UV) add $(PACKAGE)
+
+add-dev: ## Add a new development dependency (usage: make add-dev PACKAGE=package-name)
+	$(UV) add --dev $(PACKAGE)
+
+lock: ## Update lock file
+	$(UV) lock
+
 # Testing and quality
 test: ## Run tests
-	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) python -m pytest
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run python -m pytest
 
 test-coverage: ## Run tests with coverage
-	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) python -m pytest --cov=. --cov-report=html
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run python -m pytest --cov=. --cov-report=html
 
-lint: ## Run linting
-	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) ruff check .
+test-watch: ## Run tests in watch mode
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run python -m pytest --watch
 
-format: ## Format code
-	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) ruff format .
+lint: ## Run linting with Ruff
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run ruff check .
+
+lint-fix: ## Run linting with auto-fix
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run ruff check --fix .
+
+format: ## Format code with Ruff
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run ruff format .
 
 format-check: ## Check code formatting
-	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) ruff format --check .
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run ruff format --check .
+
+mypy: ## Run type checking with mypy
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run mypy .
+
+pre-commit: ## Run pre-commit hooks
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) $(UV) run pre-commit run --all-files
 
 # Production commands
 prod-build: ## Build production images
@@ -148,14 +180,66 @@ health: ## Check service health
 	@curl -f http://localhost:8000/health/ || echo "Web service not responding"
 	@curl -f http://localhost:5555/ || echo "Flower not responding"
 
+# Development tools
+shell-uv: ## Open UV shell with project dependencies
+	$(UV) shell
+
+run-server: ## Run Django development server with UV
+	$(UV) run python manage.py runserver
+
+run-worker: ## Run Celery worker with UV
+	$(UV) run celery -A api worker --loglevel=info
+
+run-beat: ## Run Celery beat scheduler with UV
+	$(UV) run celery -A api beat --loglevel=info
+
+run-flower: ## Run Flower monitoring with UV
+	$(UV) run celery -A api flower
+
+check: ## Run all checks (lint, format-check, mypy, test)
+	$(MAKE) lint
+	$(MAKE) format-check
+	$(MAKE) mypy
+	$(MAKE) test
+
+fix: ## Fix all auto-fixable issues
+	$(MAKE) lint-fix
+	$(MAKE) format
+
+# Data management
+flush-db: ## Flush database
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) python manage.py flush --noinput
+
+reset-migrations: ## Reset all migrations (DANGEROUS!)
+	@echo "This will delete all migration files. Are you sure? (y/N)"
+	@read confirm && [ "$$confirm" = "y" ] || exit 1
+	find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+	find . -path "*/migrations/*.pyc" -delete
+	$(MAKE) makemigrations
+
+seed-data: ## Load seed data
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) python manage.py loaddata fixtures/initial_data.json
+
+create-fixtures: ## Create fixtures from current data
+	$(DOCKER_COMPOSE) exec $(DJANGO_SERVICE) python manage.py dumpdata --indent=2 > fixtures/current_data.json
+
+# Monitoring
+monitor: ## Open monitoring dashboard
+	@echo "Opening monitoring tools..."
+	@echo "Flower (Celery): http://localhost:5555"
+	@echo "Django Admin: http://localhost:8000/admin"
+	@echo "API Docs: http://localhost:8000/api/docs"
+
 # Setup commands
 setup: ## Initial setup for development
 	@echo "Setting up development environment..."
+	$(MAKE) setup-env
 	$(MAKE) build
 	$(MAKE) up
 	@echo "Waiting for services to start..."
 	@sleep 10
 	$(MAKE) migrate
+	$(MAKE) seed-data
 	@echo "Setup complete! Visit http://localhost:8000"
 
 setup-env: ## Create .env file from example
@@ -166,3 +250,7 @@ setup-env: ## Create .env file from example
 	else \
 		echo ".env file already exists"; \
 	fi
+
+quick-setup: ## Quick setup without building
+	$(MAKE) up
+	$(MAKE) migrate

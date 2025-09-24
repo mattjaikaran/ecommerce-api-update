@@ -308,7 +308,6 @@ tramp
 !.env.example
 
 # AI/ML
-models/
 *.h5
 *.pkl
 *.joblib

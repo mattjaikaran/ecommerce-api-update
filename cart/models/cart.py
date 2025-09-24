@@ -1,11 +1,13 @@
-from django.core.validators import MinValueValidator
+"""Cart model definition."""
+
 from django.db import models
 
 from core.models import AbstractBaseModel, Customer
-from products.models import ProductVariant
 
 
 class Cart(AbstractBaseModel):
+    """Shopping cart model for storing customer cart information."""
+
     session_key = models.CharField(max_length=255, null=True, blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     customer = models.ForeignKey(
@@ -35,28 +37,4 @@ class Cart(AbstractBaseModel):
             models.Index(fields=["customer", "is_active"]),
             models.Index(fields=["session_key", "is_active"]),
             models.Index(fields=["expires_at", "is_active"]),
-        ]
-
-
-class CartItem(AbstractBaseModel):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product_variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f"{self.quantity}x {self.product_variant.product.name}"
-
-    class Meta:
-        verbose_name = "Cart Item"
-        verbose_name_plural = "Cart Items"
-        indexes = [
-            # Core lookup indexes
-            models.Index(fields=["cart"]),
-            models.Index(fields=["product_variant"]),
-            # Date-based indexes
-            models.Index(fields=["created_at"]),
-            models.Index(fields=["updated_at"]),
-            # Compound indexes for common queries
-            models.Index(fields=["cart", "product_variant"]),
         ]
