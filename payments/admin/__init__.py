@@ -1,6 +1,6 @@
-from .payment_method import PaymentMethodAdmin
-from .refund import RefundAdmin
-from .transaction import TransactionAdmin
+from .payment_method_admin import PaymentMethodAdmin
+from .refund_admin import RefundAdmin
+from .transaction_admin import TransactionAdmin
 
 __all__ = [
     PaymentMethodAdmin,

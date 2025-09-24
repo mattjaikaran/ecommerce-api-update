@@ -1,21 +1,21 @@
-from .address import (
+from .address_schema import (
     AddressCreateSchema,
     AddressSchema,
 )
-from .auth import (
+from .auth_schema import (
     PasswordlessLoginRequest,
     PasswordlessLoginVerify,
 )
-from .customer import (
+from .customer_schema import (
     CustomerCreateSchema,
     CustomerSchema,
     CustomerUpdateSchema,
 )
-from .feedback import (
+from .feedback_schema import (
     CustomerFeedbackCreateSchema,
     CustomerFeedbackSchema,
 )
-from .users import (
+from .user_schema import (
     UserLoginSchema,
     UserLogoutSchema,
     UserSchema,

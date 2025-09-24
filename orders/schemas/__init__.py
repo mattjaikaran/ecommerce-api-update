@@ -1,4 +1,4 @@
-from .fulfillment import (
+from .fulfillment_schema import (
     FulfillmentCreateSchema,
     FulfillmentLineItemSchema,
     FulfillmentOrderCreateSchema,
@@ -7,17 +7,17 @@ from .fulfillment import (
     FulfillmentSchema,
     FulfillmentUpdateSchema,
 )
-from .history import OrderHistorySchema
-from .note import OrderNoteCreateSchema, OrderNoteSchema
-from .order import OrderCreateSchema, OrderSchema, OrderUpdateSchema
-from .order_line_item import (
+from .history_schema import OrderHistorySchema
+from .note_schema import OrderNoteCreateSchema, OrderNoteSchema
+from .order_line_item_schema import (
     OrderLineItemCreateSchema,
     OrderLineItemSchema,
     OrderLineItemUpdateSchema,
 )
-from .payment import PaymentTransactionSchema
-from .refund import RefundCreateSchema, RefundSchema, RefundUpdateSchema
-from .tax import TaxSchema
+from .order_schema import OrderCreateSchema, OrderSchema, OrderUpdateSchema
+from .payment_schema import PaymentTransactionSchema
+from .refund_schema import RefundCreateSchema, RefundSchema, RefundUpdateSchema
+from .tax_schema import TaxSchema
 
 __all__ = [
     # Order

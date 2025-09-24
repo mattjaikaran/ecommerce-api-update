@@ -4,10 +4,13 @@ This module contains all custom exceptions used throughout the application
 to provide better error handling and more descriptive error messages.
 """
 
+import logging
 from typing import Any
 
 from django.http import JsonResponse
 from ninja.errors import HttpError
+
+logger = logging.getLogger(__name__)
 
 
 class BaseAPIException(Exception):
@@ -56,7 +59,7 @@ class AuthenticationError(BaseAPIException):
     status_code = 401
 
 
-class PermissionError(BaseAPIException):
+class APIPermissionError(BaseAPIException):
     """Raised when user doesn't have required permissions."""
 
     default_message = "Permission denied"
@@ -207,9 +210,6 @@ def handle_ninja_http_error(request, exception: HttpError) -> JsonResponse:
 def handle_generic_exception(request, exception: Exception) -> JsonResponse:
     """Handle generic exceptions in production."""
     # In production, log the full exception but don't expose details
-    import logging
-
-    logger = logging.getLogger(__name__)
     logger.exception("Unhandled exception occurred")
 
     return JsonResponse(
@@ -251,10 +251,11 @@ def validate_required_fields(required_fields: list):
             else:
                 data = request.POST
 
-            missing_fields = []
-            for field in required_fields:
-                if field not in data or not data[field]:
-                    missing_fields.append(field)
+            missing_fields = [
+                field
+                for field in required_fields
+                if field not in data or not data[field]
+            ]
 
             if missing_fields:
                 raise ValidationError(

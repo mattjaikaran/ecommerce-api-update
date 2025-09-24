@@ -1,4 +1,4 @@
-from .attribute import (
+from .attribute_schema import (
     AttributeAssignmentCreateSchema,
     AttributeAssignmentSchema,
     AttributeCreateSchema,
@@ -11,7 +11,7 @@ from .attribute import (
     AttributeValueSchema,
     AttributeValueUpdateSchema,
 )
-from .bundle import (
+from .bundle_schema import (
     BundleCreateSchema,
     BundleItemCreateSchema,
     BundleItemSchema,
@@ -19,24 +19,18 @@ from .bundle import (
     BundleSchema,
     BundleUpdateSchema,
 )
-from .category import (
+from .category_schema import (
     CategoryCreateSchema,
     CategorySchema,
     CategoryUpdateSchema,
 )
-from .collection import (
+from .collection_schema import (
     CollectionCreateSchema,
     CollectionProductSchema,
     CollectionSchema,
     CollectionUpdateSchema,
 )
-from .product import (
-    ProductCreateSchema,
-    ProductListSchema,
-    ProductSchema,
-    ProductUpdateSchema,
-)
-from .product_option import (
+from .product_option_schema import (
     ProductImageSchema,
     ProductOptionCreateSchema,
     ProductOptionSchema,
@@ -46,22 +40,28 @@ from .product_option import (
     ProductVariantSchema,
     ProductVariantUpdateSchema,
 )
-from .review import (
+from .product_schema import (
+    ProductCreateSchema,
+    ProductListSchema,
+    ProductSchema,
+    ProductUpdateSchema,
+)
+from .review_schema import (
     ReviewCreateSchema as ProductReviewCreateSchema,
 )
-from .review import (
+from .review_schema import (
     ReviewSchema as ProductReviewSchema,
 )
-from .review import (
+from .review_schema import (
     ReviewUpdateSchema as ProductReviewUpdateSchema,
 )
-from .tag import (
+from .tag_schema import (
     TagCreateSchema as ProductTagCreateSchema,
 )
-from .tag import (
+from .tag_schema import (
     TagSchema as ProductTagSchema,
 )
-from .tag import (
+from .tag_schema import (
     TagUpdateSchema as ProductTagUpdateSchema,
 )
 

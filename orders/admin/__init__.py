@@ -1,5 +1,5 @@
-from .discount import OrderDiscountAdmin
-from .fulfillment import (
+from .discount_admin import OrderDiscountAdmin
+from .fulfillment_admin import (
     FulfillmentLineItemAdmin,
     FulfillmentOrderAdmin,
     OrderFulfillmentAdmin,
@@ -7,13 +7,13 @@ from .fulfillment import (
     OrderFulfillmentTrackingAdmin,
     OrderFulfillmentTrackingUrlAdmin,
 )
-from .history import OrderHistoryAdmin
-from .note import OrderNoteAdmin
-from .order import OrderAdmin
-from .order_line_item import OrderLineItemAdmin
-from .payment import OrderPaymentAdmin, PaymentTransactionAdmin
-from .refund import RefundAdmin
-from .tax import OrderTaxAdmin, TaxAdmin
+from .history_admin import OrderHistoryAdmin
+from .note_admin import OrderNoteAdmin
+from .order_admin import OrderAdmin
+from .order_line_item_admin import OrderLineItemAdmin
+from .payment_admin import OrderPaymentAdmin, PaymentTransactionAdmin
+from .refund_admin import RefundAdmin
+from .tax_admin import OrderTaxAdmin, TaxAdmin
 
 __all__ = [
     OrderAdmin,

@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.http import HttpRequest
 from ninja_extra.permissions import BasePermission
 
-from .exceptions import AuthenticationError, PermissionError
+from .exceptions import APIPermissionError, AuthenticationError
 
 
 class IsAuthenticated(BasePermission):
@@ -143,7 +143,7 @@ def require_admin(func: Callable) -> Callable:
 
         if not request.user.is_staff:
             msg = "Admin access required"
-            raise PermissionError(msg)
+            raise APIPermissionError(msg)
 
         return func(request, *args, **kwargs)
 
@@ -161,7 +161,7 @@ def require_superuser(func: Callable) -> Callable:
 
         if not request.user.is_superuser:
             msg = "Superuser access required"
-            raise PermissionError(msg)
+            raise APIPermissionError(msg)
 
         return func(request, *args, **kwargs)
 
@@ -180,7 +180,7 @@ def require_permission(permission: str) -> Callable:
 
             if not request.user.has_perm(permission):
                 msg = f"Permission required: {permission}"
-                raise PermissionError(msg)
+                raise APIPermissionError(msg)
 
             return func(request, *args, **kwargs)
 
@@ -203,7 +203,7 @@ def require_owner(obj_param: str = "obj") -> Callable:
             obj = kwargs.get(obj_param)
             if not obj:
                 msg = "Object not found"
-                raise PermissionError(msg)
+                raise APIPermissionError(msg)
 
             # Check ownership
             is_owner = False
@@ -216,7 +216,7 @@ def require_owner(obj_param: str = "obj") -> Callable:
 
             if not is_owner and not request.user.is_staff:
                 msg = "Access denied: You are not the owner"
-                raise PermissionError(msg)
+                raise APIPermissionError(msg)
 
             return func(request, *args, **kwargs)
 
@@ -243,7 +243,7 @@ def require_owner_or_admin(obj_param: str = "obj") -> Callable:
             obj = kwargs.get(obj_param)
             if not obj:
                 msg = "Object not found"
-                raise PermissionError(msg)
+                raise APIPermissionError(msg)
 
             # Check ownership
             is_owner = False
@@ -256,7 +256,7 @@ def require_owner_or_admin(obj_param: str = "obj") -> Callable:
 
             if not is_owner:
                 msg = "Access denied: You are not the owner"
-                raise PermissionError(msg)
+                raise APIPermissionError(msg)
 
             return func(request, *args, **kwargs)
 
