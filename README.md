@@ -223,12 +223,17 @@ For more detailed documentation about the scripts, see `scripts/README.md`.
 
 All controllers follow a professional, decorator-based pattern with:
 
-**✅ No Try-Catch Bloat** - Clean code with `@handle_exceptions()`
-**✅ Professional Logging** - Automatic request/response logging with `@log_api_call()`
+**✅ No Try-Catch Bloat** - Clean code with `@handle_exceptions()` decorator
+**✅ Professional Logging** - Automatic request/response logging with `@log_api_call()` decorator
 **✅ Advanced Filtering** - Built-in search, filtering, and pagination
 **✅ Optimized Queries** - `select_related()` and `prefetch_related()` for performance
 **✅ Consistent Responses** - 201 for creates, 204 for deletes, proper status codes
-**✅ Redis Caching** - Intelligent caching with `@cached_response()`
+**✅ Redis Caching** - Caching with `@cached_response()` decorator
+**✅ Pagination** - Built-in pagination with `@paginate_response()` decorator
+**✅ Search and Filter** - Built-in search and filtering with `@search_and_filter()` decorator
+**✅ Redis Caching** - Caching with `@cached_response()` decorator
+**✅ Pagination** - Built-in pagination with `@paginate_response()` decorator
+**✅ Search and Filter** - Built-in search and filtering with `@search_and_filter()` decorator
 
 ### Example Controller Pattern:
 
