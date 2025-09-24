@@ -362,6 +362,6 @@ For more help, check the main project README or create an issue.
 ## 🔗 Related Documentation
 
 - [Main README](../README.md) - Project overview and setup
-- [Architecture](../architecture.md) - System architecture
+- [Architecture](../docs/architecture.md) - System architecture
 - [API Documentation](http://localhost:8000/api/docs) - Interactive API docs
 - [Makefile](../Makefile) - Available make commands

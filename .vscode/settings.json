@@ -212,5 +212,5 @@
   "ruff.showNotifications": "onError",
   
   // Disable deprecated Python extension features
-  "python.languageServer": "Pylance"
+  "python.languageServer": "None"
 }

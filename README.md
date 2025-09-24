@@ -223,17 +223,14 @@ For more detailed documentation about the scripts, see `scripts/README.md`.
 
 All controllers follow a professional, decorator-based pattern with:
 
-**✅ No Try-Catch Bloat** - Clean code with `@handle_exceptions()` decorator
-**✅ Professional Logging** - Automatic request/response logging with `@log_api_call()` decorator
-**✅ Advanced Filtering** - Built-in search, filtering, and pagination
-**✅ Optimized Queries** - `select_related()` and `prefetch_related()` for performance
-**✅ Consistent Responses** - 201 for creates, 204 for deletes, proper status codes
-**✅ Redis Caching** - Caching with `@cached_response()` decorator
-**✅ Pagination** - Built-in pagination with `@paginate_response()` decorator
-**✅ Search and Filter** - Built-in search and filtering with `@search_and_filter()` decorator
-**✅ Redis Caching** - Caching with `@cached_response()` decorator
-**✅ Pagination** - Built-in pagination with `@paginate_response()` decorator
-**✅ Search and Filter** - Built-in search and filtering with `@search_and_filter()` decorator
+- **✅ No Try-Catch Bloat** - Clean code with `@handle_exceptions()` decorator
+- **✅ Professional Logging** - Automatic request/response logging with `@log_api_call()` decorator
+- **✅ Advanced Filtering** - Built-in search, filtering, and pagination
+- **✅ Optimized Queries** - `select_related()` and `prefetch_related()` for performance
+- **✅ Consistent Responses** - 201 for creates, 204 for deletes, proper status codes
+- **✅ Redis Caching** - Advanced caching with versioning, warming, and management
+- **✅ Pagination** - Built-in pagination with `@paginate_response()` decorator
+- **✅ Search and Filter** - Built-in search and filtering with `@search_and_filter()` decorator
 
 ### Example Controller Pattern:
 
@@ -286,19 +283,34 @@ pytest --cov=.
 
 ## Features
 
-- JWT Authentication
-- Passwordless Authentication
-- PostgreSQL Database
-- Docker & Docker Compose setup
-- Comprehensive test setup with pytest
-- Code formatting with Ruff
-- Production-ready with Gunicorn
-- Environment-based settings
-- Custom user model
-- Admin panel with Django Unfold
-- API throttling and pagination
-- CORS configuration
-- Debug toolbar for development
+### Core Functionality
+
+- **Complete Ecommerce API** - Products, Cart, Orders, Customers, Payments
+- **JWT Authentication** - Django Ninja JWT with refresh tokens
+- **Advanced Caching** - Redis with versioning, warming, and management
+- **Modern Admin** - Django Unfold admin interface
+- **Interactive API Docs** - Swagger/ReDoc with OpenAPI schema
+
+### Database & Storage
+
+- **PostgreSQL 17** - Primary database with optimized schema
+- **Redis 7.2** - Caching, sessions, and Celery broker
+- **File Storage** - Local development, S3-ready for production
+
+### Development Experience
+
+- **UV Package Management** - Fast Python dependency management
+- **Docker Compose** - Development and production configurations
+- **Hot Reloading** - Enhanced development server with live reload
+- **Enhanced Scripts** - Setup, testing, deployment, and quality checks
+- **Comprehensive Testing** - pytest with factories and fixtures
+
+### Code Quality & Monitoring
+
+- **Ruff** - Super-fast linting and formatting
+- **Error Handling** - Professional error management with decorators
+- **Request Logging** - Comprehensive API call logging
+- **Performance Monitoring** - Built-in performance tracking
 
 ## Caching System
 
@@ -437,6 +449,26 @@ CACHE_KEY_PREFIX = 'ecommerce'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 ```
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+- **[Architecture](docs/architecture.md)** - Detailed system architecture with diagrams and technical specifications
+- **[System Design](docs/system-design.md)** - Implementation details, current status, and technology stack
+- **[User Journeys](docs/user_journeys.md)** - Customer experience flows and interaction patterns
+- **[Machine Learning Features](docs/machine-learning-features.md)** - ML roadmap and learning objectives
+- **[Project Tasks](docs/todos.md)** - Implementation status and remaining tasks
+
+### App-Specific Documentation
+
+Each app includes its own README with detailed information:
+
+- **[Core App](core/README.md)** - Authentication, users, customers, and base functionality
+- **[Products App](products/README.md)** - Product management, categories, and inventory
+- **[Cart App](cart/README.md)** - Shopping cart and session management
+- **[Orders App](orders/README.md)** - Order processing, payments, and fulfillment
+- **[Scripts](scripts/README.md)** - Development scripts and automation tools
 
 ## Database
 
