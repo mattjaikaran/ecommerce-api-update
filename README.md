@@ -19,33 +19,35 @@ E-Commerce API built with Django Ninja and Postgres
 - Docker & Docker Compose (optimized for OrbStack)
 - [Celery](https://docs.celeryq.dev/) for background tasks
 - [Flower](https://flower.readthedocs.io/) for Celery monitoring
-- pytest for testing
+- Pytest for testing
+- Faker for generating test data
 - Gunicorn for production serving
 
 #### Dev Tools & Features
+
+Aiming to use the most modern tooling and features for the best developer experience.
 
 - **uv** for fast dependency management and virtual environments
 - **Ruff** for super-fast linting and formatting (configured in `pyproject.toml`)
 - **Makefile** to run commands
 - **PyTest** for unit tests with coverage reporting
-- **Custom Start App** command to create a new app
-  - with extended functionality for Django Ninja, Django Ninja Extra, and Django Unfold
-  - `make startapp <app_name>`
+- **Custom StartApp** command to create a new app with extended functionality for Django Ninja, Django Ninja Extra, and Django Unfold
+  - `make startapp <app_name>` to create a new app with extended functionality
 - **[Faker](https://faker.readthedocs.io/en/master/)** for generating realistic test data
   - See `@/core/management/commands/generate_core_data.py` for more information
-- **[Swagger UI](https://swagger.io/)** for interactive API documentation
+- **[ReDoc](https://redocly.github.io/redoc/)** for interactive API documentation
   - [Localhost Docs](http://localhost:8000/api/docs)
 - **[Debug Toolbar](https://django-debug-toolbar.readthedocs.io/en/latest)** for debugging
 - **Environment Variables** for configuration (see `env.example`)
 - **Advanced Decorators** for clean controller code:
-  - `@handle_exceptions()` - Professional error handling
-  - `@log_api_call()` - Request/response logging
-  - `@paginate_response()` - Automatic pagination
-  - `@search_and_filter()` - Advanced filtering and search
+  - `@handle_exceptions()` - Built in error handling
+  - `@log_api_call()` - Logger for request/response
+  - `@paginate_response()` - Pagination for responses
+  - `@search_and_filter()` - Advanced filtering and search with django ninja extra
   - `@cached_response()` - Redis caching
-  - `@require_authentication()` / `@require_admin()` - Authorization
+  - `@require_authentication()` / `@require_admin()` - Authorization for different levels of access
 
-## 🚀 Quick Start with Docker (Recommended)
+## Quick Start with Docker (Recommended)
 
 ```bash
 # Clone the repository
@@ -67,7 +69,7 @@ docker-compose exec django python manage.py createsuperuser
 docker-compose exec django python manage.py generate_core_data
 ```
 
-**🎯 Your services will be available at:**
+**Services will be available at:**
 
 - **API Documentation**: http://localhost:8000/api/docs
 - **Django Admin**: http://localhost:8000/admin
@@ -75,7 +77,7 @@ docker-compose exec django python manage.py generate_core_data
 - **PostgreSQL**: localhost:5432
 - **Redis**: localhost:6379
 
-## 🛠️ Local Development with uv (Alternative)
+## Local Development with uv (Alternative)
 
 ```bash
 # Clone and navigate
@@ -95,9 +97,9 @@ cp env.example .env
 # Edit .env with your local database settings
 
 # Run migrations and create superuser
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
+uv run python manage.py runserver
 ```
 
 ## Commands
@@ -212,25 +214,19 @@ All developer scripts include:
 
 For more detailed documentation about the scripts, see `scripts/README.md`.
 
-### Django Ninja Serialization
-
-- Django Ninja uses Pydantic models (Schemas) for serialization, not Django serializers like in DRF.
-- The response parameter in the route decorator specifies the expected response format.
-- Use from_orm() to convert Django ORM objects to Pydantic models.
-- Django Ninja automatically handles the conversion to JSON in the HTTP response.
-
-## 🏗️ Modern Controller Architecture
+## Modern Controller Architecture
 
 All controllers follow a professional, decorator-based pattern with:
 
-- **✅ No Try-Catch Bloat** - Clean code with `@handle_exceptions()` decorator
-- **✅ Professional Logging** - Automatic request/response logging with `@log_api_call()` decorator
-- **✅ Advanced Filtering** - Built-in search, filtering, and pagination
-- **✅ Optimized Queries** - `select_related()` and `prefetch_related()` for performance
-- **✅ Consistent Responses** - 201 for creates, 204 for deletes, proper status codes
-- **✅ Redis Caching** - Advanced caching with versioning, warming, and management
-- **✅ Pagination** - Built-in pagination with `@paginate_response()` decorator
-- **✅ Search and Filter** - Built-in search and filtering with `@search_and_filter()` decorator
+- **Built in exception handling** - Clean code with `@handle_exceptions()` decorator
+- **Request/response logging** - Logger for request/response with `@log_api_call()` decorator
+- **Advanced Filtering** - Built-in search, filtering, and pagination with `@search_and_filter()` decorator
+- **Optimized Queries** - `select_related()` and `prefetch_related()` for performance
+- **Consistent Responses** - 201 for creates, 204 for deletes, proper status codes
+- **Redis Caching** - Advanced caching with versioning, warming, and management commands with `@cached_response()` decorator
+- **Pagination** - Built-in pagination with `@paginate_response()` decorator
+- **Search and Filter** - Built-in search and filtering with `@search_and_filter()` decorator
+- **RBAC** - Role-based access control with `@require_permissions()` decorator
 
 ### Example Controller Pattern:
 
@@ -254,7 +250,7 @@ class ProductController:
         return 200, Product.objects.filter(is_active=True)
 ```
 
-## 🚀 Production Deployment
+## Production Deployment
 
 1. Update `.env` with production settings
 2. Build and run with Docker:
@@ -278,18 +274,19 @@ pytest --cov=.
 
 ## API Documentation
 
-- Swagger UI: `/api/docs`
-- ReDoc: `/api/redoc`
+- ReDoc: `/api/docs`
 
 ## Features
 
 ### Core Functionality
 
-- **Complete Ecommerce API** - Products, Cart, Orders, Customers, Payments
+- **Complete Ecommerce API** - Products, Cart, Orders, Customers, Payments with comprehensive features
 - **JWT Authentication** - Django Ninja JWT with refresh tokens
 - **Advanced Caching** - Redis with versioning, warming, and management
-- **Modern Admin** - Django Unfold admin interface
-- **Interactive API Docs** - Swagger/ReDoc with OpenAPI schema
+- **Modern Admin Panel** - Django Unfold admin interface
+- **Enhanced Searching** - Enhanced searching using django ninja extra search and filter functionality
+- **Custom Mailer Service** - Email service with HTML, plain text, and bulk email sending with templating support
+- **Interactive API Docs** - ReDoc with OpenAPI schema
 
 ### Database & Storage
 
@@ -302,7 +299,7 @@ pytest --cov=.
 - **UV Package Management** - Fast Python dependency management
 - **Docker Compose** - Development and production configurations
 - **Hot Reloading** - Enhanced development server with live reload
-- **Enhanced Scripts** - Setup, testing, deployment, and quality checks
+- **Enhanced Scripts** - Setup, testing, deployment, and quality checks with Bash and Python scripts
 - **Comprehensive Testing** - pytest with factories and fixtures
 
 ### Code Quality & Monitoring
@@ -450,7 +447,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 ```
 
-## 📚 Documentation
+## Documentation
 
 Comprehensive documentation is available in the `docs/` directory:
 
